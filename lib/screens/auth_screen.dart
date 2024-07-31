@@ -19,8 +19,9 @@ class _AuthScreenState extends State<AuthScreen> {
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.all(24),
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -92,19 +93,16 @@ class _AuthScreenState extends State<AuthScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: cPrimary100,
                     foregroundColor: cWhite,
-                  ),
-                  child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 16),
-                    child: SizedBox(
-                      width: MediaQuery.of(context).size.width,
-                      child: Text(
-                        'Masuk',
-                        textAlign: TextAlign.center,
-                        style:
-                            Theme.of(context).textTheme.titleMedium!.copyWith(
-                                  color: cWhite,
-                                ),
-                      ),
+                  ),
+                  child: SizedBox(
+                    width: MediaQuery.of(context).size.width,
+                    child: Text(
+                      'Masuk',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                            color: cWhite,
+                          ),
                     ),
                   ),
                 ),
@@ -118,12 +116,9 @@ class _AuthScreenState extends State<AuthScreen> {
                         ),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 24),
-                  child: Container(
-                    height: 1,
-                    decoration: const BoxDecoration(color: cDark600),
-                  ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 8),
+                  child: Divider(color: cDark600),
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -134,13 +129,11 @@ class _AuthScreenState extends State<AuthScreen> {
                             color: cDark300,
                           ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 8),
                     OutlinedButton(
                       style: OutlinedButton.styleFrom(
                         foregroundColor: cPrimary100,
-                        side: const BorderSide(
-                          color: cDark600,
-                        ),
+                        side: const BorderSide(color: cDark600),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -161,10 +154,9 @@ class _AuthScreenState extends State<AuthScreen> {
                   children: [
                     Text(
                       'Copyright ',
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodySmall!
-                          .copyWith(color: cDark600),
+                      style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                            color: cDark600,
+                          ),
                     ),
                     const Icon(
                       Icons.copyright,
@@ -173,10 +165,9 @@ class _AuthScreenState extends State<AuthScreen> {
                     ),
                     Text(
                       ' 2024 Top Mortar Seller',
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodySmall!
-                          .copyWith(color: cDark600),
+                      style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                            color: cDark600,
+                          ),
                     ),
                   ],
                 ),
