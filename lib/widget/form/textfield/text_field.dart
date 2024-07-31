@@ -21,6 +21,7 @@ class MTextField extends StatefulWidget {
     this.margin = const EdgeInsets.only(
       bottom: 12,
     ),
+    this.inputAction,
     this.rightContent,
   });
   final String? id;
@@ -39,6 +40,7 @@ class MTextField extends StatefulWidget {
   final TextInputType keyboardType;
   final EdgeInsets margin;
   final Widget? rightContent;
+  final TextInputAction? inputAction;
 
   @override
   State<MTextField> createState() => _MTextFieldState();
@@ -103,6 +105,7 @@ class _MTextFieldState extends State<MTextField> {
           Expanded(
             child: TextFormField(
               keyboardType: widget.keyboardType,
+              textInputAction: widget.inputAction,
               enabled: widget.enabled,
               controller: textEditingController,
               focusNode: focusNode,
