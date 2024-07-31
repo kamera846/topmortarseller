@@ -112,8 +112,11 @@ class _MTextFieldState extends State<MTextField> {
               validator: widget.validator,
               maxLength: widget.maxLength,
               obscureText: widget.obscure,
+              style: const TextStyle(color: cDark400),
               decoration: InputDecoration(
                 labelText: widget.label,
+                labelStyle:
+                    TextStyle(color: _isFocused ? cPrimary100 : cDark600),
                 prefixIcon: widget.prefixIcon == null
                     ? null
                     : Icon(
