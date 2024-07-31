@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:topmortarseller/screens/splash_screen.dart';
+import 'package:topmortarseller/data/auth_settings.dart';
+import 'package:topmortarseller/models/auth_settings_model.dart';
 import 'package:topmortarseller/util/validator/validator.dart';
 import 'package:topmortarseller/widget/form/textfield/text_field.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 
 class AuthScreen extends StatefulWidget {
-  const AuthScreen({super.key});
+  const AuthScreen({super.key, this.authType = AuthType.login});
+
+  final AuthType authType;
 
   @override
   State<AuthScreen> createState() => _AuthScreenState();
@@ -26,28 +29,34 @@ class _AuthScreenState extends State<AuthScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Hero(
-                  tag: 'favicon-auth',
+                  tag: AuthTagHero.faviconAuth,
                   child: Image.asset(
                     'assets/favicon/favicon_circle.png',
                     width: 100,
                   ),
                 ),
                 const SizedBox(height: 12),
-                Text(
-                  'Top Mortar Seller',
-                  style: Theme.of(context).textTheme.headlineSmall!.copyWith(
-                        color: cDark100,
-                      ),
+                Hero(
+                  tag: AuthTagHero.titleAuth,
+                  child: Text(
+                    authSettings[widget.authType]!.title,
+                    style: Theme.of(context).textTheme.headlineSmall!.copyWith(
+                          color: cDark100,
+                        ),
+                  ),
                 ),
                 const SizedBox(height: 6),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Text(
-                    'Gunakan akun yang terdaftar untuk melanjutkan.',
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                          color: cDark300,
-                        ),
+                Hero(
+                  tag: AuthTagHero.descriptionAuth,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Text(
+                      authSettings[widget.authType]!.description,
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                            color: cDark300,
+                          ),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 48),
@@ -59,37 +68,33 @@ class _AuthScreenState extends State<AuthScreen> {
                   validator: Validator.number,
                   onChanged: (value) {},
                 ),
-                MTextField(
-                  label: 'Password',
-                  inputAction: TextInputAction.done,
-                  obscure: _isPasswordHidden,
-                  prefixIcon: Icons.lock_outline,
-                  validator: Validator.required,
-                  onChanged: (value) {},
-                  rightContent: TextButton(
-                    onPressed: () {
-                      setState(() {
-                        _isPasswordHidden = !_isPasswordHidden;
-                      });
-                    },
-                    child: Text(
-                      _isPasswordHidden ? 'Tampilkan' : 'Sembunyikan',
-                      style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                            color: cDark300,
+                widget.authType == AuthType.login
+                    ? MTextField(
+                        label: 'Kata Sandi',
+                        inputAction: TextInputAction.done,
+                        obscure: _isPasswordHidden,
+                        prefixIcon: Icons.lock_outline,
+                        validator: Validator.required,
+                        onChanged: (value) {},
+                        rightContent: TextButton(
+                          onPressed: () {
+                            setState(() {
+                              _isPasswordHidden = !_isPasswordHidden;
+                            });
+                          },
+                          child: Text(
+                            _isPasswordHidden ? 'Tampilkan' : 'Sembunyikan',
+                            style:
+                                Theme.of(context).textTheme.bodySmall!.copyWith(
+                                      color: cDark300,
+                                    ),
                           ),
-                    ),
-                  ),
-                ),
+                        ),
+                      )
+                    : Container(),
                 const SizedBox(height: 24),
                 ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const SplashScreen(),
-                      ),
-                    );
-                  },
+                  onPressed: () {},
                   style: ElevatedButton.styleFrom(
                     backgroundColor: cPrimary100,
                     foregroundColor: cWhite,
@@ -98,7 +103,7 @@ class _AuthScreenState extends State<AuthScreen> {
                   child: SizedBox(
                     width: MediaQuery.of(context).size.width,
                     child: Text(
-                      'Masuk',
+                      authSettings[widget.authType]!.elevatedButtonText,
                       textAlign: TextAlign.center,
                       style: Theme.of(context).textTheme.titleMedium!.copyWith(
                             color: cWhite,
@@ -106,70 +111,114 @@ class _AuthScreenState extends State<AuthScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 8),
-                TextButton(
-                  onPressed: () {},
-                  child: Text(
-                    'Lupa Password',
-                    style: Theme.of(context).textTheme.titleSmall!.copyWith(
-                          color: cPrimary300,
-                        ),
-                  ),
-                ),
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 8),
-                  child: Divider(color: cDark600),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Belum punya akun?',
-                      style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                            color: cDark300,
+                widget.authType == AuthType.login
+                    ? const SizedBox(height: 8)
+                    : Container(),
+                widget.authType == AuthType.login
+                    ? Hero(
+                        tag: AuthTagHero.forgotButtonAuth,
+                        child: TextButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (ctx) => const AuthScreen(
+                                  authType: AuthType.forgot,
+                                ),
+                              ),
+                            );
+                          },
+                          child: Text(
+                            'Lupa Kata Sandi',
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleSmall!
+                                .copyWith(
+                                  color: cPrimary300,
+                                ),
                           ),
-                    ),
-                    const SizedBox(width: 8),
-                    OutlinedButton(
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: cPrimary100,
-                        side: const BorderSide(color: cDark600),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
                         ),
-                      ),
-                      onPressed: () {},
-                      child: Text(
-                        'Daftar Sekarang?',
+                      )
+                    : Container(),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: widget.authType == AuthType.login
+                      ? const Divider(color: cDark600)
+                      : Container(),
+                ),
+                Hero(
+                  tag: AuthTagHero.outlinedButtonContainer,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        authSettings[widget.authType]!
+                            .outlinedButtonDescription,
                         style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                              color: cPrimary100,
+                              color: cDark300,
                             ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 8),
+                      OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: cPrimary100,
+                          side: const BorderSide(color: cDark600),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        onPressed: () {
+                          if (widget.authType == AuthType.register ||
+                              widget.authType == AuthType.forgot) {
+                            Navigator.pop(context);
+                            return;
+                          }
+
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (ctx) => const AuthScreen(
+                                authType: AuthType.register,
+                              ),
+                            ),
+                          );
+                        },
+                        child: Text(
+                          authSettings[widget.authType]!.outlinedButtonText,
+                          style:
+                              Theme.of(context).textTheme.bodySmall!.copyWith(
+                                    color: cPrimary100,
+                                  ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 48),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Copyright ',
-                      style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                            color: cDark600,
-                          ),
-                    ),
-                    const Icon(
-                      Icons.copyright,
-                      color: cDark600,
-                      size: 12,
-                    ),
-                    Text(
-                      ' 2024 Top Mortar Seller',
-                      style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                            color: cDark600,
-                          ),
-                    ),
-                  ],
+                Hero(
+                  tag: AuthTagHero.copyrightAuth,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Copyright ',
+                        style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                              color: cDark600,
+                            ),
+                      ),
+                      const Icon(
+                        Icons.copyright,
+                        color: cDark600,
+                        size: 12,
+                      ),
+                      Text(
+                        ' 2024 Top Mortar Seller',
+                        style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                              color: cDark600,
+                            ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
