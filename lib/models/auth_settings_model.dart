@@ -4,6 +4,18 @@ enum AuthType {
   forgot,
 }
 
+enum AuthTagHero {
+  faviconAuth,
+  titleAuth,
+  descriptionAuth,
+  inputPhoneAuth,
+  inputPasswordAuth,
+  elevatedButtonAuth,
+  forgotButtonAuth,
+  outlinedButtonContainer,
+  copyrightAuth,
+}
+
 class AuthSettingsModel {
   const AuthSettingsModel(
     this.title,
