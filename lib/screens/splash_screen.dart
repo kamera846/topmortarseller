@@ -12,14 +12,19 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
+    _delayNavigate();
+  }
+
+  void _delayNavigate() async {
+    await Future.delayed(const Duration(milliseconds: 2000), () {});
     _returnHomScreen();
   }
 
-  void _returnHomScreen() async {
-    await Future.delayed(Duration(milliseconds: 3000), () {});
-    Navigator.of(context).pushReplacement(
+  void _returnHomScreen() {
+    Navigator.pushReplacement(
+      context,
       MaterialPageRoute(
-        builder: (ctx) => const AuthScreen(),
+        builder: (context) => const AuthScreen(),
       ),
     );
   }
@@ -29,9 +34,16 @@ class _SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       body: SafeArea(
         child: Center(
-          child: Image.asset(
-            'assets/logo.png',
+          // child: InkWell(
+          // onTap: _returnHomScreen,
+          child: Hero(
+            tag: 'favicon-auth',
+            child: Image.asset(
+              'assets/favicon/favicon_circle.png',
+              width: MediaQuery.of(context).size.width,
+            ),
           ),
+          // ),
         ),
       ),
     );

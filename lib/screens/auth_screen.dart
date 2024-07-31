@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:topmortarseller/screens/splash_screen.dart';
 import 'package:topmortarseller/util/validator/validator.dart';
 import 'package:topmortarseller/widget/form/textfield/text_field.dart';
 import 'package:topmortarseller/util/colors/color.dart';
@@ -23,9 +24,12 @@ class _AuthScreenState extends State<AuthScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Image.asset(
-                  'assets/favicon/favicon_circle.png',
-                  width: 100,
+                Hero(
+                  tag: 'favicon-auth',
+                  child: Image.asset(
+                    'assets/favicon/favicon_circle.png',
+                    width: 100,
+                  ),
                 ),
                 const SizedBox(height: 12),
                 Text(
@@ -77,7 +81,14 @@ class _AuthScreenState extends State<AuthScreen> {
                 ),
                 const SizedBox(height: 24),
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const SplashScreen(),
+                      ),
+                    );
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: cPrimary100,
                     foregroundColor: cWhite,
