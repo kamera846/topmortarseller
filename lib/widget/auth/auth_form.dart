@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
 import 'package:topmortarseller/data/auth_settings.dart';
 import 'package:topmortarseller/model/auth_settings_model.dart';
 import 'package:topmortarseller/screen/auth_screen.dart';
@@ -22,6 +23,12 @@ class AuthFormWidget extends StatefulWidget {
 }
 
 class _AuthFormWidgetState extends State<AuthFormWidget> {
+  final _phoneController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+  String? _phoneError;
+  String? _passwordError;
+  String? _confirmPasswordError;
   bool _isPasswordHidden = true;
   bool _isConfirmPasswordHidden = true;
 
@@ -40,6 +47,19 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
     final authType = widget.authType;
 
     if (authType == AuthType.login) {
+      final String? phoneValidator = Validator.phoneAuth(_phoneController.text);
+      final String? passwordValidator =
+          Validator.passwordAuth(_passwordController.text);
+
+      setState(() {
+        _phoneError = phoneValidator;
+        _passwordError = passwordValidator;
+      });
+
+      if (phoneValidator != null || passwordValidator != null) return;
+      _phoneController.text = '';
+      _passwordController.text = '';
+
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -170,11 +190,11 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
     if (isPhoneFieldShow) {
       formList.add(
         MTextField(
+          controller: _phoneController,
           label: 'Nomor Telpon',
-          inputAction: TextInputAction.next,
           prefixIcon: Icons.phone,
           keyboardType: TextInputType.phone,
-          validator: Validator.number,
+          errorText: _phoneError,
           onChanged: (value) {},
         ),
       );
@@ -183,11 +203,11 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
     if (isPasswordFieldShow) {
       formList.add(
         MTextField(
+          controller: _passwordController,
           label: 'Kata Sandi',
-          inputAction: TextInputAction.done,
           obscure: _isPasswordHidden,
           prefixIcon: Icons.lock_outline,
-          validator: Validator.required,
+          errorText: _passwordError,
           onChanged: (value) {},
           rightContent: TextButton(
             onPressed: () {
@@ -209,11 +229,11 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
     if (isConfirmPasswordFieldShow) {
       formList.add(
         MTextField(
+          controller: _confirmPasswordController,
           label: 'Konfirmasi Kata Sandi',
-          inputAction: TextInputAction.done,
           obscure: _isConfirmPasswordHidden,
           prefixIcon: Icons.lock_outline,
-          validator: Validator.required,
+          errorText: _confirmPasswordError,
           onChanged: (value) {},
           rightContent: TextButton(
             onPressed: () {

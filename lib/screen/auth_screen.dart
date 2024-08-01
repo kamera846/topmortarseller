@@ -21,26 +21,22 @@ class _AuthScreenState extends State<AuthScreen> {
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
-          child: SizedBox(
-            height: MediaQuery.of(context).size.height,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                AuthHeaderWidget(authType: widget.authType),
-                const SizedBox(height: 48),
-                AuthFormWidget(authType: widget.authType),
-                Hero(
-                  tag: AuthTagHero.dividerAuth,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    child: widget.authType == AuthType.login
-                        ? const Divider(color: cDark500)
-                        : Container(),
-                  ),
+          child: Column(
+            children: [
+              AuthHeaderWidget(authType: widget.authType),
+              const SizedBox(height: 48),
+              AuthFormWidget(authType: widget.authType),
+              Hero(
+                tag: AuthTagHero.dividerAuth,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: widget.authType == AuthType.login
+                      ? const Divider(color: cDark500)
+                      : Container(),
                 ),
-                AuthFooterWidget(authType: widget.authType),
-              ],
-            ),
+              ),
+              AuthFooterWidget(authType: widget.authType),
+            ],
           ),
         ),
       ),
