@@ -126,6 +126,25 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
     }
 
     if (authType == AuthType.resetPassword) {
+      final String? passwordValidator =
+          Validator.passwordAuth(_passwordController.text);
+      final String? confirmPasswordValidator =
+          Validator.passwordAuth(_confirmPasswordController.text);
+      final String? passwordMatchesValidator = Validator.passwordMatches(
+          _passwordController.text, _confirmPasswordController.text);
+
+      setState(() {
+        _passwordError = passwordValidator;
+        _confirmPasswordError =
+            confirmPasswordValidator ?? passwordMatchesValidator;
+      });
+
+      if (passwordValidator != null ||
+          confirmPasswordValidator != null ||
+          passwordMatchesValidator != null) return;
+      _passwordController.text = '';
+      _confirmPasswordController.text = '';
+
       _showCustomDialog(context);
     }
   }

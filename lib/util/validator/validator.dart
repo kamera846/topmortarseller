@@ -18,6 +18,13 @@ class Validator {
     return null;
   }
 
+  static String? passwordMatches(String value1, String value2) {
+    if (value1 != value2) {
+      return 'Kata sandi tidak cocok!';
+    }
+    return null;
+  }
+
   static String? otpAuth(String? value, int otpLength) {
     if (value == null || value.isEmpty || value.trim().length < otpLength) {
       return 'Isi semua kolom otp!';
