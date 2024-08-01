@@ -20,7 +20,7 @@ class _AuthScreenState extends State<AuthScreen> {
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 48),
           child: Column(
             children: [
               AuthHeaderWidget(authType: widget.authType),
