@@ -8,6 +8,7 @@ import 'package:topmortarseller/widget/form/button/elevated_button.dart';
 import 'package:topmortarseller/widget/form/button/text_button.dart';
 import 'package:topmortarseller/widget/form/textfield/text_field.dart';
 import 'package:topmortarseller/widget/form/textfield/text_otp_field.dart';
+import 'package:topmortarseller/widget/modal/store_info_modal.dart';
 
 class AuthFormWidget extends StatefulWidget {
   const AuthFormWidget({super.key, this.authType = AuthType.login});
@@ -35,6 +36,10 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
   void _elevatedButtonAction() {
     final authType = widget.authType;
 
+    if (authType == AuthType.register) {
+      _showCustomDialog(context);
+    }
+
     if (authType == AuthType.forgot) {
       Navigator.pushReplacement(
         context,
@@ -45,6 +50,31 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
         ),
       );
     }
+  }
+
+  void _showCustomDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StoreInfoModal(
+          name: 'Barokah Jaya Mandiri',
+          address: 'Jl Anggrek 3 asrikaton kec. pakis malang',
+          onCancel: () {
+            Navigator.of(context).pop();
+          },
+          onConfirm: () {
+            Navigator.of(context).pop();
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: ((context) => const AuthScreen(
+                      authType: AuthType.otp,
+                    )),
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   @override
