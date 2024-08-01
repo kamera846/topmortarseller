@@ -69,6 +69,15 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
     }
 
     if (authType == AuthType.forgot) {
+      final String? phoneValidator = Validator.phoneAuth(_phoneController.text);
+
+      setState(() {
+        _phoneError = phoneValidator;
+      });
+
+      if (phoneValidator != null) return;
+      _phoneController.text = '';
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -91,6 +100,15 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
     }
 
     if (authType == AuthType.register) {
+      final String? phoneValidator = Validator.phoneAuth(_phoneController.text);
+
+      setState(() {
+        _phoneError = phoneValidator;
+      });
+
+      if (phoneValidator != null) return;
+      _phoneController.text = '';
+
       _showCustomDialog(context);
     }
 
