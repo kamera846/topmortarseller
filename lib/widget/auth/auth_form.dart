@@ -7,6 +7,7 @@ import 'package:topmortarseller/util/validator/validator.dart';
 import 'package:topmortarseller/widget/form/button/elevated_button.dart';
 import 'package:topmortarseller/widget/form/button/text_button.dart';
 import 'package:topmortarseller/widget/form/textfield/text_field.dart';
+import 'package:topmortarseller/widget/form/textfield/text_otp_field.dart';
 
 class AuthFormWidget extends StatefulWidget {
   const AuthFormWidget({super.key, this.authType = AuthType.login});
@@ -20,7 +21,7 @@ class AuthFormWidget extends StatefulWidget {
 class _AuthFormWidgetState extends State<AuthFormWidget> {
   bool _isPasswordHidden = true;
 
-  void _navigateToForgot() {
+  void _forgotButton() {
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -29,6 +30,21 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
         ),
       ),
     );
+  }
+
+  void _elevatedButtonAction() {
+    final authType = widget.authType;
+
+    if (authType == AuthType.forgot) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (ctx) => const AuthScreen(
+            authType: AuthType.otp,
+          ),
+        ),
+      );
+    }
   }
 
   @override
@@ -57,14 +73,16 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
                 ),
               )
             : Container(),
-        MTextField(
-          label: 'Nomor Telpon',
-          inputAction: TextInputAction.next,
-          prefixIcon: Icons.phone,
-          keyboardType: TextInputType.phone,
-          validator: Validator.number,
-          onChanged: (value) {},
-        ),
+        widget.authType != AuthType.otp
+            ? MTextField(
+                label: 'Nomor Telpon',
+                inputAction: TextInputAction.next,
+                prefixIcon: Icons.phone,
+                keyboardType: TextInputType.phone,
+                validator: Validator.number,
+                onChanged: (value) {},
+              )
+            : Container(),
         widget.authType == AuthType.login
             ? MTextField(
                 label: 'Kata Sandi',
@@ -82,15 +100,18 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
                   child: Text(
                     _isPasswordHidden ? 'Tampilkan' : 'Sembunyikan',
                     style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                          color: cDark300,
+                          color: cDark600,
                         ),
                   ),
                 ),
               )
             : Container(),
+        widget.authType == AuthType.otp
+            ? MOtpForm(onCompleted: (otp) {})
+            : Container(),
         const SizedBox(height: 24),
         MElevatedButton(
-          onPressed: () {},
+          onPressed: _elevatedButtonAction,
           isFullWidth: true,
           title: authSettings[widget.authType]!.elevatedButtonText,
         ),
@@ -101,7 +122,7 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
             ? Hero(
                 tag: AuthTagHero.forgotButtonAuth,
                 child: MTextButton(
-                  onPressed: _navigateToForgot,
+                  onPressed: _forgotButton,
                   title: 'Lupa Kata Sandi',
                 ),
               )

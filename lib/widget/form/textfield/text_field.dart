@@ -97,7 +97,7 @@ class _MTextFieldState extends State<MTextField> {
         ),
         border: Border.all(
           color: _isFocused ? cPrimary100 : cDark600,
-          width: 1.0,
+          width: _isFocused ? 2 : 1,
         ),
       ),
       child: Row(

@@ -34,6 +34,11 @@ class _AuthFooterWidgetState extends State<AuthFooterWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final String? outlinedButtonDescription =
+        authSettings[widget.authType]!.outlinedButtonDescription;
+    final String? outlinedButtonText =
+        authSettings[widget.authType]!.outlinedButtonText;
+
     return Column(
       children: [
         Hero(
@@ -41,17 +46,21 @@ class _AuthFooterWidgetState extends State<AuthFooterWidget> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                authSettings[widget.authType]!.outlinedButtonDescription,
-                style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                      color: cDark300,
-                    ),
-              ),
+              outlinedButtonDescription != null
+                  ? Text(
+                      outlinedButtonDescription,
+                      style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                            color: cDark300,
+                          ),
+                    )
+                  : Container(),
               const SizedBox(width: 8),
-              MOutlinedButton(
-                onPressed: _outlinedButtonAction,
-                title: authSettings[widget.authType]!.outlinedButtonText,
-              ),
+              outlinedButtonText != null
+                  ? MOutlinedButton(
+                      onPressed: _outlinedButtonAction,
+                      title: outlinedButtonText,
+                    )
+                  : Container(),
             ],
           ),
         ),

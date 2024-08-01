@@ -21,5 +21,12 @@ const authSettings = {
     'Dapatkan OTP',
     'Sudah ingat sandi anda?',
     'Masuk Sekarang!',
-  )
+  ),
+  AuthType.otp: AuthSettingsModel(
+    'Masukan Kode OTP',
+    'Kode otp sudah dikirim ke nomor tujuan.',
+    'Lanjutkan',
+    null,
+    null,
+  ),
 };

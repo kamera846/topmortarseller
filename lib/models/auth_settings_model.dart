@@ -2,6 +2,7 @@ enum AuthType {
   login,
   register,
   forgot,
+  otp,
 }
 
 enum AuthTagHero {
@@ -30,6 +31,6 @@ class AuthSettingsModel {
   final String title;
   final String description;
   final String elevatedButtonText;
-  final String outlinedButtonDescription;
-  final String outlinedButtonText;
+  final String? outlinedButtonDescription;
+  final String? outlinedButtonText;
 }
