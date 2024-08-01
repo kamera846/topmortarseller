@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:topmortarseller/data/auth_settings.dart';
 import 'package:topmortarseller/model/auth_settings_model.dart';
 import 'package:topmortarseller/screen/auth_screen.dart';
+import 'package:topmortarseller/screen/home_screen.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/util/validator/validator.dart';
 import 'package:topmortarseller/widget/form/button/elevated_button.dart';
@@ -38,8 +39,13 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
   void _elevatedButtonAction() {
     final authType = widget.authType;
 
-    if (authType == AuthType.register || authType == AuthType.resetPassword) {
-      _showCustomDialog(context);
+    if (authType == AuthType.login) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (ctx) => const HomeScreen(),
+        ),
+      );
     }
 
     if (authType == AuthType.forgot) {
@@ -62,6 +68,14 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
           ),
         ),
       );
+    }
+
+    if (authType == AuthType.register) {
+      _showCustomDialog(context);
+    }
+
+    if (authType == AuthType.resetPassword) {
+      _showCustomDialog(context);
     }
   }
 
