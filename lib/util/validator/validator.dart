@@ -17,4 +17,11 @@ class Validator {
     }
     return null;
   }
+
+  static String? otpAuth(String? value, int otpLength) {
+    if (value == null || value.isEmpty || value.trim().length < otpLength) {
+      return 'Isi semua kolom otp!';
+    }
+    return null;
+  }
 }

@@ -23,12 +23,15 @@ class AuthFormWidget extends StatefulWidget {
 }
 
 class _AuthFormWidgetState extends State<AuthFormWidget> {
+  final _otpLength = 6;
   final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  String? _otpController;
   String? _phoneError;
   String? _passwordError;
   String? _confirmPasswordError;
+  String? _otpError;
   bool _isPasswordHidden = true;
   bool _isConfirmPasswordHidden = true;
 
@@ -89,6 +92,16 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
     }
 
     if (authType == AuthType.otp) {
+      final String? otpValidator =
+          Validator.otpAuth(_otpController, _otpLength);
+
+      setState(() {
+        _otpError = otpValidator;
+      });
+
+      if (otpValidator != null) return;
+      _otpController = '';
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -272,7 +285,16 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
 
     if (isOtpFieldShow) {
       formList.add(
-        MOtpForm(onCompleted: (otp) {}),
+        MOtpForm(
+          errorText: _otpError,
+          otpLength: _otpLength,
+          onChange: (value) {
+            _otpController = value;
+          },
+          onCompleted: (otp) {
+            _otpController = otp;
+          },
+        ),
       );
     }
 
