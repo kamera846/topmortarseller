@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:topmortarseller/screens/splash_screen.dart';
+import 'package:topmortarseller/screen/splash_screen.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 
 final mColorScheme =

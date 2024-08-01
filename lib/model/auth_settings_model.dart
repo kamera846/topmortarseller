@@ -3,6 +3,7 @@ enum AuthType {
   register,
   forgot,
   otp,
+  resetPassword,
 }
 
 enum AuthTagHero {

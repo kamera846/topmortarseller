@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:topmortarseller/models/auth_settings_model.dart';
-import 'package:topmortarseller/screens/auth_screen.dart';
+import 'package:topmortarseller/model/auth_settings_model.dart';
+import 'package:topmortarseller/screen/auth_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});

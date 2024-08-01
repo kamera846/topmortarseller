@@ -1,4 +1,4 @@
-import 'package:topmortarseller/models/auth_settings_model.dart';
+import 'package:topmortarseller/model/auth_settings_model.dart';
 
 const authSettings = {
   AuthType.login: AuthSettingsModel(
@@ -17,15 +17,22 @@ const authSettings = {
   ),
   AuthType.forgot: AuthSettingsModel(
     'Reset Password',
-    'Masukan nomor untuk mendapatkan kode otp reset password.',
+    'Masukkan nomor untuk mendapatkan kode otp reset password.',
     'Dapatkan OTP',
     'Sudah ingat sandi anda?',
     'Masuk Sekarang!',
   ),
   AuthType.otp: AuthSettingsModel(
-    'Masukan Kode OTP',
+    'Masukkan Kode OTP',
     'Kode otp sudah dikirim ke nomor tujuan.',
     'Lanjutkan',
+    null,
+    null,
+  ),
+  AuthType.resetPassword: AuthSettingsModel(
+    'Reset Password',
+    'Simpanlah password anda agar tidak lupa.',
+    'Reset Sekarang',
     null,
     null,
   ),
