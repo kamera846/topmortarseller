@@ -8,11 +8,13 @@ enum AuthTagHero {
   faviconAuth,
   titleAuth,
   descriptionAuth,
+  backButtonAuth,
   inputPhoneAuth,
   inputPasswordAuth,
   elevatedButtonAuth,
   forgotButtonAuth,
-  outlinedButtonContainer,
+  dividerAuth,
+  outlinedButtonContainerAuth,
   copyrightAuth,
 }
 

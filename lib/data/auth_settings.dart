@@ -13,13 +13,13 @@ const authSettings = {
     'Cek terlebih dahulu apakah nomor anda sudah terdaftar.',
     'Cek Nomor',
     'Sudah punya akun?',
-    'Kembali',
+    'Masuk Sekarang!',
   ),
   AuthType.forgot: AuthSettingsModel(
     'Reset Password',
     'Masukan nomor untuk mendapatkan kode otp reset password.',
     'Dapatkan OTP',
     'Sudah ingat sandi anda?',
-    'Kembali',
+    'Masuk Sekarang!',
   )
 };

@@ -60,6 +60,28 @@ class _AuthScreenState extends State<AuthScreen> {
                   ),
                 ),
                 const SizedBox(height: 48),
+                widget.authType != AuthType.login
+                    ? Hero(
+                        tag: AuthTagHero.backButtonAuth,
+                        child: Row(
+                          children: [
+                            TextButton.icon(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              label: const Text('Kembali'),
+                              style: TextButton.styleFrom(
+                                foregroundColor: cDark600,
+                                padding: const EdgeInsets.all(0),
+                              ),
+                              icon: const Icon(
+                                Icons.arrow_circle_left_rounded,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : Container(),
                 MTextField(
                   label: 'Nomor Telpon',
                   inputAction: TextInputAction.next,
@@ -140,14 +162,17 @@ class _AuthScreenState extends State<AuthScreen> {
                         ),
                       )
                     : Container(),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: widget.authType == AuthType.login
-                      ? const Divider(color: cDark600)
-                      : Container(),
+                Hero(
+                  tag: AuthTagHero.dividerAuth,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: widget.authType == AuthType.login
+                        ? const Divider(color: cDark600)
+                        : Container(),
+                  ),
                 ),
                 Hero(
-                  tag: AuthTagHero.outlinedButtonContainer,
+                  tag: AuthTagHero.outlinedButtonContainerAuth,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
