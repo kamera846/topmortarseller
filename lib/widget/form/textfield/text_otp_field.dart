@@ -72,12 +72,27 @@ class _MOtpFormState extends State<MOtpForm> {
             maxLength: 1,
             decoration: InputDecoration(
               counterText: '',
-              border: OutlineInputBorder(
+              enabledBorder: OutlineInputBorder(
+                borderSide: const BorderSide(color: cDark400, width: 1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: const BorderSide(color: cPrimary100, width: 2),
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
+            // decoration: InputDecoration(
+            //   counterText: '',
+            //   border: OutlineInputBorder(
+            //     borderRadius: BorderRadius.circular(8),
+            //     borderSide: const BorderSide(
+            //       color: cPrimary100,
+            //       width: 5,
+            //     ),
+            //   ),
+            // ),
             style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                  color: cDark400,
+                  color: cDark200,
                   fontWeight: FontWeight.bold,
                 ),
           ),

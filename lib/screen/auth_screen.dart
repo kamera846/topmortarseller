@@ -34,7 +34,7 @@ class _AuthScreenState extends State<AuthScreen> {
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8),
                     child: widget.authType == AuthType.login
-                        ? const Divider(color: cDark600)
+                        ? const Divider(color: cDark500)
                         : Container(),
                   ),
                 ),

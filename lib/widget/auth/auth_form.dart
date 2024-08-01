@@ -83,13 +83,14 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
     final authType = widget.authType;
 
     Widget storeInfoModal = MInfoModal(
-      title: 'Apa benar ini toko anda',
+      title: 'Apa benar ini toko anda?',
       contentName: 'Barokah Jaya Mandiri',
       contentDescription: 'Jl Anggrek 3 asrikaton kec. pakis malang',
       contentIcon: Icons.storefront_outlined,
       onCancel: () {
         Navigator.of(context).pop();
       },
+      confirmText: 'Oke, Lanjut',
       onConfirm: () {
         Navigator.of(context).pop();
         Navigator.of(context).pushReplacement(
@@ -102,10 +103,10 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
       },
     );
     Widget successResetPasswordModal = MInfoModal(
-      title: 'Yeayy, berhasil',
       contentName: 'Password Berhasil Direset',
-      contentDescription: 'Silahkan login menggunakan password anda yang baru.',
+      contentDescription: 'login menggunakan password anda yang baru.',
       contentIcon: Icons.change_circle_rounded,
+      contentIconColor: Colors.green.shade800,
       cancelText: null,
       onConfirm: () {
         Navigator.of(context).pop();
@@ -113,7 +114,7 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
       },
     );
     if (authType == AuthType.register || authType == AuthType.resetPassword) {
-      showDialog(
+      showCupertinoDialog(
         context: context,
         builder: (BuildContext context) {
           if (authType == AuthType.register) {
@@ -143,22 +144,25 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
     if (isBackButtonShow) {
       formList.add(Hero(
         tag: AuthTagHero.backButtonAuth,
-        child: Row(
-          children: [
-            TextButton.icon(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              label: const Text('Kembali'),
-              style: TextButton.styleFrom(
-                foregroundColor: cDark600,
-                padding: const EdgeInsets.all(0),
+        child: Container(
+          margin: const EdgeInsets.only(bottom: 8),
+          child: Row(
+            children: [
+              TextButton.icon(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                label: const Text('Kembali'),
+                style: TextButton.styleFrom(
+                  foregroundColor: cDark100,
+                  padding: const EdgeInsets.all(0),
+                ),
+                icon: const Icon(
+                  Icons.arrow_circle_left_rounded,
+                ),
               ),
-              icon: const Icon(
-                Icons.arrow_circle_left_rounded,
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ));
     }
@@ -194,7 +198,7 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
             child: Text(
               _isPasswordHidden ? 'Tampilkan' : 'Sembunyikan',
               style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                    color: cDark600,
+                    color: cDark300,
                   ),
             ),
           ),
@@ -220,7 +224,7 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
             child: Text(
               _isConfirmPasswordHidden ? 'Tampilkan' : 'Sembunyikan',
               style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                    color: cDark600,
+                    color: cDark300,
                   ),
             ),
           ),

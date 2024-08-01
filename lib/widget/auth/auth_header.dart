@@ -38,7 +38,7 @@ class AuthHeaderWidget extends StatelessWidget {
               authSettings[authType]!.description,
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                    color: cDark300,
+                    color: cDark200,
                   ),
             ),
           ),

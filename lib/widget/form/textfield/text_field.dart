@@ -89,14 +89,13 @@ class _MTextFieldState extends State<MTextField> {
   Widget build(BuildContext context) {
     return Container(
       margin: widget.margin,
-      // padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
         color: Theme.of(context).scaffoldBackgroundColor,
         borderRadius: const BorderRadius.all(
           Radius.circular(8),
         ),
         border: Border.all(
-          color: _isFocused ? cPrimary100 : cDark600,
+          color: _isFocused ? cPrimary100 : cDark400,
           width: _isFocused ? 2 : 1,
         ),
       ),
@@ -112,22 +111,23 @@ class _MTextFieldState extends State<MTextField> {
               validator: widget.validator,
               maxLength: widget.maxLength,
               obscureText: widget.obscure,
-              style: const TextStyle(color: cDark400),
+              style: const TextStyle(color: cDark200),
               decoration: InputDecoration(
                 labelText: widget.label,
                 labelStyle:
-                    TextStyle(color: _isFocused ? cPrimary100 : cDark600),
+                    TextStyle(color: _isFocused ? cPrimary100 : cDark300),
                 prefixIcon: widget.prefixIcon == null
                     ? null
                     : Icon(
                         widget.prefixIcon,
                       ),
-                prefixIconColor: _isFocused ? cPrimary100 : cDark600,
+                prefixIconColor: _isFocused ? cPrimary100 : cDark300,
                 suffixIcon: widget.suffixIcon == null
                     ? null
                     : Icon(
                         widget.suffixIcon,
                       ),
+                suffixIconColor: _isFocused ? cPrimary100 : cDark300,
                 helperText: widget.helper,
                 hintText: widget.hint,
                 enabledBorder: InputBorder.none,

@@ -5,22 +5,24 @@ import 'package:topmortarseller/util/colors/color.dart';
 class MInfoModal extends StatelessWidget {
   const MInfoModal({
     super.key,
-    required this.title,
+    this.title,
     this.contentName,
     this.contentDescription,
     this.cancelText = 'Batal',
     this.confirmText = 'Oke',
     this.contentIcon,
+    this.contentIconColor,
     this.onConfirm,
     this.onCancel,
   });
 
-  final String title;
+  final String? title;
   final String? contentName;
   final String? contentDescription;
   final String? cancelText;
   final String? confirmText;
   final IconData? contentIcon;
+  final Color? contentIconColor;
   final VoidCallback? onConfirm;
   final VoidCallback? onCancel;
 
@@ -46,38 +48,45 @@ class MInfoModal extends StatelessWidget {
       );
     }
 
-    return CupertinoAlertDialog(
-      title: Text(title),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          contentIcon != null
-              ? IconButton.outlined(
-                  onPressed: () {},
-                  icon: Icon(contentIcon),
-                )
-              : Container(),
-          contentName != null
-              ? Text(
-                  contentName!,
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleMedium!
-                      .copyWith(color: cDark100),
-                )
-              : Container(),
-          contentDescription != null
-              ? Text(
-                  contentDescription!,
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyMedium!
-                      .copyWith(color: cDark300),
-                )
-              : Container(),
-        ],
+    return CupertinoPopupSurface(
+      isSurfacePainted: false,
+      child: CupertinoAlertDialog(
+        title: title != null ? Text(title!) : null,
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            contentIcon != null
+                ? Container(
+                    margin: const EdgeInsets.all(8),
+                    child: Icon(
+                      contentIcon,
+                      color: contentIconColor ?? cPrimary100,
+                      size: 32,
+                    ),
+                  )
+                : Container(),
+            contentName != null
+                ? Text(
+                    contentName!,
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleMedium!
+                        .copyWith(color: cDark100),
+                  )
+                : Container(),
+            contentDescription != null
+                ? Text(
+                    contentDescription!,
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyMedium!
+                        .copyWith(color: cDark200),
+                  )
+                : Container(),
+          ],
+        ),
+        actions: actions,
       ),
-      actions: actions,
     );
   }
 }

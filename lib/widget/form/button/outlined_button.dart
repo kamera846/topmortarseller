@@ -30,7 +30,7 @@ class _MOutlinedButtonState extends State<MOutlinedButton> {
     return OutlinedButton(
       style: OutlinedButton.styleFrom(
         foregroundColor: cPrimary100,
-        side: const BorderSide(color: cDark600),
+        side: const BorderSide(color: cDark400),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
         ),

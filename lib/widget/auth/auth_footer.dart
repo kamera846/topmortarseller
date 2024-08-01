@@ -49,9 +49,7 @@ class _AuthFooterWidgetState extends State<AuthFooterWidget> {
               outlinedButtonDescription != null
                   ? Text(
                       outlinedButtonDescription,
-                      style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                            color: cDark300,
-                          ),
+                      style: Theme.of(context).textTheme.bodySmall,
                     )
                   : Container(),
               const SizedBox(width: 8),
@@ -73,18 +71,18 @@ class _AuthFooterWidgetState extends State<AuthFooterWidget> {
               Text(
                 'Copyright ',
                 style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                      color: cDark600,
+                      color: cDark300,
                     ),
               ),
               const Icon(
                 Icons.copyright,
-                color: cDark600,
+                color: cDark300,
                 size: 12,
               ),
               Text(
                 ' 2024 Top Mortar Seller',
                 style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                      color: cDark600,
+                      color: cDark300,
                     ),
               ),
             ],
