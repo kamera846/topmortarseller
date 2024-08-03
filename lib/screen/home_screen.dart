@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:topmortarseller/model/auth_settings_model.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/widget/drawer/main_drawer.dart';
+import 'package:topmortarseller/widget/home/home_header.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -10,7 +11,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Halaman Utama'),
+        title: const Text('Top Mortar Seller'),
         backgroundColor: cWhite,
         foregroundColor: cDark100,
         actions: [
@@ -27,24 +28,10 @@ class HomeScreen extends StatelessWidget {
         ],
       ),
       drawer: const MainDrawer(),
-      body: Center(
+      body: const Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              'Whoah! ...',
-              style: Theme.of(context)
-                  .textTheme
-                  .headlineSmall!
-                  .copyWith(color: Theme.of(context).colorScheme.onBackground),
-            ),
-            Text(
-              'Belum ada apapun disini.',
-              style: Theme.of(context)
-                  .textTheme
-                  .bodySmall!
-                  .copyWith(color: Theme.of(context).colorScheme.onBackground),
-            )
+            HomeHeader(),
           ],
         ),
       ),
