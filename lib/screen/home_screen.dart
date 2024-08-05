@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:topmortarseller/model/auth_settings_model.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/widget/drawer/main_drawer.dart';
-import 'package:topmortarseller/widget/home/home_header.dart';
+import 'package:topmortarseller/widget/card/card_promo_scanner.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
