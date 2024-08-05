@@ -2,8 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/screen/qr_scanner.dart';
 
-class HomeHeader extends StatelessWidget {
+class HomeHeader extends StatefulWidget {
   const HomeHeader({super.key});
+
+  @override
+  State<HomeHeader> createState() => _HomeHeaderState();
+}
+
+class _HomeHeaderState extends State<HomeHeader> {
+  String? _scanResult;
+
+  void onScanResult(result) {
+    setState(() {
+      _scanResult = result;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +75,7 @@ class HomeHeader extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    'Promo tersedia',
+                    _scanResult ?? 'Promo tersedia',
                     style: Theme.of(context).textTheme.bodySmall!.copyWith(
                           color: cDark400,
                         ),
@@ -88,7 +101,9 @@ class HomeHeader extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (ctx) => const QRScannerPage(),
+                            builder: (ctx) => QRScannerScreen(
+                              onScanResult: onScanResult,
+                            ),
                           ),
                         );
                       },
