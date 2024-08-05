@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:topmortarseller/util/colors/color.dart';
+import 'package:topmortarseller/screen/qr_scanner.dart';
 
 class HomeHeader extends StatelessWidget {
   const HomeHeader({super.key});
@@ -83,7 +84,14 @@ class HomeHeader extends StatelessWidget {
                           borderRadius: BorderRadius.circular(16),
                         ),
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (ctx) => const QRScannerPage(),
+                          ),
+                        );
+                      },
                       child: const Text("Scan Sekarang"),
                     ),
                   ),
