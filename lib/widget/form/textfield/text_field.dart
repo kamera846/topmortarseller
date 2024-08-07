@@ -94,7 +94,9 @@ class _MTextFieldState extends State<MTextField> {
       Container(
         padding: inputPadding,
         decoration: BoxDecoration(
-          color: cDark500,
+          color: widget.enabled == false
+              ? cDark500
+              : Theme.of(context).scaffoldBackgroundColor,
           borderRadius: const BorderRadius.all(
             Radius.circular(8),
           ),
