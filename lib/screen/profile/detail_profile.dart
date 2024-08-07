@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:topmortarseller/data/tag_hero.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/widget/card/rekening_card.dart';
+import 'package:topmortarseller/widget/form/button/elevated_button.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -19,9 +20,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         children: [
           Container(
             padding: EdgeInsets.only(
-              top: MediaQuery.of(context).padding.top + 20,
+              top: MediaQuery.of(context).padding.top + 12,
               right: 0,
-              bottom: 20,
+              bottom: 12,
               left: 0,
             ),
             decoration: BoxDecoration(
@@ -60,18 +61,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 12),
                 Hero(
                   tag: TagHero.mainDrawerHeader,
                   child: Row(
                     children: [
-                      const SizedBox(width: 20),
+                      const SizedBox(width: 12),
                       const Icon(
                         Icons.storefront,
                         size: 48,
                         color: cWhite,
                       ),
-                      const SizedBox(width: 18),
+                      const SizedBox(width: 12),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -100,31 +101,40 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           ],
                         ),
                       ),
-                      const SizedBox(width: 20),
+                      const SizedBox(width: 12),
                     ],
                   ),
                 ),
-                const SizedBox(height: 20),
               ],
             ),
           ),
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        'Daftar Rekening',
+                        style: Theme.of(context).textTheme.titleSmall,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  const RekeningCard(),
+                  const RekeningCard(),
+                ],
+              ),
+            ),
+          ),
           Container(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      'Daftar Rekening',
-                      style: Theme.of(context).textTheme.titleSmall,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                const RekeningCard(),
-                const RekeningCard(),
-              ],
+            padding: const EdgeInsets.all(12),
+            child: MElevatedButton(
+              title: 'Tambah Rekening Lain',
+              isFullWidth: true,
+              onPressed: () {},
             ),
           )
         ],

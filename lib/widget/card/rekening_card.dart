@@ -12,7 +12,7 @@ class _RekeningCardState extends State<RekeningCard> {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.only(bottom: 20),
+      margin: const EdgeInsets.only(bottom: 12),
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8), // Menentukan sudut melengkung
@@ -34,7 +34,7 @@ class _RekeningCardState extends State<RekeningCard> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    'BCA',
+                    'PT. BCA (Bank Central Asia) TBK',
                     style: Theme.of(context)
                         .textTheme
                         .titleSmall!
@@ -42,21 +42,23 @@ class _RekeningCardState extends State<RekeningCard> {
                   ),
                   Text(
                     '0918230981283',
-                    style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                         color: cDark100, fontWeight: FontWeight.normal),
+                  ),
+                  Text(
+                    'a.n Mochammad Rafli Ramadani',
+                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                        color: cDark200, fontWeight: FontWeight.normal),
                   ),
                 ],
               ),
             ),
             const SizedBox(width: 12),
-            TextButton(
+            IconButton(
               onPressed: () {},
-              child: Text(
-                'Edit',
-                style: Theme.of(context)
-                    .textTheme
-                    .titleSmall!
-                    .copyWith(color: cDark100, fontWeight: FontWeight.normal),
+              icon: const Icon(
+                Icons.delete_forever_rounded,
+                color: cDark200,
               ),
             ),
           ],
