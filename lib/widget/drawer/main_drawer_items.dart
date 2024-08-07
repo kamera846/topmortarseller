@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:topmortarseller/screen/profile/detail_profile.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 
 class MainDrawerItems extends StatelessWidget {
@@ -16,7 +17,7 @@ class MainDrawerItems extends StatelessWidget {
             color: cDark100,
           ),
           title: Text(
-            'Profil',
+            'Profil saya',
             style: Theme.of(context).textTheme.titleSmall!.copyWith(
                   color: cDark100,
                 ),
@@ -27,7 +28,13 @@ class MainDrawerItems extends StatelessWidget {
                   color: cDark200,
                 ),
           ),
-          onTap: () {},
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (ctx) => const EditProfileScreen(),
+              ),
+            );
+          },
         ),
         const Padding(
           padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
@@ -54,7 +61,10 @@ class MainDrawerItems extends StatelessWidget {
                   color: cDark200,
                 ),
           ),
-          onTap: () {},
+          onTap: () {
+            Navigator.of(context).pop();
+            Navigator.of(context).pop();
+          },
         ),
       ],
     );
