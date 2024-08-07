@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:topmortarseller/model/auth_settings_model.dart';
+import 'package:topmortarseller/data/tag_hero.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/widget/drawer/main_drawer.dart';
 import 'package:topmortarseller/widget/card/card_promo_scanner.dart';
@@ -18,7 +18,7 @@ class HomeScreen extends StatelessWidget {
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 16),
             child: Hero(
-              tag: AuthTagHero.faviconAuth,
+              tag: TagHero.faviconAuth,
               child: Image.asset(
                 'assets/favicon/favicon_circle.png',
                 width: 32,

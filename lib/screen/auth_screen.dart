@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:topmortarseller/data/tag_hero.dart';
 import 'package:topmortarseller/model/auth_settings_model.dart';
 import 'package:topmortarseller/widget/auth/auth_footer.dart';
 import 'package:topmortarseller/widget/auth/auth_form.dart';
@@ -27,7 +28,7 @@ class _AuthScreenState extends State<AuthScreen> {
               const SizedBox(height: 48),
               AuthFormWidget(authType: widget.authType),
               Hero(
-                tag: AuthTagHero.dividerAuth,
+                tag: TagHero.dividerAuth,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   child: widget.authType == AuthType.login

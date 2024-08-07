@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:topmortarseller/data/auth_settings.dart';
+import 'package:topmortarseller/data/tag_hero.dart';
 import 'package:topmortarseller/model/auth_settings_model.dart';
 import 'package:topmortarseller/screen/auth_screen.dart';
 import 'package:topmortarseller/util/colors/color.dart';
@@ -42,7 +43,7 @@ class _AuthFooterWidgetState extends State<AuthFooterWidget> {
     return Column(
       children: [
         Hero(
-          tag: AuthTagHero.outlinedButtonContainerAuth,
+          tag: TagHero.outlinedButtonContainerAuth,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -64,7 +65,7 @@ class _AuthFooterWidgetState extends State<AuthFooterWidget> {
         ),
         const SizedBox(height: 48),
         Hero(
-          tag: AuthTagHero.copyrightAuth,
+          tag: TagHero.copyrightAuth,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [

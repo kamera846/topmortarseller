@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:topmortarseller/data/auth_settings.dart';
+import 'package:topmortarseller/data/tag_hero.dart';
 import 'package:topmortarseller/model/auth_settings_model.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 
@@ -13,7 +14,7 @@ class AuthHeaderWidget extends StatelessWidget {
     return Column(
       children: [
         Hero(
-          tag: AuthTagHero.faviconAuth,
+          tag: TagHero.faviconAuth,
           child: Image.asset(
             'assets/favicon/favicon_circle.png',
             width: 100,
@@ -21,7 +22,7 @@ class AuthHeaderWidget extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         Hero(
-          tag: AuthTagHero.titleAuth,
+          tag: TagHero.titleAuth,
           child: Text(
             authSettings[authType]!.title,
             style: Theme.of(context).textTheme.headlineSmall!.copyWith(
@@ -31,7 +32,7 @@ class AuthHeaderWidget extends StatelessWidget {
         ),
         const SizedBox(height: 6),
         Hero(
-          tag: AuthTagHero.descriptionAuth,
+          tag: TagHero.descriptionAuth,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Text(

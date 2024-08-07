@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:topmortarseller/data/tag_hero.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/widget/card/rekening_card.dart';
 
@@ -60,43 +61,48 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   ],
                 ),
                 const SizedBox(height: 20),
-                Row(
-                  children: [
-                    const SizedBox(width: 20),
-                    const Icon(
-                      Icons.storefront,
-                      size: 48,
-                      color: cWhite,
-                    ),
-                    const SizedBox(width: 18),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'Toko Barokah Jaya',
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium!
-                                .copyWith(
-                                  color: cWhite,
-                                ),
-                          ),
-                          Text(
-                            'Jl Anggrek 3 asrikaton kec. pakis kab. malang',
-                            softWrap: true,
-                            overflow: TextOverflow.visible,
-                            style:
-                                Theme.of(context).textTheme.bodySmall!.copyWith(
-                                      color: cPrimary600,
-                                    ),
-                          )
-                        ],
+                Hero(
+                  tag: TagHero.mainDrawerHeader,
+                  child: Row(
+                    children: [
+                      const SizedBox(width: 20),
+                      const Icon(
+                        Icons.storefront,
+                        size: 48,
+                        color: cWhite,
                       ),
-                    ),
-                    const SizedBox(width: 20),
-                  ],
+                      const SizedBox(width: 18),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'Toko Barokah Jaya',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium!
+                                  .copyWith(
+                                    color: cWhite,
+                                  ),
+                            ),
+                            Text(
+                              'Jl Anggrek 3 asrikaton kec. pakis kab. malang',
+                              softWrap: true,
+                              overflow: TextOverflow.visible,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall!
+                                  .copyWith(
+                                    color: cPrimary600,
+                                  ),
+                            )
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 20),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 20),
               ],

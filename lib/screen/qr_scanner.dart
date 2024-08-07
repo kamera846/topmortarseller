@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
-import 'package:topmortarseller/model/auth_settings_model.dart';
+import 'package:topmortarseller/data/tag_hero.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 
 class QRScannerScreen extends StatefulWidget {
@@ -94,7 +94,7 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
                       .copyWith(color: cWhite),
                 ),
                 Hero(
-                  tag: AuthTagHero.faviconAuth,
+                  tag: TagHero.faviconAuth,
                   child: Image.asset(
                     'assets/favicon/favicon_circle.png',
                     width: 32,

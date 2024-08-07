@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:topmortarseller/model/auth_settings_model.dart';
+import 'package:topmortarseller/data/tag_hero.dart';
 import 'package:topmortarseller/screen/auth_screen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -38,7 +38,7 @@ class _SplashScreenState extends State<SplashScreen> {
           // child: InkWell(
           // onTap: _returnHomScreen,
           child: Hero(
-            tag: AuthTagHero.faviconAuth,
+            tag: TagHero.faviconAuth,
             child: Image.asset(
               'assets/favicon/favicon_circle.png',
               width: MediaQuery.of(context).size.width,

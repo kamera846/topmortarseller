@@ -6,20 +6,6 @@ enum AuthType {
   resetPassword,
 }
 
-enum AuthTagHero {
-  faviconAuth,
-  titleAuth,
-  descriptionAuth,
-  backButtonAuth,
-  inputPhoneAuth,
-  inputPasswordAuth,
-  elevatedButtonAuth,
-  forgotButtonAuth,
-  dividerAuth,
-  outlinedButtonContainerAuth,
-  copyrightAuth,
-}
-
 class AuthSettingsModel {
   const AuthSettingsModel(
     this.title,

@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:topmortarseller/data/auth_settings.dart';
+import 'package:topmortarseller/data/tag_hero.dart';
 import 'package:topmortarseller/model/auth_settings_model.dart';
 import 'package:topmortarseller/screen/auth_screen.dart';
 import 'package:topmortarseller/screen/home_screen.dart';
@@ -213,7 +214,7 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
 
     if (isBackButtonShow) {
       formList.add(Hero(
-        tag: AuthTagHero.backButtonAuth,
+        tag: TagHero.backButtonAuth,
         child: Container(
           margin: const EdgeInsets.only(bottom: 8),
           child: Row(
@@ -330,7 +331,7 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
       formList.add(const SizedBox(height: 8));
       formList.add(
         Hero(
-          tag: AuthTagHero.forgotButtonAuth,
+          tag: TagHero.forgotButtonAuth,
           child: MTextButton(
             onPressed: _forgotButton,
             title: 'Lupa Kata Sandi',
