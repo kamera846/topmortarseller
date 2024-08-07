@@ -13,6 +13,7 @@ class MTextField extends StatefulWidget {
     this.helper,
     this.errorText,
     this.maxLength,
+    this.maxLines = 1,
     this.onSubmitted,
     this.obscure = false,
     this.enabled = true,
@@ -36,6 +37,7 @@ class MTextField extends StatefulWidget {
   final bool obscure;
   final bool enabled;
   final int? maxLength;
+  final int? maxLines;
   final IconData? prefixIcon;
   final IconData? suffixIcon;
   final Function(String) onChanged;
@@ -78,10 +80,21 @@ class _MTextFieldState extends State<MTextField> {
   @override
   Widget build(BuildContext context) {
     List<Widget> listItem = [];
+    EdgeInsets inputPadding = const EdgeInsets.all(0);
+
+    if (widget.prefixIcon == null && widget.prefixIcon == null) {
+      inputPadding = const EdgeInsets.only(left: 16, right: 16);
+    } else if (widget.prefixIcon == null) {
+      inputPadding = const EdgeInsets.only(left: 16);
+    } else if (widget.suffixIcon == null) {
+      inputPadding = const EdgeInsets.only(right: 16);
+    }
+
     listItem.add(
       Container(
+        padding: inputPadding,
         decoration: BoxDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
+          color: cDark500,
           borderRadius: const BorderRadius.all(
             Radius.circular(8),
           ),
@@ -101,6 +114,7 @@ class _MTextFieldState extends State<MTextField> {
                 focusNode: focusNode,
                 validator: widget.validator,
                 maxLength: widget.maxLength,
+                maxLines: widget.maxLines,
                 obscureText: widget.obscure,
                 style: const TextStyle(color: cDark200),
                 decoration: InputDecoration(
