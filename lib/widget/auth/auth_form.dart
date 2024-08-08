@@ -74,25 +74,7 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
     var phoneNumber = _phoneController.text;
 
     if (authType == AuthType.login) {
-      final String? phoneValidator = Validator.phoneAuth(phoneNumber);
-      final String? passwordValidator =
-          Validator.passwordAuth(_passwordController.text);
-
-      setState(() {
-        _phoneError = phoneValidator;
-        _passwordError = passwordValidator;
-      });
-
-      if (phoneValidator != null || passwordValidator != null) return;
-      _phoneController.text = '';
-      _passwordController.text = '';
-
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (ctx) => const HomeScreen(),
-        ),
-      );
+      loginHandler();
     }
 
     if (authType == AuthType.forgot) {
@@ -125,6 +107,51 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
 
     if (authType == AuthType.resetPassword) {
       resetPasswordHandler();
+    }
+  }
+
+  void loginHandler() async {
+    final phoneNumber = _phoneController.text;
+    final password = _passwordController.text;
+    final String? phoneValidator = Validator.phoneAuth(phoneNumber);
+    final String? passwordValidator = Validator.passwordAuth(password);
+
+    setState(() {
+      _phoneError = phoneValidator;
+      _passwordError = passwordValidator;
+    });
+
+    if (phoneValidator != null || passwordValidator != null) return;
+
+    setState(() => widget.isLoading!(true));
+
+    try {
+      final response = await AuthApiService().login(
+        phoneNumber: phoneNumber,
+        password: password,
+      );
+
+      if (response.statusCode == 200) {
+        final responseBody = json.decode(response.body);
+        final apiResponse = ApiResponse.fromJson(responseBody);
+
+        if (apiResponse.code == 200) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (ctx) => const HomeScreen(),
+            ),
+          );
+        }
+        showSnackBar(context, apiResponse.msg);
+      } else {
+        showSnackBar(
+            context, '$failedRequestText. Status Code: ${response.statusCode}');
+      }
+    } catch (e) {
+      showSnackBar(context, '$failedRequestText. Exception: $e');
+    } finally {
+      setState(() => widget.isLoading!(false));
     }
   }
 
@@ -203,8 +230,8 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
 
     try {
       final response = await AuthApiService().requestOtp(
-        idContact: _userData!.idContact,
-        idDistributor: _userData!.idDistributor,
+        idContact: _userData!.idContact ?? '',
+        idDistributor: _userData!.idDistributor ?? '',
       );
 
       if (response.statusCode == 200) {
@@ -250,8 +277,8 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
 
     try {
       final response = await AuthApiService().verifyOtp(
-        idContact: _userData!.idContact,
-        otp: _otpController,
+        idContact: _userData!.idContact ?? '',
+        otp: _otpController ?? '',
       );
 
       if (response.statusCode == 200) {
@@ -304,7 +331,7 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
 
     try {
       final response = await AuthApiService().resetPassword(
-        idContact: _userData!.idContact,
+        idContact: _userData!.idContact ?? '',
         password: _confirmPasswordController.text,
       );
 
