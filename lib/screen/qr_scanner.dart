@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
-import 'package:topmortarseller/data/tag_hero.dart';
+import 'package:topmortarseller/util/tag_hero.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 
 class QRScannerScreen extends StatefulWidget {

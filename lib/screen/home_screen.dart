@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:topmortarseller/data/tag_hero.dart';
+import 'package:topmortarseller/util/tag_hero.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/widget/drawer/main_drawer.dart';
 import 'package:topmortarseller/widget/card/card_promo_scanner.dart';
