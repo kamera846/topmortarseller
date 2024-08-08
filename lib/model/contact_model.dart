@@ -1,79 +1,79 @@
 class ContactModel {
   const ContactModel({
-    this.id_contact,
+    this.idContact,
     this.nama = '',
     this.nomorhp,
-    this.tgl_lahir,
-    this.store_owner,
-    this.id_city,
-    this.maps_url,
+    this.tglLahir,
+    this.storeOwner,
+    this.idCity,
+    this.mapsUrl,
     this.address,
-    this.store_status,
-    this.ktp_owner,
-    this.termin_payment,
-    this.id_promo,
+    this.storeStatus,
+    this.ktpOwner,
+    this.terminPayment,
+    this.idPromo,
     this.reputation,
-    this.created_at,
-    this.payment_method,
-    this.tagih_mingguan,
-    this.nomorhp_2,
-    this.nomor_cat_1,
-    this.nomor_cat_2,
-    this.pass_contact,
-    this.nama_city,
-    this.kode_city,
-    this.id_distributor,
+    this.createdAt,
+    this.paymentMethod,
+    this.tagihMingguan,
+    this.nomorhp2,
+    this.nomorCat1,
+    this.nomorCat2,
+    this.passContact,
+    this.namaCity,
+    this.kodeCity,
+    this.idDistributor,
   });
 
-  final String? id_contact;
+  final String? idContact;
   final String? nama;
   final String? nomorhp;
-  final String? tgl_lahir;
-  final String? store_owner;
-  final String? id_city;
-  final String? maps_url;
+  final String? tglLahir;
+  final String? storeOwner;
+  final String? idCity;
+  final String? mapsUrl;
   final String? address;
-  final String? store_status;
-  final String? ktp_owner;
-  final String? termin_payment;
-  final String? id_promo;
+  final String? storeStatus;
+  final String? ktpOwner;
+  final String? terminPayment;
+  final String? idPromo;
   final String? reputation;
-  final String? created_at;
-  final String? payment_method;
-  final String? tagih_mingguan;
-  final String? nomorhp_2;
-  final String? nomor_cat_1;
-  final String? nomor_cat_2;
-  final String? pass_contact;
-  final String? nama_city;
-  final String? kode_city;
-  final String? id_distributor;
+  final String? createdAt;
+  final String? paymentMethod;
+  final String? tagihMingguan;
+  final String? nomorhp2;
+  final String? nomorCat1;
+  final String? nomorCat2;
+  final String? passContact;
+  final String? namaCity;
+  final String? kodeCity;
+  final String? idDistributor;
 
   factory ContactModel.fromJson(Map<String, dynamic> json) {
     return ContactModel(
-      id_contact: json['id_contact'] ?? '',
+      idContact: json['id_contact'] ?? '',
       nama: json['nama'] ?? '',
       nomorhp: json['nomorhp'] ?? '',
-      tgl_lahir: json['tgl_lahir'] ?? '',
-      store_owner: json['store_owner'] ?? '',
-      id_city: json['id_city'] ?? '',
-      maps_url: json['maps_url'] ?? '',
+      tglLahir: json['tgl_lahir'] ?? '',
+      storeOwner: json['store_owner'] ?? '',
+      idCity: json['id_city'] ?? '',
+      mapsUrl: json['maps_url'] ?? '',
       address: json['address'] ?? '',
-      store_status: json['store_status'] ?? '',
-      ktp_owner: json['ktp_owner'] ?? '',
-      termin_payment: json['termin_payment'] ?? '',
-      id_promo: json['id_promo'] ?? '',
+      storeStatus: json['store_status'] ?? '',
+      ktpOwner: json['ktp_owner'] ?? '',
+      terminPayment: json['termin_payment'] ?? '',
+      idPromo: json['id_promo'] ?? '',
       reputation: json['reputation'] ?? '',
-      created_at: json['created_at'] ?? '',
-      payment_method: json['payment_method'] ?? '',
-      tagih_mingguan: json['tagih_mingguan'] ?? '',
-      nomorhp_2: json['nomorhp_2'] ?? '',
-      nomor_cat_1: json['nomor_cat_1'] ?? '',
-      nomor_cat_2: json['nomor_cat_2'] ?? '',
-      pass_contact: json['pass_contact'] ?? '',
-      nama_city: json['nama_city'] ?? '',
-      kode_city: json['kode_city'] ?? '',
-      id_distributor: json['id_distributor'] ?? '',
+      createdAt: json['created_at'] ?? '',
+      paymentMethod: json['payment_method'] ?? '',
+      tagihMingguan: json['tagih_mingguan'] ?? '',
+      nomorhp2: json['nomorhp_2'] ?? '',
+      nomorCat1: json['nomor_cat_1'] ?? '',
+      nomorCat2: json['nomor_cat_2'] ?? '',
+      passContact: json['pass_contact'] ?? '',
+      namaCity: json['nama_city'] ?? '',
+      kodeCity: json['kode_city'] ?? '',
+      idDistributor: json['id_distributor'] ?? '',
     );
   }
 }

@@ -41,7 +41,6 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
         });
         widget.onScanResult(scanData.code);
         qrController!.pauseCamera;
-        print('QR Code Data: ${scanData.code}');
         Navigator.of(context).pop();
         return;
       }

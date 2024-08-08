@@ -113,10 +113,6 @@ class _NewRekeningScreenState extends State<NewRekeningScreen> {
                     _noRekeningErrorText = null;
                   });
                 }
-
-                print(_selectedBank);
-                print(_noRekeningController.text);
-                print(_ownerNameController.text);
               },
             ),
           ],

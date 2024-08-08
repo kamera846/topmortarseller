@@ -55,7 +55,6 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
   @override
   void initState() {
     super.initState();
-    print(widget.userData);
     _userData = widget.userData;
   }
 
@@ -169,7 +168,7 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
                   title: 'Apa benar ini toko anda?',
                   contentName: _userData!.nama,
                   contentDescription: _userData!.address!.isEmpty
-                      ? _userData!.store_owner
+                      ? _userData!.storeOwner
                       : _userData!.address,
                   contentIcon: Icons.storefront_outlined,
                   cancelText: 'Bukan',
@@ -204,8 +203,8 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
 
     try {
       final response = await AuthApiService().requestOtp(
-        idContact: _userData!.id_contact,
-        idDistributor: _userData!.id_distributor,
+        idContact: _userData!.idContact,
+        idDistributor: _userData!.idDistributor,
       );
 
       if (response.statusCode == 200) {
@@ -251,7 +250,7 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
 
     try {
       final response = await AuthApiService().verifyOtp(
-        idContact: _userData!.id_contact,
+        idContact: _userData!.idContact,
         otp: _otpController,
       );
 
@@ -305,7 +304,7 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
 
     try {
       final response = await AuthApiService().resetPassword(
-        idContact: _userData!.id_contact,
+        idContact: _userData!.idContact,
         password: _confirmPasswordController.text,
       );
 
