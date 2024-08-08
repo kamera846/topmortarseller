@@ -188,7 +188,8 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
     setState(() => widget.isLoading!(true));
 
     try {
-      final response = await AuthApiService().fetchRegister(phoneNumber);
+      final response =
+          await AuthApiService().fetchRegister(phoneNumber: phoneNumber);
 
       if (response.statusCode == 200) {
         final responseBody = json.decode(response.body);
@@ -205,19 +206,14 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
                 contentDescription:
                     data.address!.isEmpty ? data.store_owner : data.address,
                 contentIcon: Icons.storefront_outlined,
+                cancelText: 'Bukan',
                 onCancel: () {
                   Navigator.of(context).pop();
                 },
                 confirmText: 'Oke, Lanjut',
                 onConfirm: () {
                   Navigator.of(context).pop();
-                  Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(
-                      builder: ((context) => const AuthScreen(
-                            authType: AuthType.otp,
-                          )),
-                    ),
-                  );
+                  requestOtpHandler(data);
                 },
               );
             },
@@ -226,11 +222,47 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
           showSnackBar(context, apiResponse.msg);
         }
       } else {
-        showSnackBar(context,
-            'Gagal mendapatkan data. Status Code: ${response.statusCode}');
+        showSnackBar(
+            context, '$failedRequestText. Status Code: ${response.statusCode}');
       }
     } catch (e) {
-      showSnackBar(context, 'Gagal mendapatkan data. Exception: $e');
+      showSnackBar(context, '$failedRequestText. Exception: $e');
+    } finally {
+      setState(() => widget.isLoading!(false));
+    }
+  }
+
+  void requestOtpHandler(ContactModel data) async {
+    setState(() => widget.isLoading!(true));
+
+    try {
+      final response = await AuthApiService().requestOtp(
+        idContact: data.id_contact,
+        idDistributor: data.id_distributor,
+      );
+
+      if (response.statusCode == 200) {
+        final responseBody = json.decode(response.body);
+        final apiResponse = ApiResponse.fromJson(responseBody);
+
+        if (apiResponse.code == 200) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: ((context) => const AuthScreen(
+                    authType: AuthType.otp,
+                  )),
+            ),
+          );
+          showSnackBar(context, apiResponse.msg);
+        } else {
+          showSnackBar(context, apiResponse.msg);
+        }
+      } else {
+        showSnackBar(
+            context, '$failedRequestText. Status Code: ${response.statusCode}');
+      }
+    } catch (e) {
+      showSnackBar(context, '$failedRequestText. Exception: $e');
     } finally {
       setState(() => widget.isLoading!(false));
     }
