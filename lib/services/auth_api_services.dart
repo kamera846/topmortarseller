@@ -45,4 +45,18 @@ class AuthApiService {
 
     return response;
   }
+
+  Future<Response> resetPassword({String? idContact, String? password}) async {
+    final url = Uri.https(baseUrl, 'api/auth/reset');
+    final response = await http.post(
+      url,
+      headers: headerSetup,
+      body: json.encode({
+        'id_contact': idContact,
+        'pass_contact': password,
+      }),
+    );
+
+    return response;
+  }
 }

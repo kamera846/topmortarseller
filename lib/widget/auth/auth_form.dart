@@ -125,41 +125,7 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
     }
 
     if (authType == AuthType.resetPassword) {
-      final String? passwordValidator =
-          Validator.passwordAuth(_passwordController.text);
-      final String? confirmPasswordValidator =
-          Validator.passwordAuth(_confirmPasswordController.text);
-      final String? passwordMatchesValidator = Validator.passwordMatches(
-          _passwordController.text, _confirmPasswordController.text);
-
-      setState(() {
-        _passwordError = passwordValidator;
-        _confirmPasswordError =
-            confirmPasswordValidator ?? passwordMatchesValidator;
-      });
-
-      if (passwordValidator != null ||
-          confirmPasswordValidator != null ||
-          passwordMatchesValidator != null) return;
-      _passwordController.text = '';
-      _confirmPasswordController.text = '';
-
-      showCupertinoDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return MInfoModal(
-            contentName: 'Password Berhasil Direset',
-            contentDescription: 'login menggunakan password anda yang baru.',
-            contentIcon: Icons.change_circle_rounded,
-            contentIconColor: Colors.green.shade800,
-            cancelText: null,
-            onConfirm: () {
-              Navigator.of(context).pop();
-              Navigator.of(context).pop();
-            },
-          );
-        },
-      );
+      resetPasswordHandler();
     }
   }
 
@@ -306,6 +272,67 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
         }
 
         showSnackBar(context, apiResponse.msg);
+      } else {
+        showSnackBar(
+            context, '$failedRequestText. Status Code: ${response.statusCode}');
+      }
+    } catch (e) {
+      showSnackBar(context, '$failedRequestText. Exception: $e');
+    } finally {
+      setState(() => widget.isLoading!(false));
+    }
+  }
+
+  void resetPasswordHandler() async {
+    final String? passwordValidator =
+        Validator.passwordAuth(_passwordController.text);
+    final String? confirmPasswordValidator =
+        Validator.passwordAuth(_confirmPasswordController.text);
+    final String? passwordMatchesValidator = Validator.passwordMatches(
+        _passwordController.text, _confirmPasswordController.text);
+
+    setState(() {
+      _passwordError = passwordValidator;
+      _confirmPasswordError =
+          confirmPasswordValidator ?? passwordMatchesValidator;
+    });
+
+    if (passwordValidator != null ||
+        confirmPasswordValidator != null ||
+        passwordMatchesValidator != null) return;
+
+    setState(() => widget.isLoading!(true));
+
+    try {
+      final response = await AuthApiService().resetPassword(
+        idContact: _userData!.id_contact,
+        password: _confirmPasswordController.text,
+      );
+
+      if (response.statusCode == 200) {
+        final responseBody = json.decode(response.body);
+        final apiResponse = ApiResponse.fromJson(responseBody);
+
+        if (apiResponse.code == 200) {
+          showCupertinoDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return MInfoModal(
+                contentName: 'Yeayy, Proses Selesai!',
+                contentDescription: apiResponse.msg,
+                contentIcon: Icons.change_circle_rounded,
+                contentIconColor: Colors.green.shade800,
+                cancelText: null,
+                onConfirm: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pop();
+                },
+              );
+            },
+          );
+        } else {
+          showSnackBar(context, apiResponse.msg);
+        }
       } else {
         showSnackBar(
             context, '$failedRequestText. Status Code: ${response.statusCode}');
