@@ -1,5 +1,12 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:topmortarseller/model/contact_model.dart';
+import 'package:topmortarseller/services/api.dart';
+import 'package:topmortarseller/services/auth_api_services.dart';
 
 import 'package:topmortarseller/util/auth_settings.dart';
 import 'package:topmortarseller/util/tag_hero.dart';
@@ -13,11 +20,14 @@ import 'package:topmortarseller/widget/form/button/text_button.dart';
 import 'package:topmortarseller/widget/form/textfield/text_field.dart';
 import 'package:topmortarseller/widget/form/textfield/text_otp_field.dart';
 import 'package:topmortarseller/widget/modal/info_modal.dart';
+import 'package:topmortarseller/widget/snackbar/show_snackbar.dart';
 
 class AuthFormWidget extends StatefulWidget {
-  const AuthFormWidget({super.key, this.authType = AuthType.login});
+  const AuthFormWidget(
+      {super.key, this.authType = AuthType.login, this.isLoading});
 
   final AuthType authType;
+  final Function(bool)? isLoading;
 
   @override
   State<AuthFormWidget> createState() => _AuthFormWidgetState();
@@ -47,11 +57,12 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
     );
   }
 
-  void _elevatedButtonAction() {
+  void _elevatedButtonAction() async {
     final authType = widget.authType;
+    var phoneNumber = _phoneController.text;
 
     if (authType == AuthType.login) {
-      final String? phoneValidator = Validator.phoneAuth(_phoneController.text);
+      final String? phoneValidator = Validator.phoneAuth(phoneNumber);
       final String? passwordValidator =
           Validator.passwordAuth(_passwordController.text);
 
@@ -73,7 +84,7 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
     }
 
     if (authType == AuthType.forgot) {
-      final String? phoneValidator = Validator.phoneAuth(_phoneController.text);
+      final String? phoneValidator = Validator.phoneAuth(phoneNumber);
 
       setState(() {
         _phoneError = phoneValidator;
@@ -114,16 +125,72 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
     }
 
     if (authType == AuthType.register) {
-      final String? phoneValidator = Validator.phoneAuth(_phoneController.text);
+      final String? phoneValidator = Validator.phoneAuth(phoneNumber);
 
       setState(() {
         _phoneError = phoneValidator;
       });
 
       if (phoneValidator != null) return;
-      _phoneController.text = '';
 
-      _showCustomDialog(context);
+      if (phoneNumber.startsWith('62')) {
+        phoneNumber = '0${phoneNumber.substring(2)}';
+      } else if (phoneNumber.startsWith('+62')) {
+        phoneNumber = '0${phoneNumber.substring(3)}';
+      } else if (phoneNumber.startsWith('8')) {
+        phoneNumber = '0$phoneNumber';
+      }
+
+      setState(() {
+        widget.isLoading!(true);
+      });
+
+      try {
+        final response = await AuthApiService().fetchRegister(phoneNumber);
+        if (response.statusCode == 200) {
+          final responseBody = json.decode(response.body);
+          final apiResponse = ApiResponse.fromJson(responseBody);
+
+          if (apiResponse.data != null) {
+            final data = ContactModel.fromJson(apiResponse.data!);
+            showCupertinoDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return MInfoModal(
+                  title: 'Apa benar ini toko anda?',
+                  contentName: data.nama,
+                  contentDescription:
+                      data.address!.isEmpty ? data.store_owner : data.address,
+                  contentIcon: Icons.storefront_outlined,
+                  onCancel: () {
+                    Navigator.of(context).pop();
+                  },
+                  confirmText: 'Oke, Lanjut',
+                  onConfirm: () {
+                    Navigator.of(context).pop();
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(
+                        builder: ((context) => const AuthScreen(
+                              authType: AuthType.otp,
+                            )),
+                      ),
+                    );
+                  },
+                );
+              },
+            );
+          }
+        } else {
+          showSnackBar(context,
+              'Gagal mendapatkan data. Status Code: ${response.statusCode}');
+        }
+      } catch (e) {
+        showSnackBar(context, 'Gagal mendapatkan data. Exception: $e');
+      } finally {
+        setState(() {
+          widget.isLoading!(false);
+        });
+      }
     }
 
     if (authType == AuthType.resetPassword) {
@@ -146,53 +213,20 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
       _passwordController.text = '';
       _confirmPasswordController.text = '';
 
-      _showCustomDialog(context);
-    }
-  }
-
-  void _showCustomDialog(BuildContext context) {
-    final authType = widget.authType;
-
-    Widget storeInfoModal = MInfoModal(
-      title: 'Apa benar ini toko anda?',
-      contentName: 'Barokah Jaya Mandiri',
-      contentDescription: 'Jl Anggrek 3 asrikaton kec. pakis malang',
-      contentIcon: Icons.storefront_outlined,
-      onCancel: () {
-        Navigator.of(context).pop();
-      },
-      confirmText: 'Oke, Lanjut',
-      onConfirm: () {
-        Navigator.of(context).pop();
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: ((context) => const AuthScreen(
-                  authType: AuthType.otp,
-                )),
-          ),
-        );
-      },
-    );
-    Widget successResetPasswordModal = MInfoModal(
-      contentName: 'Password Berhasil Direset',
-      contentDescription: 'login menggunakan password anda yang baru.',
-      contentIcon: Icons.change_circle_rounded,
-      contentIconColor: Colors.green.shade800,
-      cancelText: null,
-      onConfirm: () {
-        Navigator.of(context).pop();
-        Navigator.of(context).pop();
-      },
-    );
-    if (authType == AuthType.register || authType == AuthType.resetPassword) {
       showCupertinoDialog(
         context: context,
         builder: (BuildContext context) {
-          if (authType == AuthType.register) {
-            return storeInfoModal;
-          } else {
-            return successResetPasswordModal;
-          }
+          return MInfoModal(
+            contentName: 'Password Berhasil Direset',
+            contentDescription: 'login menggunakan password anda yang baru.',
+            contentIcon: Icons.change_circle_rounded,
+            contentIconColor: Colors.green.shade800,
+            cancelText: null,
+            onConfirm: () {
+              Navigator.of(context).pop();
+              Navigator.of(context).pop();
+            },
+          );
         },
       );
     }
