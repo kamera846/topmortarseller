@@ -18,8 +18,8 @@ class _RekeningCardState extends State<RekeningCard> {
         borderRadius: BorderRadius.circular(8), // Menentukan sudut melengkung
       ),
       child: Container(
-        width: double.maxFinite,
-        padding: const EdgeInsets.symmetric(vertical: 12),
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
         decoration: BoxDecoration(
           color: cDark600,
           border: Border.all(color: cDark500, width: 1),
@@ -27,7 +27,6 @@ class _RekeningCardState extends State<RekeningCard> {
         ),
         child: Row(
           children: [
-            const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -35,25 +34,28 @@ class _RekeningCardState extends State<RekeningCard> {
                 children: [
                   Text(
                     'PT. BCA (Bank Central Asia) TBK',
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleSmall!
-                        .copyWith(color: cDark100, fontWeight: FontWeight.bold),
+                    style: Theme.of(context).textTheme.titleSmall!.copyWith(
+                          color: cDark100,
+                          fontWeight: FontWeight.bold,
+                        ),
                   ),
                   Text(
                     '0918230981283',
                     style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                        color: cDark100, fontWeight: FontWeight.normal),
+                          color: cDark100,
+                          fontWeight: FontWeight.normal,
+                        ),
                   ),
                   Text(
                     'a.n Mochammad Rafli Ramadani',
                     style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                        color: cDark200, fontWeight: FontWeight.normal),
+                          color: cDark200,
+                          fontWeight: FontWeight.normal,
+                        ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(width: 12),
             IconButton(
               onPressed: () {},
               icon: const Icon(

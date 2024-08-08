@@ -114,12 +114,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         'Daftar Rekening',
                         style: Theme.of(context).textTheme.titleSmall,
                       ),
+                      Text(
+                          'Digunakan untuk tujuan transfer promo cashback dari kami.',
+                          softWrap: true,
+                          overflow: TextOverflow.visible,
+                          style: Theme.of(context).textTheme.bodySmall)
                     ],
                   ),
                   const SizedBox(height: 12),
