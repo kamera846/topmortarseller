@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:topmortarseller/screen/splash_screen.dart';
 import 'package:topmortarseller/util/colors/color.dart';
@@ -8,6 +10,7 @@ final mDarkColorScheme =
     ColorScheme.fromSeed(seedColor: cDark100, brightness: Brightness.dark);
 
 void main() {
+  HttpOverrides.global = MyHttpOverrides();
   runApp(const MyApp());
 }
 
@@ -40,5 +43,15 @@ class MyApp extends StatelessWidget {
       themeMode: ThemeMode.light,
       home: const SplashScreen(),
     );
+  }
+}
+
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    final client = super.createHttpClient(context);
+    client.badCertificateCallback =
+        (X509Certificate cert, String host, int port) => true;
+    return client;
   }
 }
