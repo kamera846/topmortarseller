@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:topmortarseller/model/contact_model.dart';
 import 'package:topmortarseller/util/tag_hero.dart';
 import 'package:topmortarseller/model/auth_settings_model.dart';
 import 'package:topmortarseller/widget/auth/auth_footer.dart';
@@ -8,9 +9,14 @@ import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/widget/modal/loading_modal.dart';
 
 class AuthScreen extends StatefulWidget {
-  const AuthScreen({super.key, this.authType = AuthType.login});
+  const AuthScreen({
+    super.key,
+    this.authType = AuthType.login,
+    this.userData,
+  });
 
   final AuthType authType;
+  final ContactModel? userData;
 
   @override
   State<AuthScreen> createState() => _AuthScreenState();
@@ -18,6 +24,13 @@ class AuthScreen extends StatefulWidget {
 
 class _AuthScreenState extends State<AuthScreen> {
   bool _isLoading = false;
+  ContactModel? _userData;
+
+  @override
+  void initState() {
+    super.initState();
+    _userData = widget.userData;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +45,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 const SizedBox(height: 48),
                 AuthFormWidget(
                   authType: widget.authType,
+                  userData: _userData,
                   isLoading: (state) {
                     setState(() {
                       _isLoading = state;

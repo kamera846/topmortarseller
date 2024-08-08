@@ -31,4 +31,18 @@ class AuthApiService {
 
     return response;
   }
+
+  Future<Response> verifyOtp({String? idContact, String? otp}) async {
+    final url = Uri.https(baseUrl, 'api/verify-otp');
+    final response = await http.post(
+      url,
+      headers: headerSetup,
+      body: json.encode({
+        'id_contact': idContact,
+        'otp': otp,
+      }),
+    );
+
+    return response;
+  }
 }

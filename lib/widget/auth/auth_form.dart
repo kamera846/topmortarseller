@@ -23,11 +23,16 @@ import 'package:topmortarseller/widget/modal/info_modal.dart';
 import 'package:topmortarseller/widget/snackbar/show_snackbar.dart';
 
 class AuthFormWidget extends StatefulWidget {
-  const AuthFormWidget(
-      {super.key, this.authType = AuthType.login, this.isLoading});
+  const AuthFormWidget({
+    super.key,
+    this.authType = AuthType.login,
+    this.isLoading,
+    this.userData,
+  });
 
   final AuthType authType;
   final Function(bool)? isLoading;
+  final ContactModel? userData;
 
   @override
   State<AuthFormWidget> createState() => _AuthFormWidgetState();
@@ -45,6 +50,14 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
   String? _otpError;
   bool _isPasswordHidden = true;
   bool _isConfirmPasswordHidden = true;
+  ContactModel? _userData;
+
+  @override
+  void initState() {
+    super.initState();
+    print(widget.userData);
+    _userData = widget.userData;
+  }
 
   void _forgotButton() {
     Navigator.push(
@@ -104,24 +117,7 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
     }
 
     if (authType == AuthType.otp) {
-      final String? otpValidator =
-          Validator.otpAuth(_otpController, _otpLength);
-
-      setState(() {
-        _otpError = otpValidator;
-      });
-
-      if (otpValidator != null) return;
-      _otpController = '';
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (ctx) => const AuthScreen(
-            authType: AuthType.resetPassword,
-          ),
-        ),
-      );
+      verifyOtp();
     }
 
     if (authType == AuthType.register) {
@@ -196,28 +192,33 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
         final apiResponse = ApiResponse.fromJson(responseBody);
 
         if (apiResponse.code == 200) {
-          final data = ContactModel.fromJson(apiResponse.data!);
-          showCupertinoDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return MInfoModal(
-                title: 'Apa benar ini toko anda?',
-                contentName: data.nama,
-                contentDescription:
-                    data.address!.isEmpty ? data.store_owner : data.address,
-                contentIcon: Icons.storefront_outlined,
-                cancelText: 'Bukan',
-                onCancel: () {
-                  Navigator.of(context).pop();
-                },
-                confirmText: 'Oke, Lanjut',
-                onConfirm: () {
-                  Navigator.of(context).pop();
-                  requestOtpHandler(data);
-                },
-              );
-            },
-          );
+          setState(() {
+            _userData = ContactModel.fromJson(apiResponse.data!);
+          });
+          if (_userData != null) {
+            showCupertinoDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return MInfoModal(
+                  title: 'Apa benar ini toko anda?',
+                  contentName: _userData!.nama,
+                  contentDescription: _userData!.address!.isEmpty
+                      ? _userData!.store_owner
+                      : _userData!.address,
+                  contentIcon: Icons.storefront_outlined,
+                  cancelText: 'Bukan',
+                  onCancel: () {
+                    Navigator.of(context).pop();
+                  },
+                  confirmText: 'Oke, Lanjut',
+                  onConfirm: () {
+                    Navigator.of(context).pop();
+                    requestOtpHandler();
+                  },
+                );
+              },
+            );
+          }
         } else {
           showSnackBar(context, apiResponse.msg);
         }
@@ -232,13 +233,13 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
     }
   }
 
-  void requestOtpHandler(ContactModel data) async {
+  void requestOtpHandler() async {
     setState(() => widget.isLoading!(true));
 
     try {
       final response = await AuthApiService().requestOtp(
-        idContact: data.id_contact,
-        idDistributor: data.id_distributor,
+        idContact: _userData!.id_contact,
+        idDistributor: _userData!.id_distributor,
       );
 
       if (response.statusCode == 200) {
@@ -248,15 +249,63 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
         if (apiResponse.code == 200) {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
-              builder: ((context) => const AuthScreen(
+              builder: ((context) => AuthScreen(
                     authType: AuthType.otp,
+                    userData: _userData!,
                   )),
             ),
           );
-          showSnackBar(context, apiResponse.msg);
-        } else {
-          showSnackBar(context, apiResponse.msg);
         }
+
+        showSnackBar(context, apiResponse.msg);
+      } else {
+        showSnackBar(
+            context, '$failedRequestText. Status Code: ${response.statusCode}');
+      }
+    } catch (e) {
+      showSnackBar(context, '$failedRequestText. Exception: $e');
+    } finally {
+      setState(() => widget.isLoading!(false));
+    }
+  }
+
+  void verifyOtp() async {
+    final String? otpValidator = Validator.otpAuth(
+      _otpController,
+      _otpLength,
+    );
+
+    setState(() {
+      _otpError = otpValidator;
+    });
+
+    if (otpValidator != null) return;
+
+    setState(() => widget.isLoading!(true));
+
+    try {
+      final response = await AuthApiService().verifyOtp(
+        idContact: _userData!.id_contact,
+        otp: _otpController,
+      );
+
+      if (response.statusCode == 200) {
+        final responseBody = json.decode(response.body);
+        final apiResponse = ApiResponse.fromJson(responseBody);
+
+        if (apiResponse.code == 200) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (ctx) => AuthScreen(
+                authType: AuthType.resetPassword,
+                userData: _userData,
+              ),
+            ),
+          );
+        }
+
+        showSnackBar(context, apiResponse.msg);
       } else {
         showSnackBar(
             context, '$failedRequestText. Status Code: ${response.statusCode}');
