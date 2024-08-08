@@ -125,72 +125,7 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
     }
 
     if (authType == AuthType.register) {
-      final String? phoneValidator = Validator.phoneAuth(phoneNumber);
-
-      setState(() {
-        _phoneError = phoneValidator;
-      });
-
-      if (phoneValidator != null) return;
-
-      if (phoneNumber.startsWith('62')) {
-        phoneNumber = '0${phoneNumber.substring(2)}';
-      } else if (phoneNumber.startsWith('+62')) {
-        phoneNumber = '0${phoneNumber.substring(3)}';
-      } else if (phoneNumber.startsWith('8')) {
-        phoneNumber = '0$phoneNumber';
-      }
-
-      setState(() {
-        widget.isLoading!(true);
-      });
-
-      try {
-        final response = await AuthApiService().fetchRegister(phoneNumber);
-        if (response.statusCode == 200) {
-          final responseBody = json.decode(response.body);
-          final apiResponse = ApiResponse.fromJson(responseBody);
-
-          if (apiResponse.data != null) {
-            final data = ContactModel.fromJson(apiResponse.data!);
-            showCupertinoDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return MInfoModal(
-                  title: 'Apa benar ini toko anda?',
-                  contentName: data.nama,
-                  contentDescription:
-                      data.address!.isEmpty ? data.store_owner : data.address,
-                  contentIcon: Icons.storefront_outlined,
-                  onCancel: () {
-                    Navigator.of(context).pop();
-                  },
-                  confirmText: 'Oke, Lanjut',
-                  onConfirm: () {
-                    Navigator.of(context).pop();
-                    Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(
-                        builder: ((context) => const AuthScreen(
-                              authType: AuthType.otp,
-                            )),
-                      ),
-                    );
-                  },
-                );
-              },
-            );
-          }
-        } else {
-          showSnackBar(context,
-              'Gagal mendapatkan data. Status Code: ${response.statusCode}');
-        }
-      } catch (e) {
-        showSnackBar(context, 'Gagal mendapatkan data. Exception: $e');
-      } finally {
-        setState(() {
-          widget.isLoading!(false);
-        });
-      }
+      registerHandler();
     }
 
     if (authType == AuthType.resetPassword) {
@@ -229,6 +164,75 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
           );
         },
       );
+    }
+  }
+
+  void registerHandler() async {
+    var phoneNumber = _phoneController.text;
+    final String? phoneValidator = Validator.phoneAuth(phoneNumber);
+
+    setState(() {
+      _phoneError = phoneValidator;
+    });
+
+    if (phoneValidator != null) return;
+
+    if (phoneNumber.startsWith('62')) {
+      phoneNumber = '0${phoneNumber.substring(2)}';
+    } else if (phoneNumber.startsWith('+62')) {
+      phoneNumber = '0${phoneNumber.substring(3)}';
+    } else if (phoneNumber.startsWith('8')) {
+      phoneNumber = '0$phoneNumber';
+    }
+
+    setState(() => widget.isLoading!(true));
+
+    try {
+      final response = await AuthApiService().fetchRegister(phoneNumber);
+
+      if (response.statusCode == 200) {
+        final responseBody = json.decode(response.body);
+        final apiResponse = ApiResponse.fromJson(responseBody);
+
+        if (apiResponse.code == 200) {
+          final data = ContactModel.fromJson(apiResponse.data!);
+          showCupertinoDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return MInfoModal(
+                title: 'Apa benar ini toko anda?',
+                contentName: data.nama,
+                contentDescription:
+                    data.address!.isEmpty ? data.store_owner : data.address,
+                contentIcon: Icons.storefront_outlined,
+                onCancel: () {
+                  Navigator.of(context).pop();
+                },
+                confirmText: 'Oke, Lanjut',
+                onConfirm: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(
+                      builder: ((context) => const AuthScreen(
+                            authType: AuthType.otp,
+                          )),
+                    ),
+                  );
+                },
+              );
+            },
+          );
+        } else {
+          showSnackBar(context, apiResponse.msg);
+        }
+      } else {
+        showSnackBar(context,
+            'Gagal mendapatkan data. Status Code: ${response.statusCode}');
+      }
+    } catch (e) {
+      showSnackBar(context, 'Gagal mendapatkan data. Exception: $e');
+    } finally {
+      setState(() => widget.isLoading!(false));
     }
   }
 
