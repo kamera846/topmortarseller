@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:topmortarseller/screen/profile/detail_profile.dart';
+import 'package:topmortarseller/screen/profile/detail_profile_screen.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 
 class MainDrawerItems extends StatelessWidget {
@@ -31,7 +31,7 @@ class MainDrawerItems extends StatelessWidget {
           onTap: () {
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (ctx) => const EditProfileScreen(),
+                builder: (ctx) => const DetailProfileScreen(),
               ),
             );
           },

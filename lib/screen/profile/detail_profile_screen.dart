@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:topmortarseller/data/tag_hero.dart';
+import 'package:topmortarseller/screen/profile/new_rekening_screen.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/widget/card/rekening_card.dart';
 import 'package:topmortarseller/widget/form/button/elevated_button.dart';
 
-class EditProfileScreen extends StatefulWidget {
-  const EditProfileScreen({super.key});
+class DetailProfileScreen extends StatefulWidget {
+  const DetailProfileScreen({super.key});
 
   @override
-  State<EditProfileScreen> createState() => _EditProfileScreenState();
+  State<DetailProfileScreen> createState() => _DetailProfileScreenState();
 }
 
-class _EditProfileScreenState extends State<EditProfileScreen> {
+class _DetailProfileScreenState extends State<DetailProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,7 +46,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         Navigator.of(context).pop();
                       },
                       style: IconButton.styleFrom(
-                        padding: const EdgeInsets.all(1),
+                        padding: const EdgeInsets.all(0),
                       ),
                       icon: const Icon(
                         Icons.arrow_back,
@@ -55,7 +56,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     const SizedBox(width: 8),
                     Text(
                       'Profil Saya',
-                      style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                      style: Theme.of(context).textTheme.titleLarge!.copyWith(
                             color: cWhite,
                           ),
                     ),
@@ -140,7 +141,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             child: MElevatedButton(
               title: 'Tambah Rekening Lain',
               isFullWidth: true,
-              onPressed: () {},
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const NewRekeningScreen(),
+                  ),
+                );
+              },
             ),
           )
         ],
