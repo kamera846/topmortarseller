@@ -9,7 +9,7 @@ import 'package:topmortarseller/services/api.dart';
 import 'package:topmortarseller/services/auth_api_services.dart';
 
 import 'package:topmortarseller/util/auth_settings.dart';
-import 'package:topmortarseller/util/tag_hero.dart';
+import 'package:topmortarseller/util/enum.dart';
 import 'package:topmortarseller/model/auth_settings_model.dart';
 import 'package:topmortarseller/screen/auth_screen.dart';
 import 'package:topmortarseller/screen/home_screen.dart';
@@ -136,6 +136,8 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
         final apiResponse = ApiResponse.fromJson(responseBody);
 
         if (apiResponse.code == 200) {
+          await saveLoginState();
+          await saveContactModel(ContactModel.fromJson(apiResponse.data!));
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
@@ -143,6 +145,7 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
             ),
           );
         }
+
         showSnackBar(context, apiResponse.msg);
       } else {
         showSnackBar(

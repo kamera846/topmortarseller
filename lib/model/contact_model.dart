@@ -1,3 +1,8 @@
+import 'dart:convert';
+
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:topmortarseller/util/enum.dart';
+
 class ContactModel {
   const ContactModel({
     this.idContact,
@@ -49,6 +54,32 @@ class ContactModel {
   final String? kodeCity;
   final String? idDistributor;
 
+  Map<String, dynamic> toJson() => {
+        'id_contact': idContact ?? '',
+        'nama': nama ?? '',
+        'nomorhp': nomorhp ?? '',
+        'tgl_lahir': tglLahir ?? '',
+        'store_owner': storeOwner ?? '',
+        'id_city': idCity ?? '',
+        'maps_url': mapsUrl ?? '',
+        'address': address ?? '',
+        'store_status': storeStatus ?? '',
+        'ktp_owner': ktpOwner ?? '',
+        'termin_payment': terminPayment ?? '',
+        'id_promo': idPromo ?? '',
+        'reputation': reputation ?? '',
+        'created_at': createdAt ?? '',
+        'payment_method': paymentMethod ?? '',
+        'tagih_mingguan': tagihMingguan ?? '',
+        'nomorhp_2': nomorhp2 ?? '',
+        'nomor_cat_1': nomorCat1 ?? '',
+        'nomor_cat_2': nomorCat2 ?? '',
+        'pass_contact': passContact ?? '',
+        'nama_city': namaCity ?? '',
+        'kode_city': kodeCity ?? '',
+        'id_distributor': idDistributor ?? '',
+      };
+
   factory ContactModel.fromJson(Map<String, dynamic> json) {
     return ContactModel(
       idContact: json['id_contact'] ?? '',
@@ -76,4 +107,19 @@ class ContactModel {
       idDistributor: json['id_distributor'] ?? '',
     );
   }
+}
+
+Future<void> saveContactModel(ContactModel model) async {
+  final prefs = await SharedPreferences.getInstance();
+  final jsonString = jsonEncode(model.toJson());
+  await prefs.setString(GlobalEnum.contactModel.toString(), jsonString);
+}
+
+Future<ContactModel?> getContactModel() async {
+  final prefs = await SharedPreferences.getInstance();
+  final jsonString = prefs.getString(GlobalEnum.contactModel.toString());
+  if (jsonString != null) {
+    return ContactModel.fromJson(jsonDecode(jsonString));
+  }
+  return null;
 }

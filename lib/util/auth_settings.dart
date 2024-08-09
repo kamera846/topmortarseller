@@ -1,4 +1,6 @@
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:topmortarseller/model/auth_settings_model.dart';
+import 'package:topmortarseller/util/enum.dart';
 
 const authSettings = {
   AuthType.login: AuthSettingsModel(
@@ -37,3 +39,8 @@ const authSettings = {
     null,
   ),
 };
+
+Future<void> saveLoginState() async {
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.setBool(GlobalEnum.isLoggedIn.toString(), true);
+}
