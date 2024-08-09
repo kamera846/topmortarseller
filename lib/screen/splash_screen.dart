@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:topmortarseller/screen/home_screen.dart';
+import 'package:topmortarseller/util/auth_settings.dart';
 import 'package:topmortarseller/util/enum.dart';
 import 'package:topmortarseller/screen/auth_screen.dart';
 
@@ -18,10 +20,24 @@ class _SplashScreenState extends State<SplashScreen> {
 
   void _delayNavigate() async {
     await Future.delayed(const Duration(milliseconds: 2000), () {});
-    _returnHomScreen();
+    final loginState = await getLoginState();
+    if (loginState) {
+      _returnHomeScreen();
+    } else {
+      _returnAuthScreen();
+    }
   }
 
-  void _returnHomScreen() {
+  void _returnHomeScreen() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const HomeScreen(),
+      ),
+    );
+  }
+
+  void _returnAuthScreen() {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
@@ -35,8 +51,6 @@ class _SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       body: SafeArea(
         child: Center(
-          // child: InkWell(
-          // onTap: _returnHomScreen,
           child: Hero(
             tag: TagHero.faviconAuth,
             child: Image.asset(
@@ -44,7 +58,6 @@ class _SplashScreenState extends State<SplashScreen> {
               width: MediaQuery.of(context).size.width,
             ),
           ),
-          // ),
         ),
       ),
     );

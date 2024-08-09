@@ -44,3 +44,12 @@ Future<void> saveLoginState() async {
   final prefs = await SharedPreferences.getInstance();
   await prefs.setBool(GlobalEnum.isLoggedIn.toString(), true);
 }
+
+Future<bool> getLoginState() async {
+  final prefs = await SharedPreferences.getInstance();
+  final loginState = prefs.getBool(GlobalEnum.isLoggedIn.toString());
+  if (loginState != null) {
+    return loginState;
+  }
+  return false;
+}
