@@ -12,3 +12,8 @@ enum TagHero {
   copyrightAuth,
   mainDrawerHeader,
 }
+
+enum GlobalEnum {
+  isLoggedIn,
+  contactModel,
+}

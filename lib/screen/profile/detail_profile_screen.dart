@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:topmortarseller/util/tag_hero.dart';
+import 'package:topmortarseller/util/enum.dart';
 import 'package:topmortarseller/screen/profile/new_rekening_screen.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/widget/card/rekening_card.dart';
