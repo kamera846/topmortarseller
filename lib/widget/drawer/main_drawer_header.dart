@@ -3,7 +3,14 @@ import 'package:topmortarseller/util/enum.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 
 class MainDrawerHeader extends StatelessWidget {
-  const MainDrawerHeader({super.key});
+  const MainDrawerHeader({
+    super.key,
+    required this.title,
+    required this.description,
+  });
+
+  final String title;
+  final String description;
 
   @override
   Widget build(BuildContext context) {
@@ -35,13 +42,13 @@ class MainDrawerHeader extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    'Toko Barokah Jaya',
+                    title,
                     style: Theme.of(context).textTheme.titleMedium!.copyWith(
                           color: cWhite,
                         ),
                   ),
                   Text(
-                    'Jl Anggrek 3 asrikaton kec. pakis kab. malang',
+                    description,
                     softWrap: true,
                     overflow: TextOverflow.visible,
                     style: Theme.of(context).textTheme.bodySmall!.copyWith(

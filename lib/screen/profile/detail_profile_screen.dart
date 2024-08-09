@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:topmortarseller/model/contact_model.dart';
 import 'package:topmortarseller/util/enum.dart';
 import 'package:topmortarseller/screen/profile/new_rekening_screen.dart';
 import 'package:topmortarseller/util/colors/color.dart';
@@ -13,8 +14,43 @@ class DetailProfileScreen extends StatefulWidget {
 }
 
 class _DetailProfileScreenState extends State<DetailProfileScreen> {
+  late ContactModel? userData;
+
+  @override
+  void initState() {
+    super.initState();
+    _getUserData();
+  }
+
+  void _getUserData() async {
+    final data = await getContactModel();
+    setState(() {
+      userData = data;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    var title = '-';
+    var description = '-';
+
+    if (userData != null) {
+      if (userData!.nama != null &&
+          userData!.nama != null &&
+          userData!.nama!.isNotEmpty) {
+        title = userData!.nama!;
+      }
+      if (userData!.address != null &&
+          userData!.address != null &&
+          userData!.address!.isNotEmpty) {
+        description = userData!.address!;
+      } else if (userData!.nomorhp != null &&
+          userData!.nomorhp != null &&
+          userData!.nomorhp!.isNotEmpty) {
+        description = userData!.nomorhp!;
+      }
+    }
+
     return Scaffold(
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -80,7 +116,7 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              'Toko Barokah Jaya',
+                              title,
                               style: Theme.of(context)
                                   .textTheme
                                   .titleMedium!
@@ -89,7 +125,7 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
                                   ),
                             ),
                             Text(
-                              'Jl Anggrek 3 asrikaton kec. pakis kab. malang',
+                              description,
                               softWrap: true,
                               overflow: TextOverflow.visible,
                               style: Theme.of(context)
