@@ -123,3 +123,8 @@ Future<ContactModel?> getContactModel() async {
   }
   return null;
 }
+
+Future<void> removeContactModel() async {
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.remove(GlobalEnum.contactModel.toString());
+}

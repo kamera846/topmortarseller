@@ -53,3 +53,8 @@ Future<bool> getLoginState() async {
   }
   return false;
 }
+
+Future<void> removeLoginState() async {
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.remove(GlobalEnum.isLoggedIn.toString());
+}

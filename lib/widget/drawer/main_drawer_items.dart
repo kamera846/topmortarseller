@@ -1,11 +1,46 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:topmortarseller/model/contact_model.dart';
 import 'package:topmortarseller/screen/auth_screen.dart';
 import 'package:topmortarseller/screen/profile/detail_profile_screen.dart';
+import 'package:topmortarseller/util/auth_settings.dart';
 import 'package:topmortarseller/util/colors/color.dart';
+import 'package:topmortarseller/widget/modal/info_modal.dart';
 
 class MainDrawerItems extends StatelessWidget {
   const MainDrawerItems({super.key});
+
+  void _showConfirmlogout(BuildContext context) {
+    showCupertinoDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return MInfoModal(
+          contentName: 'Keluar dari akun?',
+          contentDescription:
+              'Anda diharuskan login kembali ketika mengakses aplikasi jika keluar dari akun.',
+          contentIcon: Icons.warning_rounded,
+          contentIconColor: cPrimary100,
+          cancelText: 'Batal',
+          onCancel: () {
+            Navigator.of(context).pop();
+          },
+          confirmText: 'Oke',
+          onConfirm: () async {
+            await removeLoginState();
+            await removeContactModel();
+            Navigator.of(context).pop();
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (ctx) => const AuthScreen(),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,6 +65,7 @@ class MainDrawerItems extends StatelessWidget {
                 ),
           ),
           onTap: () {
+            Navigator.of(context).pop();
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (ctx) => const DetailProfileScreen(),
@@ -64,11 +100,7 @@ class MainDrawerItems extends StatelessWidget {
           ),
           onTap: () {
             Navigator.of(context).pop();
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
-                builder: (ctx) => const AuthScreen(),
-              ),
-            );
+            _showConfirmlogout(context);
           },
         ),
       ],
