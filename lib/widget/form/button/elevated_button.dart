@@ -7,11 +7,13 @@ class MElevatedButton extends StatefulWidget {
     required this.title,
     required this.onPressed,
     this.isFullWidth = false,
+    this.enabled = true,
   });
 
   final String title;
   final void Function() onPressed;
   final bool isFullWidth;
+  final bool enabled;
 
   @override
   State<MElevatedButton> createState() => _MElevatedButtonState();
@@ -29,9 +31,9 @@ class _MElevatedButtonState extends State<MElevatedButton> {
     );
 
     return ElevatedButton(
-      onPressed: widget.onPressed,
+      onPressed: widget.enabled ? widget.onPressed : null,
       style: ElevatedButton.styleFrom(
-        backgroundColor: cPrimary100,
+        backgroundColor: widget.enabled ? cPrimary100 : cDark400,
         foregroundColor: cWhite,
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
       ),

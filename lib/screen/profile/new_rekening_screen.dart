@@ -30,6 +30,52 @@ class _NewRekeningScreenState extends State<NewRekeningScreen> {
   String? _noRekeningErrorText;
   String? _ownerNameErrorText;
 
+  bool isValidForm = false;
+
+  void _checkOwnerName() {
+    if (_selectedBank == options[0]) {
+      setState(() {
+        _selectedErrorText = 'Pilih Bank Anda';
+      });
+      return;
+    } else {
+      setState(() {
+        _selectedErrorText = null;
+      });
+    }
+
+    if (_noRekeningController.text.isEmpty) {
+      setState(() {
+        _noRekeningErrorText = 'Anda belum mengisi kolom nomor rekening!';
+        _ownerNameController.text = '';
+        _ownerNameErrorText = null;
+      });
+      return;
+    } else {
+      setState(() {
+        _noRekeningErrorText = null;
+        _ownerNameController.text = '';
+        _ownerNameErrorText = null;
+      });
+    }
+
+    if (_noRekeningController.text == '12345') {
+      setState(() {
+        _noRekeningErrorText = null;
+        _ownerNameController.text = 'Mochammad Rafli Ramadani';
+        _ownerNameErrorText = null;
+        isValidForm = true;
+      });
+    } else {
+      setState(() {
+        _noRekeningErrorText = null;
+        _ownerNameController.text = '';
+        _ownerNameErrorText =
+            'Tidak dapat menemukan nomor rekening atau e-wallet.';
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -64,56 +110,46 @@ class _NewRekeningScreenState extends State<NewRekeningScreen> {
             ),
             MTextField(
                 controller: _noRekeningController,
-                label: 'Nomor Rekening',
+                label: 'Nomor Rekening atau E-Wallet',
                 keyboardType: TextInputType.number,
                 errorText: _noRekeningErrorText,
-                rightContent: TextButton(
-                  onPressed: () {
-                    _ownerNameController.text = 'Mochammad Rafli Ramadani';
-                  },
-                  child: Text(
-                    'Cek Pemilik',
-                    style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                          color: cDark300,
-                        ),
-                  ),
+                onChanged: (value) {}),
+            MElevatedButton(
+              title: 'Cek Nama Pemilik',
+              onPressed: _checkOwnerName,
+            ),
+            const SizedBox(height: 12),
+            if (_ownerNameController.text.isNotEmpty)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).scaffoldBackgroundColor,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(width: 1, color: cDark400),
                 ),
-                onChanged: (value) {}),
-            MTextField(
-                label: 'Nama Pemilik',
-                controller: _ownerNameController,
-                enabled: false,
-                errorText: _ownerNameErrorText,
-                onChanged: (value) {}),
+                child: Text(
+                  _ownerNameController.text,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleMedium!
+                      .copyWith(color: cDark200, fontWeight: FontWeight.bold),
+                ),
+              ),
+            if (_ownerNameErrorText != null && _ownerNameErrorText!.isNotEmpty)
+              Text(
+                _ownerNameErrorText!,
+                style: const TextStyle(color: cPrimary100),
+              ),
             Expanded(
               child: Container(),
             ),
             MElevatedButton(
               title: 'Simpan Rekening',
               isFullWidth: true,
-              onPressed: () {
-                if (_selectedBank == options[0]) {
-                  setState(() {
-                    _selectedErrorText = 'Pilih Bank Anda';
-                  });
-                  return;
-                } else {
-                  setState(() {
-                    _selectedErrorText = null;
-                  });
-                }
-                if (_noRekeningController.text.isEmpty) {
-                  setState(() {
-                    _noRekeningErrorText =
-                        'Anda belum mengisi kolom nomor rekening!';
-                  });
-                  return;
-                } else {
-                  setState(() {
-                    _noRekeningErrorText = null;
-                  });
-                }
-              },
+              enabled: isValidForm ? true : false,
+              onPressed: () {},
             ),
           ],
         ),
@@ -161,12 +197,15 @@ class _SelectBankFieldState extends State<SelectBankField> {
           child:
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             const Text(
-              'Nama Bank',
+              'Nama Bank atau E-Wallet',
               style: TextStyle(
-                  color: cDark300, fontSize: 10, fontWeight: FontWeight.bold),
+                  color: cDark300, fontSize: 11, fontWeight: FontWeight.w500),
             ),
             DropdownButtonFormField(
-              decoration: const InputDecoration(border: InputBorder.none),
+              decoration: const InputDecoration(
+                border: InputBorder.none,
+              ),
+              dropdownColor: cWhite,
               value: selectedValue,
               onChanged: (String? newValue) {
                 setState(() {
@@ -178,7 +217,14 @@ class _SelectBankFieldState extends State<SelectBankField> {
                   widget.options.map<DropdownMenuItem<String>>((String value) {
                 return DropdownMenuItem<String>(
                   value: value,
-                  child: Text(value),
+                  child: Text(
+                    value,
+                    style: Theme.of(context).textTheme.titleSmall!.copyWith(
+                          color: cDark200,
+                          fontWeight: FontWeight.w500,
+                          fontSize: 14,
+                        ),
+                  ),
                 );
               }).toList(),
             )

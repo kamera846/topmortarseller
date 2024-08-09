@@ -55,99 +55,16 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            padding: EdgeInsets.only(
-              top: MediaQuery.of(context).padding.top + 12,
-              right: 0,
-              bottom: 12,
-              left: 0,
-            ),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  cPrimary100,
-                  cPrimary100.withOpacity(0.8),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    const SizedBox(width: 12),
-                    IconButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      style: IconButton.styleFrom(
-                        padding: const EdgeInsets.all(0),
-                      ),
-                      icon: const Icon(
-                        Icons.arrow_back,
-                        color: cWhite,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Profil Saya',
-                      style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                            color: cWhite,
-                          ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Hero(
-                  tag: TagHero.mainDrawerHeader,
-                  child: Row(
-                    children: [
-                      const SizedBox(width: 12),
-                      const Icon(
-                        Icons.storefront,
-                        size: 48,
-                        color: cWhite,
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              title,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium!
-                                  .copyWith(
-                                    color: cWhite,
-                                  ),
-                            ),
-                            Text(
-                              description,
-                              softWrap: true,
-                              overflow: TextOverflow.visible,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodySmall!
-                                  .copyWith(
-                                    color: cPrimary600,
-                                  ),
-                            )
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+          DetailProfileHeader(
+            title: title,
+            description: description,
           ),
           Expanded(
             child: Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 24,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -186,6 +103,106 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
               },
             ),
           )
+        ],
+      ),
+    );
+  }
+}
+
+class DetailProfileHeader extends StatelessWidget {
+  const DetailProfileHeader({
+    super.key,
+    required this.title,
+    required this.description,
+  });
+
+  final String title;
+  final String description;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.only(
+        top: MediaQuery.of(context).padding.top + 12,
+        right: 0,
+        bottom: 24,
+        left: 0,
+      ),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            cPrimary100,
+            cPrimary100.withOpacity(0.8),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              const SizedBox(width: 12),
+              IconButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                style: IconButton.styleFrom(
+                  padding: const EdgeInsets.all(0),
+                ),
+                icon: const Icon(
+                  Icons.arrow_back,
+                  color: cWhite,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Profil Saya',
+                style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                      color: cWhite,
+                    ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Hero(
+            tag: TagHero.mainDrawerHeader,
+            child: Row(
+              children: [
+                const SizedBox(width: 12),
+                const Icon(
+                  Icons.storefront,
+                  size: 48,
+                  color: cWhite,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        title,
+                        style:
+                            Theme.of(context).textTheme.titleMedium!.copyWith(
+                                  color: cWhite,
+                                ),
+                      ),
+                      Text(
+                        description,
+                        softWrap: true,
+                        overflow: TextOverflow.visible,
+                        style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                              color: cPrimary600,
+                            ),
+                      )
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 12),
+              ],
+            ),
+          ),
         ],
       ),
     );
