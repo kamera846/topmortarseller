@@ -5,7 +5,6 @@ import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:topmortarseller/screen/scanner/scanner_result_screen.dart';
 import 'package:topmortarseller/util/enum.dart';
 import 'package:topmortarseller/util/colors/color.dart';
-import 'package:topmortarseller/widget/card/rekening_card.dart';
 
 class QRScannerScreen extends StatefulWidget {
   const QRScannerScreen({super.key, required this.onScanResult});
