@@ -37,7 +37,7 @@ class BankApiService {
       onError('$failedRequestText. Exception: $e');
       return items;
     } finally {
-      onCompleted;
+      onCompleted();
     }
   }
 }

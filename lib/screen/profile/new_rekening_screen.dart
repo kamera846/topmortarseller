@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:topmortarseller/model/bank_model.dart';
 import 'package:topmortarseller/services/bank_api.dart';
 import 'package:topmortarseller/util/colors/color.dart';
+import 'package:topmortarseller/util/loading_item.dart';
 import 'package:topmortarseller/widget/form/button/elevated_button.dart';
 import 'package:topmortarseller/widget/form/textfield/text_field.dart';
 import 'package:topmortarseller/widget/snackbar/show_snackbar.dart';
+
+BankModel defaultBank = const BankModel(
+    idBank: '-1', namaBank: '== Pilih Bank ==', isBca: '-1', swiftBank: '-1');
 
 class NewRekeningScreen extends StatefulWidget {
   const NewRekeningScreen({super.key});
@@ -13,18 +18,8 @@ class NewRekeningScreen extends StatefulWidget {
 }
 
 class _NewRekeningScreenState extends State<NewRekeningScreen> {
-  final List<String> options = [
-    '== Pilih Bank ==',
-    '1 PT. BCA (Bank Central Asia) TBK',
-    '2 BNI (PT. Bank Nasional Indonesia)',
-    '3 PT. BCA (Bank Central Asia) TBK',
-    '4 BNI (PT. Bank Nasional Indonesia)',
-    '5 PT. BCA (Bank Central Asia) TBK',
-    '6 BNI (PT. Bank Nasional Indonesia)',
-    '7 PT. BCA (Bank Central Asia) TBK',
-    '8 BNI (PT. Bank Nasional Indonesia)',
-  ];
-  String? _selectedBank;
+  List<BankModel> options = [];
+  BankModel? _selectedBank;
   final _noRekeningController = TextEditingController();
   final _ownerNameController = TextEditingController();
 
@@ -33,31 +28,33 @@ class _NewRekeningScreenState extends State<NewRekeningScreen> {
   String? _ownerNameErrorText;
 
   bool isValidForm = false;
-  bool isLoading = false;
+  bool isLoading = true;
 
   @override
   void initState() {
-    _selectedBank = options[0];
     _getBanks();
     super.initState();
   }
 
   _getBanks() async {
     setState(() => isLoading = true);
-    final items = await BankApiService().banks(
-      onError: (e) => showSnackBar(context, e),
-      onCompleted: () => setState(() => isLoading = false),
-    );
+    List<BankModel>? items = [];
+    items = await BankApiService().banks(
+        onError: (e) => showSnackBar(context, e),
+        onCompleted: () {
+          setState(() {
+            isLoading = false;
+          });
+        });
 
-    if (items != null && items.isNotEmpty) {
-      print(items[0].namaBank);
-    } else {
-      print(items);
-    }
+    setState(() {
+      items?.insert(0, defaultBank);
+      options = items!;
+    });
   }
 
   void _checkOwnerName() {
-    if (_selectedBank == null && _selectedBank == options[0]) {
+    if (_selectedBank == null || _selectedBank?.idBank == '-1') {
       setState(() {
         _selectedErrorText = 'Pilih Bank Anda';
       });
@@ -126,6 +123,8 @@ class _NewRekeningScreenState extends State<NewRekeningScreen> {
             SelectBankField(
               options: options,
               errorText: _selectedErrorText,
+              isLoading: isLoading,
+              selectedBank: _selectedBank ?? defaultBank,
               onChange: (value) {
                 setState(() {
                   _selectedBank = value;
@@ -187,11 +186,15 @@ class SelectBankField extends StatefulWidget {
     super.key,
     required this.onChange,
     required this.options,
+    required this.isLoading,
+    required this.selectedBank,
     this.errorText,
   });
 
-  final Function(String) onChange;
-  final List<String> options;
+  final Function(BankModel) onChange;
+  final List<BankModel> options;
+  final BankModel selectedBank;
+  final bool isLoading;
   final String? errorText;
 
   @override
@@ -201,8 +204,6 @@ class SelectBankField extends StatefulWidget {
 class _SelectBankFieldState extends State<SelectBankField> {
   @override
   Widget build(BuildContext context) {
-    String selectedValue = widget.options[0];
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -218,41 +219,47 @@ class _SelectBankFieldState extends State<SelectBankField> {
               width: 1,
             ),
           ),
-          child:
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            const Text(
-              'Nama Bank atau E-Wallet',
-              style: TextStyle(
-                  color: cDark300, fontSize: 11, fontWeight: FontWeight.w500),
-            ),
-            DropdownButtonFormField(
-              decoration: const InputDecoration(
-                border: InputBorder.none,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Nama Bank atau E-Wallet',
+                style: TextStyle(
+                    color: cDark300, fontSize: 11, fontWeight: FontWeight.w500),
               ),
-              dropdownColor: cWhite,
-              value: selectedValue,
-              onChanged: (String? newValue) {
-                setState(() {
-                  selectedValue = newValue!;
-                  widget.onChange(newValue);
-                });
-              },
-              items:
-                  widget.options.map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(
-                    value,
-                    style: Theme.of(context).textTheme.titleSmall!.copyWith(
-                          color: cDark200,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 14,
-                        ),
-                  ),
-                );
-              }).toList(),
-            )
-          ]),
+              widget.isLoading
+                  ? const LoadingItem(
+                      margin: EdgeInsets.only(bottom: 12),
+                    )
+                  : DropdownButtonFormField<BankModel>(
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                      ),
+                      dropdownColor: cWhite,
+                      value: widget.selectedBank,
+                      onChanged: (BankModel? value) {
+                        widget.onChange(value!);
+                      },
+                      items: widget.options
+                          .map<DropdownMenuItem<BankModel>>((BankModel bank) {
+                        return DropdownMenuItem<BankModel>(
+                          value: bank,
+                          child: Text(
+                            bank.namaBank!,
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleSmall!
+                                .copyWith(
+                                  color: cDark200,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 14,
+                                ),
+                          ),
+                        );
+                      }).toList(),
+                    )
+            ],
+          ),
         ),
         if (widget.errorText != null)
           Text(
