@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:topmortarseller/model/contact_model.dart';
 import 'package:topmortarseller/util/enum.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/widget/drawer/main_drawer.dart';
@@ -13,21 +12,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  late ContactModel? userData;
-
-  @override
-  void initState() {
-    super.initState();
-    _getUserData();
-  }
-
-  void _getUserData() async {
-    final data = await getContactModel();
-    setState(() {
-      userData = data;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,9 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      drawer: MainDrawer(
-        userData: userData,
-      ),
+      drawer: const MainDrawer(),
       body: const Center(
         child: Column(
           children: [

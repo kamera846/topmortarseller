@@ -4,33 +4,45 @@ import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/widget/drawer/main_drawer_header.dart';
 import 'package:topmortarseller/widget/drawer/main_drawer_items.dart';
 
-class MainDrawer extends StatelessWidget {
-  const MainDrawer({super.key, this.userData});
+class MainDrawer extends StatefulWidget {
+  const MainDrawer({super.key});
 
-  final ContactModel? userData;
+  @override
+  State<MainDrawer> createState() => _MainDrawerState();
+}
+
+class _MainDrawerState extends State<MainDrawer> {
+  String? title;
+  String? description;
+
+  @override
+  void initState() {
+    _getUserData();
+    super.initState();
+  }
+
+  void _getUserData() async {
+    final data = await getContactModel();
+    setState(() {
+      if (data != null) {
+        if (data.nama != null && data.nama != null && data.nama!.isNotEmpty) {
+          title = data.nama!;
+        }
+        if (data.address != null &&
+            data.address != null &&
+            data.address!.isNotEmpty) {
+          description = data.address!;
+        } else if (data.nomorhp != null &&
+            data.nomorhp != null &&
+            data.nomorhp!.isNotEmpty) {
+          description = data.nomorhp!;
+        }
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    var title = '-';
-    var description = '-';
-
-    if (userData != null) {
-      if (userData!.nama != null &&
-          userData!.nama != null &&
-          userData!.nama!.isNotEmpty) {
-        title = userData!.nama!;
-      }
-      if (userData!.address != null &&
-          userData!.address != null &&
-          userData!.address!.isNotEmpty) {
-        description = userData!.address!;
-      } else if (userData!.nomorhp != null &&
-          userData!.nomorhp != null &&
-          userData!.nomorhp!.isNotEmpty) {
-        description = userData!.nomorhp!;
-      }
-    }
-
     return Drawer(
       backgroundColor: cWhite,
       child: Column(

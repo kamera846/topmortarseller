@@ -3,6 +3,7 @@ import 'package:topmortarseller/model/contact_model.dart';
 import 'package:topmortarseller/util/enum.dart';
 import 'package:topmortarseller/screen/profile/new_rekening_screen.dart';
 import 'package:topmortarseller/util/colors/color.dart';
+import 'package:topmortarseller/util/loading_item.dart';
 import 'package:topmortarseller/widget/card/rekening_card.dart';
 import 'package:topmortarseller/widget/form/button/elevated_button.dart';
 
@@ -14,43 +15,37 @@ class DetailProfileScreen extends StatefulWidget {
 }
 
 class _DetailProfileScreenState extends State<DetailProfileScreen> {
-  late ContactModel? userData;
+  String? title;
+  String? description;
 
   @override
   void initState() {
-    super.initState();
     _getUserData();
+    super.initState();
   }
 
   void _getUserData() async {
     final data = await getContactModel();
     setState(() {
-      userData = data;
+      if (data != null) {
+        if (data.nama != null && data.nama != null && data.nama!.isNotEmpty) {
+          title = data.nama!;
+        }
+        if (data.address != null &&
+            data.address != null &&
+            data.address!.isNotEmpty) {
+          description = data.address!;
+        } else if (data.nomorhp != null &&
+            data.nomorhp != null &&
+            data.nomorhp!.isNotEmpty) {
+          description = data.nomorhp!;
+        }
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    var title = '-';
-    var description = '-';
-
-    if (userData != null) {
-      if (userData!.nama != null &&
-          userData!.nama != null &&
-          userData!.nama!.isNotEmpty) {
-        title = userData!.nama!;
-      }
-      if (userData!.address != null &&
-          userData!.address != null &&
-          userData!.address!.isNotEmpty) {
-        description = userData!.address!;
-      } else if (userData!.nomorhp != null &&
-          userData!.nomorhp != null &&
-          userData!.nomorhp!.isNotEmpty) {
-        description = userData!.nomorhp!;
-      }
-    }
-
     return Scaffold(
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -76,10 +71,11 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
                         style: Theme.of(context).textTheme.titleSmall,
                       ),
                       Text(
-                          'Digunakan untuk tujuan transfer promo cashback dari kami.',
-                          softWrap: true,
-                          overflow: TextOverflow.visible,
-                          style: Theme.of(context).textTheme.bodySmall)
+                        'Digunakan untuk tujuan transfer promo cashback dari kami.',
+                        softWrap: true,
+                        overflow: TextOverflow.visible,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
                     ],
                   ),
                   const SizedBox(height: 12),
@@ -116,8 +112,8 @@ class DetailProfileHeader extends StatelessWidget {
     required this.description,
   });
 
-  final String title;
-  final String description;
+  final String? title;
+  final String? description;
 
   @override
   Widget build(BuildContext context) {
@@ -181,21 +177,30 @@ class DetailProfileHeader extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
-                        title,
-                        style:
-                            Theme.of(context).textTheme.titleMedium!.copyWith(
-                                  color: cWhite,
-                                ),
-                      ),
-                      Text(
-                        description,
-                        softWrap: true,
-                        overflow: TextOverflow.visible,
-                        style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                              color: cPrimary600,
+                      title == null
+                          ? const LoadingItem()
+                          : Text(
+                              title!,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium!
+                                  .copyWith(
+                                    color: cWhite,
+                                  ),
                             ),
-                      )
+                      description == null
+                          ? const LoadingItem()
+                          : Text(
+                              description!,
+                              softWrap: true,
+                              overflow: TextOverflow.visible,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall!
+                                  .copyWith(
+                                    color: cPrimary600,
+                                  ),
+                            )
                     ],
                   ),
                 ),

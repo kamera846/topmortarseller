@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:topmortarseller/util/enum.dart';
 import 'package:topmortarseller/util/colors/color.dart';
+import 'package:topmortarseller/util/loading_item.dart';
 
 class MainDrawerHeader extends StatelessWidget {
   const MainDrawerHeader({
@@ -9,8 +10,8 @@ class MainDrawerHeader extends StatelessWidget {
     required this.description,
   });
 
-  final String title;
-  final String description;
+  final String? title;
+  final String? description;
 
   @override
   Widget build(BuildContext context) {
@@ -41,20 +42,26 @@ class MainDrawerHeader extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    title,
-                    style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                          color: cWhite,
+                  title == null
+                      ? const LoadingItem()
+                      : Text(
+                          title!,
+                          style:
+                              Theme.of(context).textTheme.titleMedium!.copyWith(
+                                    color: cWhite,
+                                  ),
                         ),
-                  ),
-                  Text(
-                    description,
-                    softWrap: true,
-                    overflow: TextOverflow.visible,
-                    style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                          color: cPrimary600,
-                        ),
-                  )
+                  description == null
+                      ? const LoadingItem()
+                      : Text(
+                          description!,
+                          softWrap: true,
+                          overflow: TextOverflow.visible,
+                          style:
+                              Theme.of(context).textTheme.bodySmall!.copyWith(
+                                    color: cPrimary600,
+                                  ),
+                        )
                 ],
               ),
             ),
