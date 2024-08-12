@@ -2,7 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 
 class RekeningCard extends StatefulWidget {
-  const RekeningCard({super.key});
+  const RekeningCard({
+    super.key,
+    this.backgroundColor = cWhite,
+    this.rightIcon = Icons.keyboard_arrow_right_rounded,
+    this.rightIconColor = cDark200,
+    this.action,
+    this.withDeleteAction = true,
+  });
+
+  final Color backgroundColor;
+  final IconData rightIcon;
+  final Color rightIconColor;
+  final Function()? action;
+  final bool withDeleteAction;
 
   @override
   State<RekeningCard> createState() => _RekeningCardState();
@@ -11,7 +24,7 @@ class RekeningCard extends StatefulWidget {
 class _RekeningCardState extends State<RekeningCard> {
   @override
   Widget build(BuildContext context) {
-    return Card(
+    Widget cardWidget = Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 0,
       shape: RoundedRectangleBorder(
@@ -21,7 +34,7 @@ class _RekeningCardState extends State<RekeningCard> {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
         decoration: BoxDecoration(
-          color: cWhite,
+          color: widget.backgroundColor,
           border: Border.all(color: cDark500, width: 1),
           borderRadius: BorderRadius.circular(8),
         ),
@@ -49,7 +62,7 @@ class _RekeningCardState extends State<RekeningCard> {
                   Text(
                     'a.n Mochammad Rafli Ramadani',
                     style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                          color: cDark200,
+                          color: cDark100,
                           fontWeight: FontWeight.normal,
                         ),
                   ),
@@ -57,15 +70,23 @@ class _RekeningCardState extends State<RekeningCard> {
               ),
             ),
             IconButton(
-              onPressed: () {},
-              icon: const Icon(
-                Icons.delete_forever_rounded,
-                color: cDark200,
+              onPressed: widget.action ?? () {},
+              icon: Icon(
+                widget.withDeleteAction == true
+                    ? Icons.delete_forever_rounded
+                    : widget.rightIcon,
+                color: widget.rightIconColor,
               ),
             ),
           ],
         ),
       ),
     );
+    return widget.action != null
+        ? InkWell(
+            onTap: widget.action,
+            child: cardWidget,
+          )
+        : cardWidget;
   }
 }

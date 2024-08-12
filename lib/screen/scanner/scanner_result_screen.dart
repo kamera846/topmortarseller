@@ -1,7 +1,5 @@
-import 'dart:io';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/widget/card/rekening_card.dart';
 import 'package:topmortarseller/widget/form/button/elevated_button.dart';
 
@@ -15,8 +13,24 @@ class ScannerResultScreen extends StatefulWidget {
 }
 
 class _ScannerResultScreenState extends State<ScannerResultScreen> {
+  int selectedPosition = -1;
+
   @override
   Widget build(BuildContext context) {
+    List<Widget> cards = [];
+    for (var i = 0; i < 5; i++) {
+      cards.add(
+        RekeningCard(
+          backgroundColor: i == selectedPosition ? cPrimary600 : cWhite,
+          withDeleteAction: false,
+          action: () {
+            setState(() {
+              selectedPosition = i;
+            });
+          },
+        ),
+      );
+    }
     return Container(
       padding: const EdgeInsets.all(12),
       child: Column(
@@ -24,25 +38,26 @@ class _ScannerResultScreenState extends State<ScannerResultScreen> {
         children: [
           Text(
             'Konfirmasi rekening tujuan',
-            style: Theme.of(context).textTheme.titleMedium,
+            style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
           ),
           const SizedBox(height: 12),
-          const Expanded(
+          Expanded(
             child: SingleChildScrollView(
-              child: Column(children: [
-                RekeningCard(),
-                RekeningCard(),
-                RekeningCard(),
-                RekeningCard(),
-                RekeningCard(),
-                RekeningCard(),
-              ]),
+              child: Column(
+                children: cards,
+              ),
             ),
           ),
           MElevatedButton(
             title: 'Lanjutkan',
             isFullWidth: true,
-            onPressed: () {},
+            enabled: selectedPosition != -1 ? true : false,
+            onPressed: () {
+              Navigator.of(context).pop();
+              Navigator.of(context).pop();
+            },
           )
         ],
       ),
