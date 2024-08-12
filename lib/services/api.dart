@@ -7,12 +7,14 @@ class ApiResponse {
   final String status;
   final String msg;
   final Map<String, dynamic>? data;
+  final List<dynamic>? listData;
 
   ApiResponse({
     required this.code,
     required this.status,
     required this.msg,
     this.data,
+    this.listData,
   });
 
   factory ApiResponse.fromJson(Map<String, dynamic> json) {
@@ -21,6 +23,15 @@ class ApiResponse {
       status: json['status'],
       msg: json['msg'],
       data: json['data'],
+    );
+  }
+
+  factory ApiResponse.fromJsonList(Map<String, dynamic> json) {
+    return ApiResponse(
+      code: json['code'],
+      status: json['status'],
+      msg: json['msg'],
+      listData: json['data'],
     );
   }
 }

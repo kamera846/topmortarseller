@@ -6,7 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:topmortarseller/model/contact_model.dart';
 import 'package:topmortarseller/services/api.dart';
-import 'package:topmortarseller/services/auth_api_services.dart';
+import 'package:topmortarseller/services/auth_api.dart';
 
 import 'package:topmortarseller/util/auth_settings.dart';
 import 'package:topmortarseller/util/enum.dart';
