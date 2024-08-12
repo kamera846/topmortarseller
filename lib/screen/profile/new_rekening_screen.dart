@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:topmortarseller/services/bank_api.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/widget/form/button/elevated_button.dart';
 import 'package:topmortarseller/widget/form/textfield/text_field.dart';
+import 'package:topmortarseller/widget/snackbar/show_snackbar.dart';
 
 class NewRekeningScreen extends StatefulWidget {
   const NewRekeningScreen({super.key});
@@ -22,7 +24,7 @@ class _NewRekeningScreenState extends State<NewRekeningScreen> {
     '7 PT. BCA (Bank Central Asia) TBK',
     '8 BNI (PT. Bank Nasional Indonesia)',
   ];
-  String? _selectedBank = '== Pilih Bank ==';
+  String? _selectedBank;
   final _noRekeningController = TextEditingController();
   final _ownerNameController = TextEditingController();
 
@@ -31,9 +33,31 @@ class _NewRekeningScreenState extends State<NewRekeningScreen> {
   String? _ownerNameErrorText;
 
   bool isValidForm = false;
+  bool isLoading = false;
+
+  @override
+  void initState() {
+    _selectedBank = options[0];
+    _getBanks();
+    super.initState();
+  }
+
+  _getBanks() async {
+    setState(() => isLoading = true);
+    final items = await BankApiService().banks(
+      onError: (e) => showSnackBar(context, e),
+      onCompleted: () => setState(() => isLoading = false),
+    );
+
+    if (items != null && items.isNotEmpty) {
+      print(items[0].namaBank);
+    } else {
+      print(items);
+    }
+  }
 
   void _checkOwnerName() {
-    if (_selectedBank == options[0]) {
+    if (_selectedBank == null && _selectedBank == options[0]) {
       setState(() {
         _selectedErrorText = 'Pilih Bank Anda';
       });
