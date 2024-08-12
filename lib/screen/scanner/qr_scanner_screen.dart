@@ -40,12 +40,24 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
         setState(() {
           isScanResultFounded = true;
         });
-        widget.onScanResult(scanData.code);
-        qrController!.pauseCamera;
-        Navigator.of(context).pop();
+        showScannerResultScreen(scanData);
         return;
       }
     });
+  }
+
+  void showScannerResultScreen(Barcode data) async {
+    qrController!.pauseCamera();
+    // print('Scan Data: ${data.code}');
+    await showModalBottomSheet(
+      barrierColor: cDark100.withOpacity(0.7),
+      context: context,
+      builder: (ctx) => const ScannerResultScreen(),
+    );
+    setState(() {
+      isScanResultFounded = false;
+    });
+    qrController!.resumeCamera();
   }
 
   @override
@@ -101,23 +113,6 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
                   ),
                 )
               ],
-            ),
-          ),
-          Positioned(
-            bottom: 24,
-            left: 24,
-            right: 24,
-            child: ElevatedButton(
-              onPressed: () async {
-                print('Bottom dialog showed.');
-                qrController!.pauseCamera();
-                await showModalBottomSheet(
-                    context: context,
-                    builder: (ctx) => const ScannerResultScreen());
-                print('Bottom dialog closed.');
-                qrController!.resumeCamera();
-              },
-              child: const Text('Unggah Gambar'),
             ),
           ),
         ],

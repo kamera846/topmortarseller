@@ -16,6 +16,14 @@ class _ScannerResultScreenState extends State<ScannerResultScreen> {
   int selectedPosition = -1;
 
   @override
+  void dispose() {
+    setState(() {
+      selectedPosition = -1;
+    });
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     List<Widget> cards = [];
     for (var i = 0; i < 5; i++) {
@@ -31,6 +39,7 @@ class _ScannerResultScreenState extends State<ScannerResultScreen> {
         ),
       );
     }
+
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: const BoxDecoration(
