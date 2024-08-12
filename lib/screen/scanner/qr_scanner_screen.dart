@@ -5,6 +5,7 @@ import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:topmortarseller/screen/scanner/scanner_result_screen.dart';
 import 'package:topmortarseller/util/enum.dart';
 import 'package:topmortarseller/util/colors/color.dart';
+import 'package:topmortarseller/widget/card/rekening_card.dart';
 
 class QRScannerScreen extends StatefulWidget {
   const QRScannerScreen({super.key, required this.onScanResult});
@@ -112,13 +113,8 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
                 print('Bottom dialog showed.');
                 qrController!.pauseCamera();
                 await showModalBottomSheet(
-                  useSafeArea: true,
-                  context: context,
-                  showDragHandle: true,
-                  // isScrollControlled: true,
-                  backgroundColor: cWhite,
-                  builder: (ctx) => const ScannerResultScreen(),
-                );
+                    context: context,
+                    builder: (ctx) => const ScannerResultScreen());
                 print('Bottom dialog closed.');
                 qrController!.resumeCamera();
               },

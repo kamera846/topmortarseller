@@ -33,34 +33,49 @@ class _ScannerResultScreenState extends State<ScannerResultScreen> {
     }
     return Container(
       padding: const EdgeInsets.all(12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Konfirmasi rekening tujuan',
-            style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-          ),
-          const SizedBox(height: 12),
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                children: cards,
+      decoration: const BoxDecoration(
+        color: cWhite,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(24),
+          topRight: Radius.circular(24),
+        ),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        const Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.drag_handle_rounded),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Text(
+          'Konfirmasi Rekening',
+          style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                fontWeight: FontWeight.bold,
               ),
+        ),
+        Text(
+          'Cashback akan diteruskan ke rekening yang anda pilih',
+          style: Theme.of(context).textTheme.bodySmall!,
+        ),
+        const SizedBox(height: 12),
+        Expanded(
+          child: SingleChildScrollView(
+            child: Column(
+              children: cards,
             ),
           ),
-          MElevatedButton(
-            title: 'Lanjutkan',
-            isFullWidth: true,
-            enabled: selectedPosition != -1 ? true : false,
-            onPressed: () {
-              Navigator.of(context).pop();
-              Navigator.of(context).pop();
-            },
-          )
-        ],
-      ),
+        ),
+        MElevatedButton(
+          title: 'Lanjutkan',
+          isFullWidth: true,
+          enabled: selectedPosition != -1 ? true : false,
+          onPressed: () {
+            Navigator.of(context).pop();
+            Navigator.of(context).pop();
+          },
+        )
+      ]),
     );
   }
 }
