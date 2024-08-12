@@ -21,7 +21,7 @@ class _RekeningCardState extends State<RekeningCard> {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
         decoration: BoxDecoration(
-          color: cDark600,
+          color: cWhite,
           border: Border.all(color: cDark500, width: 1),
           borderRadius: BorderRadius.circular(8),
         ),

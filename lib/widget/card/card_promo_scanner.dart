@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:topmortarseller/util/colors/color.dart';
-import 'package:topmortarseller/screen/qr_scanner.dart';
+import 'package:topmortarseller/screen/scanner/qr_scanner_screen.dart';
 
 class HomeHeader extends StatefulWidget {
   const HomeHeader({super.key});

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:topmortarseller/screen/scanner/scanner_result_screen.dart';
 import 'package:topmortarseller/util/enum.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 
@@ -102,15 +103,28 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
               ],
             ),
           ),
-          // Positioned(
-          //   bottom: 24,
-          //   left: 24,
-          //   right: 24,
-          //   child: ElevatedButton(
-          //     onPressed: _pickFile,
-          //     child: const Text('Unggah Gambar'),
-          //   ),
-          // ),
+          Positioned(
+            bottom: 24,
+            left: 24,
+            right: 24,
+            child: ElevatedButton(
+              onPressed: () async {
+                print('Bottom dialog showed.');
+                qrController!.pauseCamera();
+                await showModalBottomSheet(
+                  useSafeArea: true,
+                  context: context,
+                  showDragHandle: true,
+                  // isScrollControlled: true,
+                  backgroundColor: cWhite,
+                  builder: (ctx) => const ScannerResultScreen(),
+                );
+                print('Bottom dialog closed.');
+                qrController!.resumeCamera();
+              },
+              child: const Text('Unggah Gambar'),
+            ),
+          ),
         ],
       ),
     );
