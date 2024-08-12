@@ -178,7 +178,9 @@ class DetailProfileHeader extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       title == null
-                          ? const LoadingItem()
+                          ? const LoadingItem(
+                              isPrimaryTheme: true,
+                            )
                           : Text(
                               title!,
                               style: Theme.of(context)
@@ -189,7 +191,9 @@ class DetailProfileHeader extends StatelessWidget {
                                   ),
                             ),
                       description == null
-                          ? const LoadingItem()
+                          ? const LoadingItem(
+                              isPrimaryTheme: true,
+                            )
                           : Text(
                               description!,
                               softWrap: true,
