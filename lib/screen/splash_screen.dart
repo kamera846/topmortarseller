@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:topmortarseller/model/contact_model.dart';
 import 'package:topmortarseller/screen/home_screen.dart';
 import 'package:topmortarseller/util/auth_settings.dart';
 import 'package:topmortarseller/util/enum.dart';
@@ -22,17 +23,22 @@ class _SplashScreenState extends State<SplashScreen> {
     await Future.delayed(const Duration(milliseconds: 2000), () {});
     final loginState = await getLoginState();
     if (loginState) {
-      _returnHomeScreen();
+      final userData = await getContactModel();
+      if (userData != null) {
+        _returnHomeScreen(userData);
+      } else {
+        _returnAuthScreen();
+      }
     } else {
       _returnAuthScreen();
     }
   }
 
-  void _returnHomeScreen() {
+  void _returnHomeScreen(ContactModel? userData) {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => const HomeScreen(),
+        builder: (context) => HomeScreen(userData: userData),
       ),
     );
   }

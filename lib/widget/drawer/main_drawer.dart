@@ -5,13 +5,19 @@ import 'package:topmortarseller/widget/drawer/main_drawer_header.dart';
 import 'package:topmortarseller/widget/drawer/main_drawer_items.dart';
 
 class MainDrawer extends StatefulWidget {
-  const MainDrawer({super.key});
+  const MainDrawer({
+    super.key,
+    this.userData,
+  });
+
+  final ContactModel? userData;
 
   @override
   State<MainDrawer> createState() => _MainDrawerState();
 }
 
 class _MainDrawerState extends State<MainDrawer> {
+  ContactModel? _userData;
   String? title;
   String? description;
 
@@ -22,8 +28,10 @@ class _MainDrawerState extends State<MainDrawer> {
   }
 
   void _getUserData() async {
-    final data = await getContactModel();
+    final data = widget.userData ?? await getContactModel();
     setState(() {
+      _userData = data;
+
       if (data != null) {
         if (data.nama != null && data.nama != null && data.nama!.isNotEmpty) {
           title = data.nama!;
@@ -51,7 +59,7 @@ class _MainDrawerState extends State<MainDrawer> {
             title: title,
             description: description,
           ),
-          const MainDrawerItems()
+          MainDrawerItems(userData: _userData)
         ],
       ),
     );

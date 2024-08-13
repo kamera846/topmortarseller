@@ -136,17 +136,25 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
         final apiResponse = ApiResponse.fromJson(responseBody);
 
         if (apiResponse.code == 200) {
-          await saveLoginState();
-          await saveContactModel(ContactModel.fromJson(apiResponse.data!));
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (ctx) => const HomeScreen(),
-            ),
-          );
+          if (apiResponse.data != null) {
+            final userData = ContactModel.fromJson(apiResponse.data!);
+            await saveLoginState();
+            await saveContactModel(userData);
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (ctx) => HomeScreen(
+                  userData: userData,
+                ),
+              ),
+            );
+            showSnackBar(context, apiResponse.msg);
+          } else {
+            showSnackBar(context, 'Response data is null!');
+          }
+        } else {
+          showSnackBar(context, apiResponse.msg);
         }
-
-        showSnackBar(context, apiResponse.msg);
       } else {
         showSnackBar(
             context, '$failedRequestText. Status Code: ${response.statusCode}');

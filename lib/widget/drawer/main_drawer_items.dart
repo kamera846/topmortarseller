@@ -10,7 +10,12 @@ import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/widget/modal/info_modal.dart';
 
 class MainDrawerItems extends StatelessWidget {
-  const MainDrawerItems({super.key});
+  const MainDrawerItems({
+    super.key,
+    this.userData,
+  });
+
+  final ContactModel? userData;
 
   void _showConfirmlogout(BuildContext context) {
     showCupertinoDialog(
@@ -68,7 +73,7 @@ class MainDrawerItems extends StatelessWidget {
             Navigator.of(context).pop();
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (ctx) => const DetailProfileScreen(),
+                builder: (ctx) => DetailProfileScreen(userData: userData),
               ),
             );
           },

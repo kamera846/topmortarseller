@@ -8,13 +8,19 @@ import 'package:topmortarseller/widget/card/rekening_card.dart';
 import 'package:topmortarseller/widget/form/button/elevated_button.dart';
 
 class DetailProfileScreen extends StatefulWidget {
-  const DetailProfileScreen({super.key});
+  const DetailProfileScreen({
+    super.key,
+    this.userData,
+  });
+
+  final ContactModel? userData;
 
   @override
   State<DetailProfileScreen> createState() => _DetailProfileScreenState();
 }
 
 class _DetailProfileScreenState extends State<DetailProfileScreen> {
+  // ContactModel? _userData;
   String? title;
   String? description;
 
@@ -25,8 +31,10 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
   }
 
   void _getUserData() async {
-    final data = await getContactModel();
+    final data = widget.userData ?? await getContactModel();
     setState(() {
+      // _userData = data;
+
       if (data != null) {
         if (data.nama != null && data.nama != null && data.nama!.isNotEmpty) {
           title = data.nama!;
@@ -138,7 +146,7 @@ class DetailProfileHeader extends StatelessWidget {
         children: [
           Row(
             children: [
-              const SizedBox(width: 12),
+              const SizedBox(width: 6),
               IconButton(
                 onPressed: () {
                   Navigator.of(context).pop();
@@ -151,7 +159,7 @@ class DetailProfileHeader extends StatelessWidget {
                   color: cWhite,
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 12),
               Text(
                 'Profil Saya',
                 style: Theme.of(context).textTheme.titleLarge!.copyWith(
