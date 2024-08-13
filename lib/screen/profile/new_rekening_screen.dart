@@ -1,6 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:topmortarseller/model/bank_model.dart';
+import 'package:topmortarseller/model/customer_bank_model.dart';
 import 'package:topmortarseller/services/bank_api.dart';
+import 'package:topmortarseller/services/customer_bank.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/util/loading_item.dart';
 import 'package:topmortarseller/util/validator/validator.dart';
@@ -118,8 +122,25 @@ class _NewRekeningScreenState extends State<NewRekeningScreen> {
     }
 
     setState(() => isLoading = true);
-    await Future.delayed(const Duration(milliseconds: 2000), () {});
-    setState(() => isLoading = false);
+    final CustomerBankModel? myBank = await CustomerBankApiService().newBank(
+      idContact: bankId!,
+      idBank: bankId,
+      nameRek: nameRek,
+      noRek: noRek,
+      onSuccess: (msg) => showSnackBar(context, msg),
+      onError: (e) => showSnackBar(context, e),
+      onCompleted: () => setState(() => isLoading = false),
+    );
+
+    if (myBank != null) {
+      print('My Bank: ${json.encode(myBank.toJson())}');
+    }
+
+    goBack();
+  }
+
+  void goBack() {
+    Navigator.of(context).pop();
   }
 
   @override

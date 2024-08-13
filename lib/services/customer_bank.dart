@@ -57,12 +57,18 @@ class CustomerBankApiService {
     CustomerBankModel? item;
     try {
       final url = Uri.https(baseUrl, 'api/rekeningtoko');
-      final response = await http.post(url, headers: headerSetup, body: {
-        'id_contact': idContact,
-        'id_bank': idBank,
-        'to_name': nameRek,
-        'to_account': noRek,
-      });
+      final response = await http.post(
+        url,
+        headers: headerSetup,
+        body: json.encode(
+          {
+            'id_contact': idContact,
+            'id_bank': idBank,
+            'to_name': nameRek,
+            'to_account': noRek,
+          },
+        ),
+      );
 
       if (response.statusCode == 200) {
         final responseBody = json.decode(response.body);
