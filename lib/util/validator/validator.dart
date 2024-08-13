@@ -1,4 +1,11 @@
 class Validator {
+  static String? isRequired(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Kolom ini wajib diisi.';
+    }
+    return null;
+  }
+
   static String? phoneAuth(String value) {
     final RegExp phoneRegExp = RegExp(r'^(?:\+62|62)?(0?[1-9][0-9]{8,12})$');
     if (value.isEmpty) {
@@ -28,6 +35,13 @@ class Validator {
   static String? otpAuth(String? value, int otpLength) {
     if (value == null || value.isEmpty || value.trim().length < otpLength) {
       return 'Isi semua kolom otp!';
+    }
+    return null;
+  }
+
+  static String? bankDropdown(String? bankId) {
+    if (bankId == null || bankId == '-1') {
+      return 'Pilih bank atau e-wallet anda.';
     }
     return null;
   }

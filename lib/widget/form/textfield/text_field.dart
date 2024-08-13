@@ -135,7 +135,6 @@ class _MTextFieldState extends State<MTextField> {
                           widget.suffixIcon,
                         ),
                   suffixIconColor: _isFocused ? cPrimary100 : cDark300,
-                  helperText: widget.helper,
                   hintText: widget.hint,
                   enabledBorder: InputBorder.none,
                   border: InputBorder.none,
@@ -156,12 +155,30 @@ class _MTextFieldState extends State<MTextField> {
 
     if (widget.errorText != null) {
       listItem.add(
-        Text(
-          widget.errorText ?? '',
-          style: Theme.of(context)
-              .textTheme
-              .bodySmall!
-              .copyWith(color: cPrimary100),
+        Padding(
+          padding: const EdgeInsets.only(top: 2),
+          child: Text(
+            widget.errorText ?? '',
+            style: Theme.of(context)
+                .textTheme
+                .bodySmall!
+                .copyWith(color: cPrimary100),
+          ),
+        ),
+      );
+    }
+
+    if (widget.helper != null) {
+      listItem.add(
+        Padding(
+          padding: const EdgeInsets.only(top: 2),
+          child: Text(
+            widget.helper ?? '',
+            style: Theme.of(context)
+                .textTheme
+                .bodySmall!
+                .copyWith(color: cDark200),
+          ),
         ),
       );
     }
