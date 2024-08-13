@@ -1,7 +1,9 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:topmortarseller/model/bank_model.dart';
+import 'package:topmortarseller/model/contact_model.dart';
 import 'package:topmortarseller/model/customer_bank_model.dart';
 import 'package:topmortarseller/services/bank_api.dart';
 import 'package:topmortarseller/services/customer_bank.dart';
@@ -10,6 +12,7 @@ import 'package:topmortarseller/util/loading_item.dart';
 import 'package:topmortarseller/util/validator/validator.dart';
 import 'package:topmortarseller/widget/form/button/elevated_button.dart';
 import 'package:topmortarseller/widget/form/textfield/text_field.dart';
+import 'package:topmortarseller/widget/modal/info_modal.dart';
 import 'package:topmortarseller/widget/modal/loading_modal.dart';
 import 'package:topmortarseller/widget/snackbar/show_snackbar.dart';
 
@@ -17,13 +20,19 @@ BankModel defaultBank = const BankModel(
     idBank: '-1', namaBank: '== Pilih Bank ==', isBca: '-1', swiftBank: '-1');
 
 class NewRekeningScreen extends StatefulWidget {
-  const NewRekeningScreen({super.key});
+  const NewRekeningScreen({
+    super.key,
+    this.userData,
+  });
+
+  final ContactModel? userData;
 
   @override
   State<NewRekeningScreen> createState() => _NewRekeningScreenState();
 }
 
 class _NewRekeningScreenState extends State<NewRekeningScreen> {
+  ContactModel? _userData;
   List<BankModel> options = [];
   BankModel? _selectedBank;
   final _noRekeningController = TextEditingController();
@@ -41,12 +50,18 @@ class _NewRekeningScreenState extends State<NewRekeningScreen> {
 
   @override
   void initState() {
-    _getBanks();
+    _getUserData();
     super.initState();
   }
 
-  _getBanks() async {
+  void _getUserData() async {
     setState(() => isSelectBankLoading = true);
+    final data = widget.userData ?? await getContactModel();
+    setState(() => _userData = data);
+    _getBanks();
+  }
+
+  _getBanks() async {
     List<BankModel>? items = [];
     items = await BankApiService().banks(
         onError: (e) => showSnackBar(context, e),
@@ -120,23 +135,41 @@ class _NewRekeningScreenState extends State<NewRekeningScreen> {
         _nameRekeningErrorText != null) {
       return;
     }
+    showCupertinoDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return MInfoModal(
+          contentName: 'Pengecekan Ulang',
+          contentDescription: 'Pastikan data yang anda masukkan sudah benar!',
+          contentIcon: Icons.warning_rounded,
+          contentIconColor: cPrimary100,
+          cancelText: 'Batal',
+          onCancel: () {
+            Navigator.of(context).pop();
+          },
+          confirmText: 'Lanjutkan',
+          onConfirm: () async {
+            setState(() => isLoading = true);
+            final CustomerBankModel? myBank =
+                await CustomerBankApiService().newBank(
+              idContact: _userData!.idContact!,
+              idBank: bankId!,
+              nameRek: nameRek,
+              noRek: noRek,
+              onSuccess: (msg) => showSnackBar(context, msg),
+              onError: (e) => showSnackBar(context, e),
+              onCompleted: () => setState(() => isLoading = false),
+            );
 
-    setState(() => isLoading = true);
-    final CustomerBankModel? myBank = await CustomerBankApiService().newBank(
-      idContact: bankId!,
-      idBank: bankId,
-      nameRek: nameRek,
-      noRek: noRek,
-      onSuccess: (msg) => showSnackBar(context, msg),
-      onError: (e) => showSnackBar(context, e),
-      onCompleted: () => setState(() => isLoading = false),
+            if (myBank != null) {
+              print('My Bank: ${json.encode(myBank.toJson())}');
+            }
+
+            goBack();
+          },
+        );
+      },
     );
-
-    if (myBank != null) {
-      print('My Bank: ${json.encode(myBank.toJson())}');
-    }
-
-    goBack();
   }
 
   void goBack() {
