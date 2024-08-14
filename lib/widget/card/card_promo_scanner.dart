@@ -1,20 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:topmortarseller/model/contact_model.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/screen/scanner/qr_scanner_screen.dart';
 
 class HomeHeader extends StatefulWidget {
-  const HomeHeader({super.key});
+  const HomeHeader({
+    super.key,
+    this.userData,
+  });
+
+  final ContactModel? userData;
 
   @override
   State<HomeHeader> createState() => _HomeHeaderState();
 }
 
 class _HomeHeaderState extends State<HomeHeader> {
-  String? _scanResult;
+  ContactModel? _userData;
 
-  void onScanResult(result) {
+  @override
+  void initState() {
+    _getUserData();
+    super.initState();
+  }
+
+  void _getUserData() async {
+    final data = widget.userData ?? await getContactModel();
     setState(() {
-      _scanResult = result;
+      _userData = data;
     });
   }
 
@@ -75,7 +88,7 @@ class _HomeHeaderState extends State<HomeHeader> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    _scanResult ?? 'Promo tersedia',
+                    'Promo tersedia',
                     style: Theme.of(context).textTheme.bodySmall!.copyWith(
                           color: cDark400,
                         ),
@@ -102,7 +115,7 @@ class _HomeHeaderState extends State<HomeHeader> {
                           context,
                           MaterialPageRoute(
                             builder: (ctx) => QRScannerScreen(
-                              onScanResult: onScanResult,
+                              userData: _userData,
                             ),
                           ),
                         );

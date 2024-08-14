@@ -54,10 +54,10 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       drawer: MainDrawer(userData: _userData),
-      body: const Center(
+      body: Center(
         child: Column(
           children: [
-            HomeHeader(),
+            HomeHeader(userData: widget.userData),
           ],
         ),
       ),

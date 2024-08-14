@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:topmortarseller/model/contact_model.dart';
 import 'package:topmortarseller/model/customer_bank_model.dart';
-import 'package:topmortarseller/services/customer_bank.dart';
+import 'package:topmortarseller/services/customer_bank_api.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/widget/card/rekening_card.dart';
 import 'package:topmortarseller/widget/form/button/elevated_button.dart';
@@ -9,12 +9,15 @@ import 'package:topmortarseller/widget/modal/loading_modal.dart';
 import 'package:topmortarseller/widget/snackbar/show_snackbar.dart';
 
 class ScannerResultScreen extends StatefulWidget {
-  const ScannerResultScreen({
-    super.key,
-    this.userData,
-  });
+  const ScannerResultScreen(
+      {super.key,
+      this.userData,
+      required this.scanResult,
+      required this.onProcessedClaim});
 
   final ContactModel? userData;
+  final String? scanResult;
+  final Function(CustomerBankModel?) onProcessedClaim;
 
   @override
   State<ScannerResultScreen> createState() {
@@ -137,8 +140,10 @@ class _ScannerResultScreenState extends State<ScannerResultScreen> {
           isFullWidth: true,
           enabled: selectedPosition != -1 ? true : false,
           onPressed: () {
-            Navigator.of(context).pop();
-            Navigator.of(context).pop();
+            if (selectedPosition != -1) {
+              widget.onProcessedClaim(myBanks![selectedPosition]);
+              Navigator.pop(context);
+            }
           },
         )
       ]),

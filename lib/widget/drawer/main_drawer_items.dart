@@ -31,7 +31,6 @@ class MainDrawerItems extends StatelessWidget {
           onCancel: () {
             Navigator.of(context).pop();
           },
-          confirmText: 'Oke',
           onConfirm: () async {
             await removeLoginState();
             await removeContactModel();

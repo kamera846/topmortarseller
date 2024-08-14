@@ -6,7 +6,7 @@ import 'package:topmortarseller/model/bank_model.dart';
 import 'package:topmortarseller/model/contact_model.dart';
 import 'package:topmortarseller/model/customer_bank_model.dart';
 import 'package:topmortarseller/services/bank_api.dart';
-import 'package:topmortarseller/services/customer_bank.dart';
+import 'package:topmortarseller/services/customer_bank_api.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/util/loading_item.dart';
 import 'package:topmortarseller/util/validator/validator.dart';

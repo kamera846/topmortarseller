@@ -5,7 +5,7 @@ import 'package:topmortarseller/model/claim_cashback_model.dart';
 import 'package:topmortarseller/services/api.dart';
 
 class ClaimCashbackServices {
-  Future<ClaimCashbackModel?> newBank({
+  Future<ClaimCashbackModel?> claim({
     required String idContact,
     required String idMd5,
     required Function(String e) onSuccess,

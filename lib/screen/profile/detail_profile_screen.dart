@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:topmortarseller/model/contact_model.dart';
 import 'package:topmortarseller/model/customer_bank_model.dart';
-import 'package:topmortarseller/services/customer_bank.dart';
+import 'package:topmortarseller/services/customer_bank_api.dart';
 import 'package:topmortarseller/util/enum.dart';
 import 'package:topmortarseller/screen/profile/new_rekening_screen.dart';
 import 'package:topmortarseller/util/colors/color.dart';
