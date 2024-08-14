@@ -1,10 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:topmortarseller/model/contact_model.dart';
+import 'package:topmortarseller/model/customer_bank_model.dart';
+import 'package:topmortarseller/services/customer_bank.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/widget/card/rekening_card.dart';
 import 'package:topmortarseller/widget/form/button/elevated_button.dart';
+import 'package:topmortarseller/widget/modal/loading_modal.dart';
+import 'package:topmortarseller/widget/snackbar/show_snackbar.dart';
 
 class ScannerResultScreen extends StatefulWidget {
-  const ScannerResultScreen({super.key});
+  const ScannerResultScreen({
+    super.key,
+    this.userData,
+  });
+
+  final ContactModel? userData;
 
   @override
   State<ScannerResultScreen> createState() {
@@ -14,25 +24,81 @@ class ScannerResultScreen extends StatefulWidget {
 
 class _ScannerResultScreenState extends State<ScannerResultScreen> {
   int selectedPosition = -1;
+  ContactModel? _userData;
+  List<CustomerBankModel>? myBanks = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    _getUserData();
+    super.initState();
+  }
+
+  void _getUserData() async {
+    setState(() => isLoading = true);
+
+    final data = widget.userData ?? await getContactModel();
+    setState(() {
+      _userData = data;
+    });
+
+    _getUserBanks();
+  }
+
+  void _getUserBanks() async {
+    final data = await CustomerBankApiService().banks(
+      idContact: _userData!.idContact!,
+      onSuccess: (msg) => null,
+      onError: (e) => showSnackBar(context, e),
+      onCompleted: () => setState(() => isLoading = false),
+    );
+    setState(() {
+      myBanks = data;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> cards = [];
-    for (var i = 0; i < 5; i++) {
-      cards.add(
-        RekeningCard(
-          bankName: 'PT. BCA (Bank Central Asia) TBK',
-          rekening: '0918230981283',
-          rekeningName: 'a.n Mochammad Rafli Ramadani',
-          backgroundColor: i == selectedPosition ? cPrimary600 : cWhite,
-          withDeleteAction: false,
-          action: () {
-            setState(() {
-              selectedPosition = i;
-            });
+    Widget rekeningCards = Container();
+    if (isLoading) {
+      rekeningCards = const LoadingModal();
+    } else {
+      if (myBanks != null && myBanks!.isNotEmpty) {
+        rekeningCards = ListView.builder(
+          itemCount: myBanks!.length,
+          itemBuilder: (context, index) {
+            final bankItem = myBanks![index];
+            return RekeningCard(
+              bankName: bankItem.namaBank!,
+              rekening: bankItem.toAccount!,
+              rekeningName: bankItem.toName!,
+              backgroundColor: index == selectedPosition ? cPrimary600 : cWhite,
+              withDeleteAction: false,
+              action: () {
+                setState(() {
+                  selectedPosition = index;
+                });
+              },
+            );
           },
-        ),
-      );
+        );
+      } else {
+        rekeningCards = SizedBox(
+          width: double.infinity,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(height: 24),
+              const Text('Anda belum menambahkan rekening!'),
+              const SizedBox(height: 12),
+              MElevatedButton(
+                title: 'Tambah Rekening',
+                onPressed: () {},
+              ),
+            ],
+          ),
+        );
+      }
     }
 
     return Container(
@@ -64,11 +130,7 @@ class _ScannerResultScreenState extends State<ScannerResultScreen> {
         ),
         const SizedBox(height: 12),
         Expanded(
-          child: SingleChildScrollView(
-            child: Column(
-              children: cards,
-            ),
-          ),
+          child: rekeningCards,
         ),
         MElevatedButton(
           title: 'Lanjutkan',
