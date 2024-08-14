@@ -4,13 +4,19 @@ import 'package:topmortarseller/util/colors/color.dart';
 class RekeningCard extends StatefulWidget {
   const RekeningCard({
     super.key,
+    required this.bankName,
+    required this.rekening,
+    required this.rekeningName,
     this.backgroundColor = cWhite,
     this.rightIcon = Icons.keyboard_arrow_right_rounded,
     this.rightIconColor = cDark200,
     this.action,
-    this.withDeleteAction = true,
+    this.withDeleteAction = false,
   });
 
+  final String bankName;
+  final String rekening;
+  final String rekeningName;
   final Color backgroundColor;
   final IconData rightIcon;
   final Color rightIconColor;
@@ -46,21 +52,21 @@ class _RekeningCardState extends State<RekeningCard> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    'PT. BCA (Bank Central Asia) TBK',
+                    widget.bankName,
                     style: Theme.of(context).textTheme.titleSmall!.copyWith(
                           color: cDark100,
                           fontWeight: FontWeight.bold,
                         ),
                   ),
                   Text(
-                    '0918230981283',
+                    widget.rekening,
                     style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                           color: cDark100,
                           fontWeight: FontWeight.normal,
                         ),
                   ),
                   Text(
-                    'a.n Mochammad Rafli Ramadani',
+                    'a.n ${widget.rekeningName}',
                     style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                           color: cDark100,
                           fontWeight: FontWeight.normal,

@@ -21,6 +21,9 @@ class _ScannerResultScreenState extends State<ScannerResultScreen> {
     for (var i = 0; i < 5; i++) {
       cards.add(
         RekeningCard(
+          bankName: 'PT. BCA (Bank Central Asia) TBK',
+          rekening: '0918230981283',
+          rekeningName: 'a.n Mochammad Rafli Ramadani',
           backgroundColor: i == selectedPosition ? cPrimary600 : cWhite,
           withDeleteAction: false,
           action: () {

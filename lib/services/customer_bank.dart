@@ -5,13 +5,13 @@ import 'package:topmortarseller/model/customer_bank_model.dart';
 import 'package:topmortarseller/services/api.dart';
 
 class CustomerBankApiService {
-  Future<CustomerBankModel?> banks({
+  Future<List<CustomerBankModel>?> banks({
     required String idContact,
     required Function(String e) onSuccess,
     required Function(String e) onError,
     required Function() onCompleted,
   }) async {
-    CustomerBankModel? item;
+    List<CustomerBankModel>? data;
     try {
       final url = Uri.https(baseUrl, 'api/rekeningtoko/contact/$idContact');
       final response = await http.get(
@@ -21,25 +21,27 @@ class CustomerBankApiService {
 
       if (response.statusCode == 200) {
         final responseBody = json.decode(response.body);
-        final apiResponse = ApiResponse.fromJson(responseBody);
+        final apiResponse = ApiResponse.fromJsonList(responseBody);
 
         if (apiResponse.code == 200) {
-          if (apiResponse.data != null) {
-            item = CustomerBankModel.fromJson(apiResponse.data!);
+          if (apiResponse.listData != null) {
+            data = apiResponse.listData
+                ?.map((item) => CustomerBankModel.fromJson(item))
+                .toList();
           }
           onSuccess(apiResponse.msg);
-          return item;
+          return data;
         }
 
         onError(apiResponse.msg);
-        return item;
+        return data;
       } else {
         onError('$failedRequestText. Status Code: ${response.statusCode}');
-        return item;
+        return data;
       }
     } catch (e) {
       onError('$failedRequestText. Exception: $e');
-      return item;
+      return data;
     } finally {
       onCompleted();
     }
