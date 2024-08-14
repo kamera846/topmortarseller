@@ -56,7 +56,7 @@ class CustomerBankApiService {
     required Function(String e) onError,
     required Function() onCompleted,
   }) async {
-    CustomerBankModel? item;
+    CustomerBankModel? data;
     try {
       final url = Uri.https(baseUrl, 'api/rekeningtoko');
       final response = await http.post(
@@ -78,21 +78,21 @@ class CustomerBankApiService {
 
         if (apiResponse.code == 200) {
           if (apiResponse.data != null) {
-            item = CustomerBankModel.fromJson(apiResponse.data!);
+            data = CustomerBankModel.fromJson(apiResponse.data!);
           }
           onSuccess(apiResponse.msg);
-          return item;
+          return data;
         }
 
         onError(apiResponse.msg);
-        return item;
+        return data;
       } else {
         onError('$failedRequestText. Status Code: ${response.statusCode}');
-        return item;
+        return data;
       }
     } catch (e) {
       onError('$failedRequestText. Exception: $e');
-      return item;
+      return data;
     } finally {
       onCompleted();
     }
