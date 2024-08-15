@@ -25,10 +25,12 @@ class NewRekeningScreen extends StatefulWidget {
   const NewRekeningScreen({
     super.key,
     this.userData,
+    this.rekeningId = "-1",
     required this.onSuccess,
   });
 
   final ContactModel? userData;
+  final String rekeningId;
   final Function(bool? state) onSuccess;
 
   @override
@@ -78,13 +80,41 @@ class _NewRekeningScreenState extends State<NewRekeningScreen> {
     items = await BankApiService().banks(
         onError: (e) => showSnackBar(context, e),
         onCompleted: () {
-          setState(() => isSelectBankLoading = false);
+          if (widget.rekeningId == '-1') {
+            setState(() => isSelectBankLoading = false);
+          }
         });
 
     setState(() {
       items?.insert(0, defaultBank);
       options = items!;
     });
+
+    if (widget.rekeningId != '-1') {
+      _getUserBank(widget.rekeningId);
+    }
+  }
+
+  void _getUserBank(String rekeningId) async {
+    final myBanks = await CustomerBankApiService().banks(
+      idContact: _userData!.idContact!,
+      onSuccess: (msg) {},
+      onError: (e) => showSnackBar(context, e),
+      onCompleted: () => setState(() => isSelectBankLoading = false),
+    );
+
+    if (myBanks != null) {
+      final bankItem = myBanks[0];
+      final selectedOptionIndex =
+          options.indexWhere((element) => element.idBank == bankItem.idBank);
+      if (selectedOptionIndex != -1) {
+        setState(() {
+          _selectedBank = options[selectedOptionIndex];
+          _noRekeningController.text = bankItem.toAccount!;
+          _nameRekeningController.text = bankItem.toName!;
+        });
+      }
+    }
   }
 
   // void _checkOwnerName() {
@@ -175,6 +205,29 @@ class _NewRekeningScreenState extends State<NewRekeningScreen> {
     final noRek = _noRekeningController.text;
     final nameRek = _nameRekeningController.text;
 
+    if (widget.rekeningId != '-1') {
+      await CustomerBankApiService().editBank(
+        rekeningId: widget.rekeningId,
+        idContact: _userData!.idContact!,
+        idBank: bankId!,
+        nameRek: nameRek,
+        noRek: noRek,
+        onSuccess: (msg) {
+          showSnackBar(context, msg);
+          widget.onSuccess(true);
+        },
+        onError: (e) {
+          showSnackBar(context, e);
+          widget.onSuccess(false);
+        },
+        onCompleted: () {
+          setState(() => isLoading = false);
+          goBack();
+        },
+      );
+      return;
+    }
+
     final CustomerBankModel? myBank = await CustomerBankApiService().newBank(
       idContact: _userData!.idContact!,
       idBank: bankId!,
@@ -220,7 +273,9 @@ class _NewRekeningScreenState extends State<NewRekeningScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tambah Rekening Baru'),
+        title: Text(widget.rekeningId == '-1'
+            ? 'Tambah Rekening Baru'
+            : 'Edit Rekening'),
       ),
       body: Stack(
         children: [
@@ -298,12 +353,13 @@ class _NewRekeningScreenState extends State<NewRekeningScreen> {
                 Expanded(
                   child: Container(),
                 ),
-                MElevatedButton(
-                  title: 'Simpan Rekening',
-                  isFullWidth: true,
-                  // enabled: isValidForm ? true : false,
-                  onPressed: _saveRekening,
-                ),
+                if (!isSelectBankLoading)
+                  MElevatedButton(
+                    title: 'Simpan Rekening',
+                    isFullWidth: true,
+                    // enabled: isValidForm ? true : false,
+                    onPressed: _saveRekening,
+                  ),
                 if (prefs != null &&
                     (isSkipCreateBank == null || isSkipCreateBank == false))
                   MTextButton(
@@ -379,8 +435,7 @@ class _SelectBankFieldState extends State<SelectBankField> {
                       onChanged: (BankModel? value) {
                         widget.onChange(value!);
                       },
-                      items: widget.options
-                          .map<DropdownMenuItem<BankModel>>((BankModel bank) {
+                      items: widget.options.map((BankModel bank) {
                         return DropdownMenuItem<BankModel>(
                           value: bank,
                           child: Text(

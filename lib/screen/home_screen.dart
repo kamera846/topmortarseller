@@ -47,17 +47,21 @@ class _HomeScreenState extends State<HomeScreen> {
       );
 
       if (userBanks == null || userBanks.isEmpty) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (ctx) => NewRekeningScreen(
-              userData: _userData,
-              onSuccess: (bool? state) {},
-            ),
-          ),
-        );
+        _goToNewRekeningScreen();
       }
     }
     setState(() => isLoading = false);
+  }
+
+  void _goToNewRekeningScreen() {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (ctx) => NewRekeningScreen(
+          userData: _userData,
+          onSuccess: (bool? state) {},
+        ),
+      ),
+    );
   }
 
   @override

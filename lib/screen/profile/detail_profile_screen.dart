@@ -128,7 +128,13 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
                                     MaterialPageRoute(
                                       builder: (context) => NewRekeningScreen(
                                         userData: _userData,
-                                        onSuccess: (bool? state) {},
+                                        rekeningId: bankItem.idRekeningToko!,
+                                        onSuccess: (bool? state) {
+                                          if (state != null && state) {
+                                            setState(() => isLoading = true);
+                                            _getUserBanks();
+                                          }
+                                        },
                                       ),
                                     ),
                                   );

@@ -1,6 +1,6 @@
 class CustomerBankModel {
   const CustomerBankModel({
-    this.idRekeningRoko,
+    this.idRekeningToko,
     this.idContact,
     this.toName,
     this.idBank,
@@ -12,7 +12,7 @@ class CustomerBankModel {
     this.isBca,
   });
 
-  final String? idRekeningRoko;
+  final String? idRekeningToko;
   final String? idContact;
   final String? toName;
   final String? idBank;
@@ -24,7 +24,7 @@ class CustomerBankModel {
   final String? isBca;
 
   Map<String, dynamic> toJson() => {
-        'id_rekening_toko': idRekeningRoko ?? '',
+        'id_rekening_toko': idRekeningToko ?? '',
         'id_contact': idContact ?? '',
         'to_name': toName ?? '',
         'id_bank': idBank ?? '',
@@ -38,7 +38,7 @@ class CustomerBankModel {
 
   factory CustomerBankModel.fromJson(Map<String, dynamic> json) {
     return CustomerBankModel(
-      idRekeningRoko: json['id_rekening_toko'] ?? '',
+      idRekeningToko: json['id_rekening_toko'] ?? '',
       idContact: json['id_contact'] ?? '',
       toName: json['to_name'] ?? '',
       idBank: json['id_bank'] ?? '',

@@ -97,4 +97,56 @@ class CustomerBankApiService {
       onCompleted();
     }
   }
+
+  Future<CustomerBankModel?> editBank({
+    required String rekeningId,
+    required String idContact,
+    required String idBank,
+    required String nameRek,
+    required String noRek,
+    required Function(String e) onSuccess,
+    required Function(String e) onError,
+    required Function() onCompleted,
+  }) async {
+    CustomerBankModel? data;
+    try {
+      final url = Uri.https(baseUrl, 'api/rekeningtoko/$rekeningId');
+      final response = await http.post(
+        url,
+        headers: headerSetup,
+        body: json.encode(
+          {
+            'id_contact': idContact,
+            'id_bank': idBank,
+            'to_name': nameRek,
+            'to_account': noRek,
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        final responseBody = json.decode(response.body);
+        final apiResponse = ApiResponse.fromJson(responseBody);
+
+        if (apiResponse.code == 200) {
+          if (apiResponse.data != null) {
+            data = CustomerBankModel.fromJson(apiResponse.data!);
+          }
+          onSuccess(apiResponse.msg);
+          return data;
+        }
+
+        onError(apiResponse.msg);
+        return data;
+      } else {
+        onError('$failedRequestText. Status Code: ${response.statusCode}');
+        return data;
+      }
+    } catch (e) {
+      onError('$failedRequestText. Exception: $e');
+      return data;
+    } finally {
+      onCompleted();
+    }
+  }
 }
