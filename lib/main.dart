@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
           foregroundColor: cWhite,
         ),
         scaffoldBackgroundColor: cWhite,
-        textTheme: GoogleFonts.latoTextTheme(),
+        textTheme: GoogleFonts.poppinsTextTheme(),
       ),
       darkTheme: ThemeData.dark().copyWith(
         colorScheme: mDarkColorScheme,
@@ -39,7 +39,7 @@ class MyApp extends StatelessWidget {
           foregroundColor: cWhite,
         ),
         scaffoldBackgroundColor: cDark100,
-        textTheme: GoogleFonts.latoTextTheme(),
+        textTheme: GoogleFonts.poppinsTextTheme(),
       ),
       themeMode: ThemeMode.light,
       home: const SplashScreen(),
