@@ -16,6 +16,7 @@ import 'package:topmortarseller/screen/home_screen.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/util/validator/validator.dart';
 import 'package:topmortarseller/widget/form/button/elevated_button.dart';
+import 'package:topmortarseller/widget/form/button/outlined_button.dart';
 import 'package:topmortarseller/widget/form/button/text_button.dart';
 import 'package:topmortarseller/widget/form/textfield/text_field.dart';
 import 'package:topmortarseller/widget/form/textfield/text_otp_field.dart';
@@ -59,11 +60,32 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
   }
 
   void _forgotButton() {
+    _phoneController.text = '';
+    _passwordController.text = '';
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (ctx) => const AuthScreen(
           authType: AuthType.forgot,
+        ),
+      ),
+    );
+  }
+
+  void _outlinedButtonAction() {
+    _phoneController.text = '';
+    _passwordController.text = '';
+    if (widget.authType == AuthType.register ||
+        widget.authType == AuthType.forgot) {
+      Navigator.pop(context);
+      return;
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (ctx) => const AuthScreen(
+          authType: AuthType.register,
         ),
       ),
     );
@@ -94,7 +116,7 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
   }
 
   void loginHandler() async {
-    final phoneNumber = _phoneController.text;
+    var phoneNumber = _phoneController.text;
     final password = _passwordController.text;
     final String? phoneValidator = Validator.phoneAuth(phoneNumber);
     final String? passwordValidator = Validator.passwordAuth(password);
@@ -105,6 +127,14 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
     });
 
     if (phoneValidator != null || passwordValidator != null) return;
+
+    if (phoneNumber.startsWith('62')) {
+      phoneNumber = '0${phoneNumber.substring(2)}';
+    } else if (phoneNumber.startsWith('+62')) {
+      phoneNumber = '0${phoneNumber.substring(3)}';
+    } else if (phoneNumber.startsWith('8')) {
+      phoneNumber = '0$phoneNumber';
+    }
 
     setState(() => widget.isLoading!(true));
 
@@ -366,6 +396,10 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final String? outlinedButtonDescription =
+        authSettings[widget.authType]!.outlinedButtonDescription;
+    final String? outlinedButtonText =
+        authSettings[widget.authType]!.outlinedButtonText;
     List<Widget> formList = [];
     final authType = widget.authType;
     bool isBackButtonShow = authType != AuthType.login;
@@ -505,6 +539,40 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
         ),
       );
     }
+    formList.add(
+      Hero(
+        tag: TagHero.dividerAuth,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: widget.authType == AuthType.login
+              ? const Divider(color: cDark500)
+              : Container(),
+        ),
+      ),
+    );
+    formList.add(
+      Hero(
+        tag: TagHero.outlinedButtonContainerAuth,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            outlinedButtonDescription != null
+                ? Text(
+                    outlinedButtonDescription,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  )
+                : Container(),
+            const SizedBox(width: 8),
+            outlinedButtonText != null
+                ? MOutlinedButton(
+                    onPressed: _outlinedButtonAction,
+                    title: outlinedButtonText,
+                  )
+                : Container(),
+          ],
+        ),
+      ),
+    );
 
     return Column(
       children: formList,

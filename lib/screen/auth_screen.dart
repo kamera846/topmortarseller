@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:topmortarseller/model/contact_model.dart';
-import 'package:topmortarseller/util/enum.dart';
 import 'package:topmortarseller/model/auth_settings_model.dart';
 import 'package:topmortarseller/widget/auth/auth_footer.dart';
 import 'package:topmortarseller/widget/auth/auth_form.dart';
 import 'package:topmortarseller/widget/auth/auth_header.dart';
-import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/widget/modal/loading_modal.dart';
 
 class AuthScreen extends StatefulWidget {
@@ -51,15 +49,6 @@ class _AuthScreenState extends State<AuthScreen> {
                       _isLoading = state;
                     });
                   },
-                ),
-                Hero(
-                  tag: TagHero.dividerAuth,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    child: widget.authType == AuthType.login
-                        ? const Divider(color: cDark500)
-                        : Container(),
-                  ),
                 ),
                 AuthFooterWidget(authType: widget.authType),
               ],

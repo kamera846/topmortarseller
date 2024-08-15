@@ -2,15 +2,19 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:topmortarseller/model/bank_model.dart';
 import 'package:topmortarseller/model/contact_model.dart';
 import 'package:topmortarseller/model/customer_bank_model.dart';
+import 'package:topmortarseller/screen/home_screen.dart';
 import 'package:topmortarseller/services/bank_api.dart';
 import 'package:topmortarseller/services/customer_bank_api.dart';
 import 'package:topmortarseller/util/colors/color.dart';
+import 'package:topmortarseller/util/enum.dart';
 import 'package:topmortarseller/util/loading_item.dart';
 import 'package:topmortarseller/util/validator/validator.dart';
 import 'package:topmortarseller/widget/form/button/elevated_button.dart';
+import 'package:topmortarseller/widget/form/button/text_button.dart';
 import 'package:topmortarseller/widget/form/textfield/text_field.dart';
 import 'package:topmortarseller/widget/modal/info_modal.dart';
 import 'package:topmortarseller/widget/modal/loading_modal.dart';
@@ -32,6 +36,7 @@ class NewRekeningScreen extends StatefulWidget {
 }
 
 class _NewRekeningScreenState extends State<NewRekeningScreen> {
+  SharedPreferences? prefs;
   ContactModel? _userData;
   List<BankModel> options = [];
   BankModel? _selectedBank;
@@ -47,6 +52,7 @@ class _NewRekeningScreenState extends State<NewRekeningScreen> {
   bool isValidForm = false;
   bool isSelectBankLoading = true;
   bool isLoading = false;
+  bool? isSkipCreateBank = false;
 
   @override
   void initState() {
@@ -58,6 +64,12 @@ class _NewRekeningScreenState extends State<NewRekeningScreen> {
     setState(() => isSelectBankLoading = true);
     final data = widget.userData ?? await getContactModel();
     setState(() => _userData = data);
+    final initPrefs = await SharedPreferences.getInstance();
+    setState(() {
+      prefs = initPrefs;
+      isSkipCreateBank = prefs!
+          .getBool('${_userData!.idContact!}-${GlobalEnum.skipCreateBank}');
+    });
     _getBanks();
   }
 
@@ -149,26 +161,50 @@ class _NewRekeningScreenState extends State<NewRekeningScreen> {
           },
           confirmText: 'Lanjutkan',
           onConfirm: () async {
+            Navigator.of(context).pop();
             setState(() => isLoading = true);
-            final CustomerBankModel? myBank =
-                await CustomerBankApiService().newBank(
-              idContact: _userData!.idContact!,
-              idBank: bankId!,
-              nameRek: nameRek,
-              noRek: noRek,
-              onSuccess: (msg) => showSnackBar(context, msg),
-              onError: (e) => showSnackBar(context, e),
-              onCompleted: () => setState(() => isLoading = false),
-            );
-
-            if (myBank != null) {
-              print('My Bank: ${json.encode(myBank.toJson())}');
-            }
-
-            goBack();
+            submitSaveRekening();
           },
         );
       },
+    );
+  }
+
+  void submitSaveRekening() async {
+    final bankId = _selectedBank?.idBank;
+    final noRek = _noRekeningController.text;
+    final nameRek = _nameRekeningController.text;
+
+    final CustomerBankModel? myBank = await CustomerBankApiService().newBank(
+      idContact: _userData!.idContact!,
+      idBank: bankId!,
+      nameRek: nameRek,
+      noRek: noRek,
+      onSuccess: (msg) => showSnackBar(context, msg),
+      onError: (e) => showSnackBar(context, e),
+      onCompleted: () => setState(() => isLoading = false),
+    );
+
+    if (myBank != null) {
+      print('My Bank: ${json.encode(myBank.toJson())}');
+    }
+
+    if (isSkipCreateBank == null || isSkipCreateBank == false) {
+      _skipCreateBank();
+    } else {
+      goBack();
+    }
+  }
+
+  void _skipCreateBank() async {
+    prefs!
+        .setBool('${_userData!.idContact!}-${GlobalEnum.skipCreateBank}', true);
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (ctx) => HomeScreen(
+          userData: _userData,
+        ),
+      ),
     );
   }
 
@@ -264,6 +300,12 @@ class _NewRekeningScreenState extends State<NewRekeningScreen> {
                   // enabled: isValidForm ? true : false,
                   onPressed: _saveRekening,
                 ),
+                if (prefs != null &&
+                    (isSkipCreateBank == null || isSkipCreateBank == false))
+                  MTextButton(
+                    title: 'Atur Nanti',
+                    onPressed: _skipCreateBank,
+                  ),
               ],
             ),
           ),

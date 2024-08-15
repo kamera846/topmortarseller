@@ -63,7 +63,7 @@ class MainDrawerItems extends StatelessWidget {
                 ),
           ),
           subtitle: Text(
-            'Atur profil anda disini',
+            'Atur bank anda disini',
             style: Theme.of(context).textTheme.bodySmall!.copyWith(
                   color: cDark200,
                 ),
