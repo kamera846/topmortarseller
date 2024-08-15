@@ -3,8 +3,8 @@ import 'package:topmortarseller/model/contact_model.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/screen/scanner/qr_scanner_screen.dart';
 
-class HomeHeader extends StatefulWidget {
-  const HomeHeader({
+class CardPromoScanner extends StatefulWidget {
+  const CardPromoScanner({
     super.key,
     this.userData,
   });
@@ -12,10 +12,10 @@ class HomeHeader extends StatefulWidget {
   final ContactModel? userData;
 
   @override
-  State<HomeHeader> createState() => _HomeHeaderState();
+  State<CardPromoScanner> createState() => _CardPromoScannerState();
 }
 
-class _HomeHeaderState extends State<HomeHeader> {
+class _CardPromoScannerState extends State<CardPromoScanner> {
   ContactModel? _userData;
 
   @override

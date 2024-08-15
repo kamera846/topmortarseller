@@ -4,7 +4,7 @@ import 'package:topmortarseller/model/customer_bank_model.dart';
 import 'package:topmortarseller/screen/profile/new_rekening_screen.dart';
 import 'package:topmortarseller/services/customer_bank_api.dart';
 import 'package:topmortarseller/util/colors/color.dart';
-import 'package:topmortarseller/widget/card/rekening_card.dart';
+import 'package:topmortarseller/widget/card/card_rekening.dart';
 import 'package:topmortarseller/widget/form/button/elevated_button.dart';
 import 'package:topmortarseller/widget/modal/loading_modal.dart';
 import 'package:topmortarseller/widget/snackbar/show_snackbar.dart';
@@ -72,7 +72,7 @@ class _ScannerResultScreenState extends State<ScannerResultScreen> {
           itemCount: myBanks!.length,
           itemBuilder: (context, index) {
             final bankItem = myBanks![index];
-            return RekeningCard(
+            return CardRekening(
               bankName: bankItem.namaBank!,
               rekening: bankItem.toAccount!,
               rekeningName: bankItem.toName!,

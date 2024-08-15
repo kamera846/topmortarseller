@@ -6,7 +6,7 @@ import 'package:topmortarseller/util/enum.dart';
 import 'package:topmortarseller/screen/profile/new_rekening_screen.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/util/loading_item.dart';
-import 'package:topmortarseller/widget/card/rekening_card.dart';
+import 'package:topmortarseller/widget/card/card_rekening.dart';
 import 'package:topmortarseller/widget/form/button/elevated_button.dart';
 import 'package:topmortarseller/widget/modal/loading_modal.dart';
 import 'package:topmortarseller/widget/snackbar/show_snackbar.dart';
@@ -118,7 +118,7 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
                             itemCount: myBanks!.length,
                             itemBuilder: (context, i) {
                               final bankItem = myBanks![i];
-                              return RekeningCard(
+                              return CardRekening(
                                 bankName: bankItem.namaBank!,
                                 rekening: bankItem.toAccount!,
                                 rekeningName: bankItem.toName!,

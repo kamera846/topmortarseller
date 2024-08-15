@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 
-class RekeningCard extends StatefulWidget {
-  const RekeningCard({
+class CardRekening extends StatefulWidget {
+  const CardRekening({
     super.key,
     required this.bankName,
     required this.rekening,
@@ -24,10 +24,10 @@ class RekeningCard extends StatefulWidget {
   final bool withDeleteAction;
 
   @override
-  State<RekeningCard> createState() => _RekeningCardState();
+  State<CardRekening> createState() => _CardRekeningState();
 }
 
-class _RekeningCardState extends State<RekeningCard> {
+class _CardRekeningState extends State<CardRekening> {
   @override
   Widget build(BuildContext context) {
     Widget cardWidget = Card(

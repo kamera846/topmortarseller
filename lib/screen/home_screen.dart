@@ -90,7 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
           body: Center(
             child: Column(
               children: [
-                HomeHeader(userData: widget.userData),
+                CardPromoScanner(userData: widget.userData),
               ],
             ),
           ),
