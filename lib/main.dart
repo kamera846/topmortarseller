@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:topmortarseller/screen/splash_screen.dart';
 import 'package:topmortarseller/util/colors/color.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 final mColorScheme =
     ColorScheme.fromSeed(seedColor: cPrimary100, brightness: Brightness.light);
@@ -22,23 +23,23 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Top Mortar Seller',
-      theme: ThemeData().copyWith(
+      theme: ThemeData(useMaterial3: true).copyWith(
         colorScheme: mColorScheme,
         appBarTheme: const AppBarTheme().copyWith(
           backgroundColor: mColorScheme.primary,
           foregroundColor: mColorScheme.onPrimary,
         ),
         scaffoldBackgroundColor: cWhite,
-        useMaterial3: true,
+        textTheme: GoogleFonts.latoTextTheme(),
       ),
-      darkTheme: ThemeData.dark().copyWith(
+      darkTheme: ThemeData.dark(useMaterial3: true).copyWith(
         colorScheme: mDarkColorScheme,
         appBarTheme: const AppBarTheme().copyWith(
           backgroundColor: cDark200,
           foregroundColor: cWhite,
         ),
         scaffoldBackgroundColor: cDark100,
-        useMaterial3: true,
+        textTheme: GoogleFonts.latoTextTheme(),
       ),
       themeMode: ThemeMode.light,
       home: const SplashScreen(),
