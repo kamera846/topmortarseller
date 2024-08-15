@@ -71,30 +71,13 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
 
   void _elevatedButtonAction() async {
     final authType = widget.authType;
-    var phoneNumber = _phoneController.text;
 
     if (authType == AuthType.login) {
       loginHandler();
     }
 
     if (authType == AuthType.forgot) {
-      final String? phoneValidator = Validator.phoneAuth(phoneNumber);
-
-      setState(() {
-        _phoneError = phoneValidator;
-      });
-
-      if (phoneValidator != null) return;
-      _phoneController.text = '';
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (ctx) => const AuthScreen(
-            authType: AuthType.otp,
-          ),
-        ),
-      );
+      registerHandler();
     }
 
     if (authType == AuthType.otp) {
