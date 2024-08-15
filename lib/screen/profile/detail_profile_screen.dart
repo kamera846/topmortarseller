@@ -122,7 +122,7 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
                                 bankName: bankItem.namaBank!,
                                 rekening: bankItem.toAccount!,
                                 rekeningName: bankItem.toName!,
-                                rightIcon: Icons.edit_square,
+                                rightIcon: Icons.mode_edit,
                                 action: () {
                                   Navigator.of(context).push(
                                     MaterialPageRoute(
@@ -214,11 +214,14 @@ class DetailProfileHeader extends StatelessWidget {
         bottom: 24,
         left: 0,
       ),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         gradient: LinearGradient(
           colors: [
             cPrimary100,
-            cPrimary100.withOpacity(0.8),
+            cPrimary200,
+            cPrimary100,
+            cPrimary200,
+            cPrimary100,
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,

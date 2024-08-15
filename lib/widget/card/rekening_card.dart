@@ -38,7 +38,7 @@ class _RekeningCardState extends State<RekeningCard> {
       ),
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
         decoration: BoxDecoration(
           color: widget.backgroundColor,
           border: Border.all(color: cDark500, width: 1),
@@ -52,26 +52,30 @@ class _RekeningCardState extends State<RekeningCard> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    widget.bankName,
+                    '${widget.bankName} • ${widget.rekening}',
+                    overflow: TextOverflow.ellipsis,
+                    softWrap: true,
                     style: Theme.of(context).textTheme.titleSmall!.copyWith(
                           color: cDark100,
                           fontWeight: FontWeight.bold,
                         ),
                   ),
                   Text(
-                    widget.rekening,
-                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                          color: cDark100,
-                          fontWeight: FontWeight.normal,
-                        ),
-                  ),
-                  Text(
                     'a.n ${widget.rekeningName}',
+                    overflow: TextOverflow.ellipsis,
+                    softWrap: true,
                     style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                           color: cDark100,
                           fontWeight: FontWeight.normal,
                         ),
                   ),
+                  // Text(
+                  //   widget.rekening,
+                  //   style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                  //         color: cDark100,
+                  //         fontWeight: FontWeight.normal,
+                  //       ),
+                  // ),
                 ],
               ),
             ),

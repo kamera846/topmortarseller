@@ -78,7 +78,7 @@ class MainDrawerItems extends StatelessWidget {
           },
         ),
         const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+          padding: EdgeInsets.symmetric(horizontal: 32),
           child: Divider(
             height: 1,
             color: cDark500,
