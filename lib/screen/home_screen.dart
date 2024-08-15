@@ -37,7 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final prefs = await SharedPreferences.getInstance();
     final isSkipCreateBank =
         prefs.getBool('${_userData!.idContact!}-${GlobalEnum.skipCreateBank}');
-
+    print('My Bank: $isSkipCreateBank');
     if (isSkipCreateBank == null || isSkipCreateBank == false) {
       final userBanks = await CustomerBankApiService().banks(
         idContact: _userData!.idContact!,
@@ -45,10 +45,16 @@ class _HomeScreenState extends State<HomeScreen> {
         onError: (e) {},
         onCompleted: () {},
       );
-
+      print('My Bank: $userBanks');
       if (userBanks == null || userBanks.isEmpty) {
         _goToNewRekeningScreen();
+      } else {
+        prefs.setBool(
+            '${_userData!.idContact!}-${GlobalEnum.skipCreateBank}', true);
       }
+    } else {
+      prefs.setBool(
+          '${_userData!.idContact!}-${GlobalEnum.skipCreateBank}', true);
     }
     setState(() => isLoading = false);
   }

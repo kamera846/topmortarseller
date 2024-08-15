@@ -23,16 +23,16 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Top Mortar Seller',
-      theme: ThemeData(useMaterial3: true).copyWith(
+      theme: ThemeData().copyWith(
         colorScheme: mColorScheme,
         appBarTheme: const AppBarTheme().copyWith(
-          backgroundColor: mColorScheme.primary,
-          foregroundColor: mColorScheme.onPrimary,
+          backgroundColor: cPrimary100,
+          foregroundColor: cWhite,
         ),
         scaffoldBackgroundColor: cWhite,
         textTheme: GoogleFonts.latoTextTheme(),
       ),
-      darkTheme: ThemeData.dark(useMaterial3: true).copyWith(
+      darkTheme: ThemeData.dark().copyWith(
         colorScheme: mDarkColorScheme,
         appBarTheme: const AppBarTheme().copyWith(
           backgroundColor: cDark200,
