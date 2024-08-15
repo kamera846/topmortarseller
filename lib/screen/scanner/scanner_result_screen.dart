@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:topmortarseller/model/contact_model.dart';
 import 'package:topmortarseller/model/customer_bank_model.dart';
+import 'package:topmortarseller/screen/profile/new_rekening_screen.dart';
 import 'package:topmortarseller/services/customer_bank_api.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/widget/card/rekening_card.dart';
@@ -96,7 +97,21 @@ class _ScannerResultScreenState extends State<ScannerResultScreen> {
               const SizedBox(height: 12),
               MElevatedButton(
                 title: 'Tambah Rekening',
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => NewRekeningScreen(
+                        userData: _userData,
+                        onSuccess: (state) {
+                          if (state != null && state == true) {
+                            setState(() => isLoading = true);
+                            _getUserBanks();
+                          }
+                        },
+                      ),
+                    ),
+                  );
+                },
               ),
             ],
           ),

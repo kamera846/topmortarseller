@@ -126,8 +126,10 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
                                 action: () {
                                   Navigator.of(context).push(
                                     MaterialPageRoute(
-                                      builder: (context) =>
-                                          const NewRekeningScreen(),
+                                      builder: (context) => NewRekeningScreen(
+                                        userData: _userData,
+                                        onSuccess: (bool? state) {},
+                                      ),
                                     ),
                                   );
                                 },
@@ -149,8 +151,10 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
                                 onPressed: () {
                                   Navigator.of(context).push(
                                     MaterialPageRoute(
-                                      builder: (context) =>
-                                          const NewRekeningScreen(),
+                                      builder: (context) => NewRekeningScreen(
+                                        userData: _userData,
+                                        onSuccess: (bool? state) {},
+                                      ),
                                     ),
                                   );
                                 },

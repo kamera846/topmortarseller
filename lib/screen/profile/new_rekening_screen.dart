@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -27,9 +25,11 @@ class NewRekeningScreen extends StatefulWidget {
   const NewRekeningScreen({
     super.key,
     this.userData,
+    required this.onSuccess,
   });
 
   final ContactModel? userData;
+  final Function(bool? state) onSuccess;
 
   @override
   State<NewRekeningScreen> createState() => _NewRekeningScreenState();
@@ -180,19 +180,23 @@ class _NewRekeningScreenState extends State<NewRekeningScreen> {
       idBank: bankId!,
       nameRek: nameRek,
       noRek: noRek,
-      onSuccess: (msg) => showSnackBar(context, msg),
-      onError: (e) => showSnackBar(context, e),
+      onSuccess: (msg) {
+        showSnackBar(context, msg);
+        widget.onSuccess(true);
+      },
+      onError: (e) {
+        showSnackBar(context, e);
+        widget.onSuccess(false);
+      },
       onCompleted: () => setState(() => isLoading = false),
     );
 
     if (myBank != null) {
-      print('My Bank: ${json.encode(myBank.toJson())}');
-    }
-
-    if (isSkipCreateBank == null || isSkipCreateBank == false) {
-      _skipCreateBank();
-    } else {
-      goBack();
+      if (isSkipCreateBank == null || isSkipCreateBank == false) {
+        _skipCreateBank();
+      } else {
+        goBack();
+      }
     }
   }
 
