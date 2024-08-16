@@ -58,9 +58,10 @@ class MainDrawerItems extends StatelessWidget {
           ),
           title: Text(
             'Profil saya',
-            style: Theme.of(context).textTheme.titleSmall!.copyWith(
-                  color: cDark100,
-                ),
+            style: Theme.of(context)
+                .textTheme
+                .titleSmall!
+                .copyWith(color: cDark100, fontWeight: FontWeight.bold),
           ),
           subtitle: Text(
             'Atur bank anda disini',
@@ -92,9 +93,10 @@ class MainDrawerItems extends StatelessWidget {
           ),
           title: Text(
             'Keluar',
-            style: Theme.of(context).textTheme.titleSmall!.copyWith(
-                  color: cDark100,
-                ),
+            style: Theme.of(context)
+                .textTheme
+                .titleSmall!
+                .copyWith(color: cDark100, fontWeight: FontWeight.bold),
           ),
           subtitle: Text(
             'Anda akan keluar dari akun saat ini',

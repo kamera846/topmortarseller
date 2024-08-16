@@ -420,7 +420,9 @@ class _SelectBankFieldState extends State<SelectBankField> {
               const Text(
                 'Nama Bank atau E-Wallet',
                 style: TextStyle(
-                    color: cDark300, fontSize: 11, fontWeight: FontWeight.w500),
+                    color: cDark300,
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w500),
               ),
               widget.isLoading
                   ? const LoadingItem(

@@ -65,7 +65,9 @@ class _ScannerResultScreenState extends State<ScannerResultScreen> {
   Widget build(BuildContext context) {
     Widget rekeningCards = Container();
     if (isLoading) {
-      rekeningCards = const LoadingModal();
+      rekeningCards = const LoadingModal(
+        androidBgColor: cWhite,
+      );
     } else {
       if (myBanks != null && myBanks!.isNotEmpty) {
         rekeningCards = ListView.builder(

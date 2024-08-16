@@ -77,17 +77,17 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              DetailProfileHeader(
-                title: title,
-                description: description,
-              ),
-              Expanded(
-                child: Container(
+          DetailProfileHeader(
+            title: title,
+            description: description,
+          ),
+          Expanded(
+            child: Stack(
+              children: [
+                Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 12,
                     vertical: 24,
@@ -100,7 +100,10 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
                         children: [
                           Text(
                             'Daftar Rekening',
-                            style: Theme.of(context).textTheme.titleSmall,
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleSmall!
+                                .copyWith(fontWeight: FontWeight.bold),
                           ),
                           Text(
                             'Digunakan untuk tujuan transfer promo cashback dari kami.',
@@ -171,24 +174,24 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
                     ],
                   ),
                 ),
-              ),
-              // Container(
-              //   padding: const EdgeInsets.all(12),
-              //   child: MElevatedButton(
-              //     title: 'Tambah Rekening Lain',
-              //     isFullWidth: true,
-              //     onPressed: () {
-              //       Navigator.of(context).push(
-              //         MaterialPageRoute(
-              //           builder: (context) => const NewRekeningScreen(),
-              //         ),
-              //       );
-              //     },
-              //   ),
-              // )
-            ],
+                if (isLoading) const LoadingModal()
+              ],
+            ),
           ),
-          if (isLoading) const LoadingModal()
+          // Container(
+          //   padding: const EdgeInsets.all(12),
+          //   child: MElevatedButton(
+          //     title: 'Tambah Rekening Lain',
+          //     isFullWidth: true,
+          //     onPressed: () {
+          //       Navigator.of(context).push(
+          //         MaterialPageRoute(
+          //           builder: (context) => const NewRekeningScreen(),
+          //         ),
+          //       );
+          //     },
+          //   ),
+          // )
         ],
       ),
     );
