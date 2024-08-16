@@ -60,6 +60,6 @@ class LoadingModal extends StatelessWidget {
         ],
       ),
     );
-    return Center(child: Platform.isAndroid ? androidContent : iosContent);
+    return Center(child: Platform.isIOS ? iosContent : androidContent);
   }
 }

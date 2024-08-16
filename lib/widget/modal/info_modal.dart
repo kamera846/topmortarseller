@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:topmortarseller/util/colors/color.dart';
@@ -29,7 +31,6 @@ class MInfoModal extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<Widget> actions = [];
-
     if (cancelText != null) {
       actions.add(
         TextButton(
@@ -48,10 +49,15 @@ class MInfoModal extends StatelessWidget {
       );
     }
 
-    return CupertinoPopupSurface(
+    Widget iosContent = CupertinoPopupSurface(
       isSurfacePainted: false,
       child: CupertinoAlertDialog(
-        title: title != null ? Text(title!) : null,
+        title: title != null
+            ? Text(
+                title!,
+                textAlign: TextAlign.center,
+              )
+            : null,
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -68,6 +74,7 @@ class MInfoModal extends StatelessWidget {
             contentName != null
                 ? Text(
                     contentName!,
+                    textAlign: TextAlign.center,
                     style: Theme.of(context)
                         .textTheme
                         .titleMedium!
@@ -77,6 +84,7 @@ class MInfoModal extends StatelessWidget {
             contentDescription != null
                 ? Text(
                     contentDescription!,
+                    textAlign: TextAlign.center,
                     style: Theme.of(context)
                         .textTheme
                         .bodyMedium!
@@ -88,5 +96,54 @@ class MInfoModal extends StatelessWidget {
         actions: actions,
       ),
     );
+
+    Widget androidContent = AlertDialog(
+      backgroundColor: cWhite,
+      title: title != null
+          ? Text(
+              title!,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.titleLarge,
+            )
+          : null,
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          contentIcon != null
+              ? Container(
+                  margin: const EdgeInsets.all(8),
+                  child: Icon(
+                    contentIcon,
+                    color: contentIconColor ?? cPrimary100,
+                    size: 32,
+                  ),
+                )
+              : Container(),
+          contentName != null
+              ? Text(
+                  contentName!,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleMedium!
+                      .copyWith(color: cDark100),
+                )
+              : Container(),
+          contentDescription != null
+              ? Text(
+                  contentDescription!,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium!
+                      .copyWith(color: cDark200),
+                )
+              : Container(),
+        ],
+      ),
+      actions: actions,
+    );
+
+    return Platform.isIOS ? iosContent : androidContent;
   }
 }
