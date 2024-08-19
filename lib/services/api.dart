@@ -1,3 +1,4 @@
+// const baseUrl = 'seller.topmortarindonesia.com';
 const baseUrl = 'dev-seller.topmortarindonesia.com';
 const headerSetup = {'Content-Type': 'application/json'};
 const failedRequestText = 'Gagal memproses data';
