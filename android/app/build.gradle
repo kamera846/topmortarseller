@@ -31,14 +31,16 @@ if (flutterVersionName == null) {
     flutterVersionName = '1.0'
 }
 
+def flutterVersion = getFlutterVersion()
+
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
     namespace "com.topmortar.topmortarseller"
-    compileSdkVersion flutter.compileSdkVersion
-    ndkVersion flutter.ndkVersion
+    compileSdkVersion 34
+    ndkVersion "27.0.0"
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -60,8 +62,11 @@ android {
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
         minSdkVersion 21
         targetSdkVersion 34
-        versionCode 2
-        versionName '1.0.1'
+        versionCode flutterVersion.versionCode.toInteger()
+        versionName flutterVersion.versionName
+        ndk {
+            abiFilters "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
+        }
     }
 
     signingConfigs {
@@ -91,6 +96,14 @@ android {
         }
     }
 
+}
+
+def getFlutterVersion() {
+    def file = rootProject.file('../pubspec.yaml')
+    def version = file.readLines().find { it.startsWith('version:') }?.split(' ')[1]
+    def versionCode = version?.split('\\+')[-1]
+    def versionName = version?.split('\\+')?.first()
+    [versionCode: versionCode, versionName: versionName]
 }
 
 flutter {
