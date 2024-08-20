@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:topmortarseller/screen/splash_screen.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:upgrader/upgrader.dart';
 
 final mColorScheme =
     ColorScheme.fromSeed(seedColor: cPrimary100, brightness: Brightness.light);
@@ -42,7 +43,7 @@ class MyApp extends StatelessWidget {
         textTheme: GoogleFonts.openSansTextTheme(),
       ),
       themeMode: ThemeMode.light,
-      home: const SplashScreen(),
+      home: UpgradeAlert(child: const SplashScreen()),
     );
   }
 }
