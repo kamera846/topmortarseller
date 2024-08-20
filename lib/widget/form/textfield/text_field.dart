@@ -108,43 +108,46 @@ class _MTextFieldState extends State<MTextField> {
         child: Row(
           children: [
             Expanded(
-              child: TextFormField(
-                keyboardType: widget.keyboardType,
-                textInputAction: widget.inputAction,
-                enabled: widget.enabled,
-                controller: widget.controller,
-                focusNode: focusNode,
-                validator: widget.validator,
-                maxLength: widget.maxLength,
-                maxLines: widget.maxLines,
-                obscureText: widget.obscure,
-                style: const TextStyle(color: cDark200),
-                decoration: InputDecoration(
-                  labelText: widget.label,
-                  labelStyle:
-                      TextStyle(color: _isFocused ? cPrimary100 : cDark300),
-                  prefixIcon: widget.prefixIcon == null
-                      ? null
-                      : Icon(
-                          widget.prefixIcon,
-                        ),
-                  prefixIconColor: _isFocused ? cPrimary100 : cDark300,
-                  suffixIcon: widget.suffixIcon == null
-                      ? null
-                      : Icon(
-                          widget.suffixIcon,
-                        ),
-                  suffixIconColor: _isFocused ? cPrimary100 : cDark300,
-                  hintText: widget.hint,
-                  enabledBorder: InputBorder.none,
-                  border: InputBorder.none,
+              child: Semantics(
+                label: 'Input ${widget.label}',
+                child: TextFormField(
+                  keyboardType: widget.keyboardType,
+                  textInputAction: widget.inputAction,
+                  enabled: widget.enabled,
+                  controller: widget.controller,
+                  focusNode: focusNode,
+                  validator: widget.validator,
+                  maxLength: widget.maxLength,
+                  maxLines: widget.maxLines,
+                  obscureText: widget.obscure,
+                  style: const TextStyle(color: cDark200),
+                  decoration: InputDecoration(
+                    labelText: widget.label,
+                    labelStyle:
+                        TextStyle(color: _isFocused ? cPrimary100 : cDark300),
+                    prefixIcon: widget.prefixIcon == null
+                        ? null
+                        : Icon(
+                            widget.prefixIcon,
+                          ),
+                    prefixIconColor: _isFocused ? cPrimary100 : cDark300,
+                    suffixIcon: widget.suffixIcon == null
+                        ? null
+                        : Icon(
+                            widget.suffixIcon,
+                          ),
+                    suffixIconColor: _isFocused ? cPrimary100 : cDark300,
+                    hintText: widget.hint,
+                    enabledBorder: InputBorder.none,
+                    border: InputBorder.none,
+                  ),
+                  onChanged: (value) {
+                    widget.onChanged(value);
+                  },
+                  onFieldSubmitted: (value) {
+                    if (widget.onSubmitted != null) widget.onSubmitted!(value);
+                  },
                 ),
-                onChanged: (value) {
-                  widget.onChanged(value);
-                },
-                onFieldSubmitted: (value) {
-                  if (widget.onSubmitted != null) widget.onSubmitted!(value);
-                },
               ),
             ),
             widget.rightContent ?? Container(),

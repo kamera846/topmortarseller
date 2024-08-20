@@ -30,19 +30,22 @@ class _MElevatedButtonState extends State<MElevatedButton> {
           ),
     );
 
-    return ElevatedButton(
-      onPressed: widget.enabled ? widget.onPressed : null,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: widget.enabled ? cPrimary100 : cDark400,
-        foregroundColor: cWhite,
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+    return Semantics(
+      label: 'Tombol ${widget.title}',
+      child: ElevatedButton(
+        onPressed: widget.enabled ? widget.onPressed : null,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: widget.enabled ? cPrimary100 : cDark400,
+          foregroundColor: cWhite,
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+        ),
+        child: widget.isFullWidth
+            ? SizedBox(
+                width: MediaQuery.of(context).size.width,
+                child: textWidget,
+              )
+            : textWidget,
       ),
-      child: widget.isFullWidth
-          ? SizedBox(
-              width: MediaQuery.of(context).size.width,
-              child: textWidget,
-            )
-          : textWidget,
     );
   }
 }

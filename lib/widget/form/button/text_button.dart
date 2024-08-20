@@ -6,10 +6,16 @@ class MTextButton extends StatefulWidget {
     super.key,
     required this.onPressed,
     required this.title,
+    this.titleStyle,
+    this.icon,
+    this.iconAlignment,
     this.isFullWidth = false,
   });
 
   final String title;
+  final ButtonStyle? titleStyle;
+  final IconData? icon;
+  final IconAlignment? iconAlignment;
   final void Function() onPressed;
   final bool isFullWidth;
 
@@ -20,13 +26,15 @@ class MTextButton extends StatefulWidget {
 class _MTextButtonState extends State<MTextButton> {
   @override
   Widget build(BuildContext context) {
-    return TextButton(
-      onPressed: widget.onPressed,
-      child: Text(
-        widget.title,
-        style: Theme.of(context).textTheme.titleSmall!.copyWith(
-              color: cPrimary300,
-            ),
+    return Semantics(
+      label: 'Tombol ${widget.title}',
+      child: TextButton.icon(
+        icon: widget.icon != null ? Icon(widget.icon) : const SizedBox.shrink(),
+        iconAlignment: widget.iconAlignment ?? IconAlignment.start,
+        onPressed: widget.onPressed,
+        label: Text(widget.title),
+        style: widget.titleStyle ??
+            TextButton.styleFrom(foregroundColor: cPrimary300),
       ),
     );
   }

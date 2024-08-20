@@ -82,9 +82,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 margin: const EdgeInsets.symmetric(horizontal: 16),
                 child: Hero(
                   tag: TagHero.faviconAuth,
-                  child: Image.asset(
-                    'assets/favicon/favicon_circle.png',
-                    width: 32,
+                  child: Semantics(
+                    label: '${TagHero.faviconAuth}',
+                    child: Image.asset(
+                      'assets/favicon/favicon_circle.png',
+                      width: 32,
+                    ),
                   ),
                 ),
               ),

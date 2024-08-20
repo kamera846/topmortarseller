@@ -419,17 +419,15 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
           margin: const EdgeInsets.only(bottom: 8),
           child: Row(
             children: [
-              TextButton.icon(
+              MTextButton(
                 onPressed: () {
                   Navigator.pop(context);
                 },
-                label: const Text('Kembali'),
-                style: TextButton.styleFrom(
+                title: 'Kembali',
+                icon: Icons.arrow_circle_left_rounded,
+                titleStyle: TextButton.styleFrom(
                   foregroundColor: cDark100,
                   padding: const EdgeInsets.all(0),
-                ),
-                icon: const Icon(
-                  Icons.arrow_circle_left_rounded,
                 ),
               ),
             ],
@@ -447,8 +445,11 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
           keyboardType: TextInputType.phone,
           errorText: _phoneError,
           onChanged: (value) {
+            var formattedValue = value.replaceAll(RegExp(r'[^0-9+]'), '');
+            final String? phoneValidator = Validator.phoneAuth(formattedValue);
             setState(() {
-              _phoneError = null;
+              _phoneError = phoneValidator;
+              _phoneController.text = formattedValue;
             });
           },
         ),
@@ -464,8 +465,9 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
           prefixIcon: Icons.lock_outline,
           errorText: _passwordError,
           onChanged: (value) {
+            final String? passwordValidator = Validator.passwordAuth(value);
             setState(() {
-              _passwordError = null;
+              _passwordError = passwordValidator;
             });
           },
           rightContent: TextButton(
@@ -494,8 +496,9 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
           prefixIcon: Icons.lock_outline,
           errorText: _confirmPasswordError,
           onChanged: (value) {
+            final String? passwordValidator = Validator.passwordAuth(value);
             setState(() {
-              _confirmPasswordError = null;
+              _confirmPasswordError = passwordValidator;
             });
           },
           rightContent: TextButton(

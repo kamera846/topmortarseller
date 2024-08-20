@@ -15,9 +15,12 @@ class AuthHeaderWidget extends StatelessWidget {
       children: [
         Hero(
           tag: TagHero.faviconAuth,
-          child: Image.asset(
-            'assets/favicon/favicon_circle.png',
-            width: 100,
+          child: Semantics(
+            label: '${TagHero.faviconAuth}',
+            child: Image.asset(
+              'assets/favicon/favicon_circle.png',
+              width: 100,
+            ),
           ),
         ),
         const SizedBox(height: 12),

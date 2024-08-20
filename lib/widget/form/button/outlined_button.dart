@@ -27,21 +27,24 @@ class _MOutlinedButtonState extends State<MOutlinedButton> {
           ),
     );
 
-    return OutlinedButton(
-      style: OutlinedButton.styleFrom(
-        foregroundColor: cPrimary100,
-        side: const BorderSide(color: cDark400),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
+    return Semantics(
+      label: 'Tombol ${widget.title}',
+      child: OutlinedButton(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: cPrimary100,
+          side: const BorderSide(color: cDark400),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
         ),
+        onPressed: widget.onPressed,
+        child: widget.isFullWidth
+            ? SizedBox(
+                width: MediaQuery.of(context).size.width,
+                child: textWidget,
+              )
+            : textWidget,
       ),
-      onPressed: widget.onPressed,
-      child: widget.isFullWidth
-          ? SizedBox(
-              width: MediaQuery.of(context).size.width,
-              child: textWidget,
-            )
-          : textWidget,
     );
   }
 }
