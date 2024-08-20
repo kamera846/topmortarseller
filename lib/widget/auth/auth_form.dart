@@ -446,7 +446,11 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
           prefixIcon: Icons.phone,
           keyboardType: TextInputType.phone,
           errorText: _phoneError,
-          onChanged: (value) {},
+          onChanged: (value) {
+            setState(() {
+              _phoneError = null;
+            });
+          },
         ),
       );
     }
@@ -459,7 +463,11 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
           obscure: _isPasswordHidden,
           prefixIcon: Icons.lock_outline,
           errorText: _passwordError,
-          onChanged: (value) {},
+          onChanged: (value) {
+            setState(() {
+              _passwordError = null;
+            });
+          },
           rightContent: TextButton(
             onPressed: () {
               setState(() {
@@ -485,7 +493,11 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
           obscure: _isConfirmPasswordHidden,
           prefixIcon: Icons.lock_outline,
           errorText: _confirmPasswordError,
-          onChanged: (value) {},
+          onChanged: (value) {
+            setState(() {
+              _confirmPasswordError = null;
+            });
+          },
           rightContent: TextButton(
             onPressed: () {
               setState(() {

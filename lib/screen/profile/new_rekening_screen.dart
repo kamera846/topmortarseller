@@ -304,6 +304,7 @@ class _NewRekeningScreenState extends State<NewRekeningScreen> {
                   onChange: (value) {
                     setState(() {
                       _selectedBank = value;
+                      _selectedErrorText = null;
                     });
                   },
                 ),
@@ -312,7 +313,11 @@ class _NewRekeningScreenState extends State<NewRekeningScreen> {
                   label: 'Nomor Rekening atau E-Wallet',
                   keyboardType: TextInputType.number,
                   errorText: _noRekeningErrorText,
-                  onChanged: (value) {},
+                  onChanged: (value) {
+                    setState(() {
+                      _noRekeningErrorText = null;
+                    });
+                  },
                 ),
                 MTextField(
                   controller: _nameRekeningController,
@@ -320,7 +325,11 @@ class _NewRekeningScreenState extends State<NewRekeningScreen> {
                   helper:
                       'Pastikan nama sesuai dengan nama pemilik pada Bank atau E-Wallet anda untuk menghindari terjadinya error.',
                   errorText: _nameRekeningErrorText,
-                  onChanged: (value) {},
+                  onChanged: (value) {
+                    setState(() {
+                      _nameRekeningErrorText = null;
+                    });
+                  },
                 ),
                 // MElevatedButton(
                 //   title: 'Cek Nama Pemilik',
