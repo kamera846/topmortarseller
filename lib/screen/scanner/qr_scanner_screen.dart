@@ -201,9 +201,12 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
                 ),
                 Hero(
                   tag: TagHero.faviconAuth,
-                  child: Image.asset(
-                    'assets/favicon/favicon_circle.png',
-                    width: 32,
+                  child: Semantics(
+                    label: '${TagHero.faviconAuth}',
+                    child: Image.asset(
+                      'assets/favicon/favicon_circle.png',
+                      width: 32,
+                    ),
                   ),
                 )
               ],

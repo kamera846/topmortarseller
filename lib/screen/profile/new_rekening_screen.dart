@@ -437,31 +437,34 @@ class _SelectBankFieldState extends State<SelectBankField> {
                   ? const LoadingItem(
                       margin: EdgeInsets.only(bottom: 12),
                     )
-                  : DropdownButtonFormField<BankModel>(
-                      decoration: const InputDecoration(
-                        border: InputBorder.none,
+                  : Semantics(
+                      label: 'Dropdown Bank & E-Wallet',
+                      child: DropdownButtonFormField<BankModel>(
+                        decoration: const InputDecoration(
+                          border: InputBorder.none,
+                        ),
+                        dropdownColor: cWhite,
+                        value: widget.selectedBank,
+                        onChanged: (BankModel? value) {
+                          widget.onChange(value!);
+                        },
+                        items: widget.options.map((BankModel bank) {
+                          return DropdownMenuItem<BankModel>(
+                            value: bank,
+                            child: Text(
+                              bank.namaBank!,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleSmall!
+                                  .copyWith(
+                                    color: cDark200,
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 14,
+                                  ),
+                            ),
+                          );
+                        }).toList(),
                       ),
-                      dropdownColor: cWhite,
-                      value: widget.selectedBank,
-                      onChanged: (BankModel? value) {
-                        widget.onChange(value!);
-                      },
-                      items: widget.options.map((BankModel bank) {
-                        return DropdownMenuItem<BankModel>(
-                          value: bank,
-                          child: Text(
-                            bank.namaBank!,
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleSmall!
-                                .copyWith(
-                                  color: cDark200,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 14,
-                                ),
-                          ),
-                        );
-                      }).toList(),
                     )
             ],
           ),
