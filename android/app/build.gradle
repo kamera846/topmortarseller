@@ -11,27 +11,8 @@ if (flutterRoot == null) {
     throw new GradleException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
 }
 
-def flutterMinSdkVersion = localProperties.getProperty('flutter.minSdkVersion')
-if (flutterMinSdkVersion == null) {
-    flutterMinSdkVersion = '20'
-}
-
-def flutterTargetSdkVersion = localProperties.getProperty('flutter.targetSdkVersion')
-if (flutterTargetSdkVersion == null) {
-    flutterTargetSdkVersion = '34'
-}
-
-def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
-if (flutterVersionCode == null) {
-    flutterVersionCode = '1'
-}
-
-def flutterVersionName = localProperties.getProperty('flutter.versionName')
-if (flutterVersionName == null) {
-    flutterVersionName = '1.0'
-}
-
-def flutterVersion = getFlutterVersion()
+def flutterVersionCode = localProperties.getProperty('flutter.versionCode', '1')
+def flutterVersionName = localProperties.getProperty('flutter.versionName', '1.0')
 
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
@@ -62,8 +43,8 @@ android {
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
         minSdkVersion 21
         targetSdkVersion 34
-        versionCode flutterVersion.versionCode.toInteger()
-        versionName flutterVersion.versionName
+        versionCode flutterVersionCode.toInteger()
+        versionName flutterVersionName
         ndk {
             abiFilters "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
         }
@@ -96,14 +77,6 @@ android {
         }
     }
 
-}
-
-def getFlutterVersion() {
-    def file = rootProject.file('../pubspec.yaml')
-    def version = file.readLines().find { it.startsWith('version:') }?.split(' ')[1]
-    def versionCode = version?.split('\\+')[-1]
-    def versionName = version?.split('\\+')?.first()
-    [versionCode: versionCode, versionName: versionName]
 }
 
 flutter {
