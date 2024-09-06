@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:topmortarseller/model/claimed_model.dart';
 import 'package:topmortarseller/model/contact_model.dart';
 import 'package:topmortarseller/model/customer_bank_model.dart';
+import 'package:topmortarseller/services/claim_api.dart';
 import 'package:topmortarseller/services/customer_bank_api.dart';
 import 'package:topmortarseller/util/enum.dart';
 import 'package:topmortarseller/screen/profile/new_rekening_screen.dart';
@@ -26,7 +28,7 @@ class DetailProfileScreen extends StatefulWidget {
 class _DetailProfileScreenState extends State<DetailProfileScreen> {
   ContactModel? _userData;
   List<CustomerBankModel>? myBanks = [];
-  List<CustomerBankModel>? myRedeems = [];
+  List<ClaimedModel>? myRedeems = [];
   String? title;
   String? description;
   bool isLoading = true;
@@ -76,31 +78,55 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
   }
 
   void _getUserRedeemList() async {
-    final data = await CustomerBankApiService().banks(
+    final data = await ClaimCashbackServices().claimed(
       idContact: _userData!.idContact!,
       onSuccess: (msg) => null,
       onError: (e) => showSnackBar(context, e),
       onCompleted: () => setState(() => isLoading = false),
     );
     setState(() {
-      myRedeems?.add(data![0]);
-      myRedeems?.add(data![0]);
-      myRedeems?.add(data![0]);
-      myRedeems?.add(data![0]);
-      myRedeems?.add(data![0]);
-      myRedeems?.add(data![0]);
-      myRedeems?.add(data![0]);
-      myRedeems?.add(data![0]);
-      myRedeems?.add(data![0]);
-      myRedeems?.add(data![0]);
+      myRedeems = data;
     });
+  }
+
+  String _monthName(int month) {
+    // List nama bulan dalam bahasa Indonesia
+    List<String> months = [
+      "Januari",
+      "Februari",
+      "Maret",
+      "April",
+      "Mei",
+      "Juni",
+      "Juli",
+      "Agustus",
+      "September",
+      "Oktober",
+      "November",
+      "Desember"
+    ];
+    return months[month - 1];
+  }
+
+  String _formattedDate(dateString) {
+    DateTime dateTime = DateTime.parse(dateString);
+    String day = dateTime.day.toString().padLeft(2, '0');
+    String month = _monthName(dateTime.month);
+    String year = dateTime.year.toString();
+    String hour = dateTime.hour.toString().padLeft(2, '0');
+    String minute = dateTime.minute.toString().padLeft(2, '0');
+
+    return "$day $month $year, $hour:$minute";
   }
 
   @override
   Widget build(BuildContext context) {
     Widget cardBank = Container();
+    Widget emptyCardBank = Container();
     Widget aboutRedeem = Container();
     Widget redeemList = Container();
+    Widget emptyRedeemList = Container();
+
     if (myBanks != null && myBanks!.isNotEmpty) {
       cardBank = CardRekening(
         bankName: myBanks![0].namaBank!,
@@ -144,7 +170,7 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
             padding: const EdgeInsets.all(0),
             itemCount: myRedeems!.length,
             itemBuilder: (context, i) {
-              final bankItem = myRedeems![i];
+              final redeemItem = myRedeems![i];
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -155,19 +181,20 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Tukang Rafli Ramadani',
+                          redeemItem.nama!,
                           softWrap: true,
                           overflow: TextOverflow.visible,
                           style: Theme.of(context).textTheme.bodyLarge,
                         ),
                         Text(
-                          '06 September 2024',
+                          _formattedDate(redeemItem.claimDate!),
                           softWrap: true,
                           overflow: TextOverflow.visible,
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium!
-                              .copyWith(fontStyle: FontStyle.italic),
+                          style:
+                              Theme.of(context).textTheme.bodyMedium!.copyWith(
+                                    fontStyle: FontStyle.italic,
+                                    color: cDark200,
+                                  ),
                         ),
                       ],
                     ),
@@ -183,7 +210,7 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
         );
       }
     }
-    Widget emptyCardBank = Container();
+
     if (myBanks == null || myBanks!.isEmpty) {
       emptyCardBank = SizedBox(
         width: double.infinity,
@@ -206,10 +233,26 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
                 );
               },
             ),
+            const SizedBox(height: 24),
           ],
         ),
       );
     }
+
+    if (myRedeems == null || myRedeems!.isEmpty) {
+      emptyRedeemList = const SizedBox(
+        width: double.infinity,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(height: 24),
+            Text('Riwayat penukaran anda akan ditampilkan disini.'),
+            SizedBox(height: 24),
+          ],
+        ),
+      );
+    }
+
     return Scaffold(
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -251,6 +294,7 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
                     ),
                     aboutRedeem,
                     redeemList,
+                    emptyRedeemList,
                     // Expanded(
                     //   child: ListView.builder(
                     //     padding: const EdgeInsets.all(0),
