@@ -11,7 +11,9 @@ final mColorScheme =
 final mDarkColorScheme =
     ColorScheme.fromSeed(seedColor: cDark100, brightness: Brightness.dark);
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Upgrader.clearSavedSettings();
   HttpOverrides.global = MyHttpOverrides();
   runApp(const MyApp());
 }
@@ -43,7 +45,7 @@ class MyApp extends StatelessWidget {
         textTheme: GoogleFonts.openSansTextTheme(),
       ),
       themeMode: ThemeMode.light,
-      home: UpgradeAlert(child: const SplashScreen()),
+      home: const SplashScreen(),
     );
   }
 }

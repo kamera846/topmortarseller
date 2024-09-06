@@ -8,6 +8,7 @@ import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/widget/drawer/main_drawer.dart';
 import 'package:topmortarseller/widget/card/card_promo_scanner.dart';
 import 'package:topmortarseller/widget/modal/loading_modal.dart';
+import 'package:upgrader/upgrader.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
@@ -70,40 +71,51 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Scaffold(
-          appBar: AppBar(
-            title: const Text('Top Mortar Seller'),
-            backgroundColor: cWhite,
-            foregroundColor: cDark100,
-            actions: [
-              Container(
-                margin: const EdgeInsets.symmetric(horizontal: 16),
-                child: Hero(
-                  tag: TagHero.faviconAuth,
-                  child: Semantics(
-                    label: '${TagHero.faviconAuth}',
-                    child: Image.asset(
-                      'assets/favicon/favicon_circle.png',
-                      width: 32,
+    return UpgradeAlert(
+      upgrader: Upgrader(
+        debugLogging: true,
+        languageCode: 'id',
+        durationUntilAlertAgain: const Duration(seconds: 1),
+      ),
+      barrierDismissible: false,
+      showLater: false,
+      showReleaseNotes: false,
+      showIgnore: false,
+      child: Stack(
+        children: [
+          Scaffold(
+            appBar: AppBar(
+              title: const Text('Top Mortar Seller'),
+              backgroundColor: cWhite,
+              foregroundColor: cDark100,
+              actions: [
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Hero(
+                    tag: TagHero.faviconAuth,
+                    child: Semantics(
+                      label: '${TagHero.faviconAuth}',
+                      child: Image.asset(
+                        'assets/favicon/favicon_circle.png',
+                        width: 32,
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
-          drawer: MainDrawer(userData: _userData),
-          body: Center(
-            child: Column(
-              children: [
-                CardPromoScanner(userData: widget.userData),
               ],
             ),
+            drawer: MainDrawer(userData: _userData),
+            body: Center(
+              child: Column(
+                children: [
+                  CardPromoScanner(userData: widget.userData),
+                ],
+              ),
+            ),
           ),
-        ),
-        if (isLoading) const LoadingModal()
-      ],
+          if (isLoading) const LoadingModal()
+        ],
+      ),
     );
   }
 }
