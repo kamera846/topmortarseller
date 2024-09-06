@@ -26,6 +26,7 @@ class DetailProfileScreen extends StatefulWidget {
 class _DetailProfileScreenState extends State<DetailProfileScreen> {
   ContactModel? _userData;
   List<CustomerBankModel>? myBanks = [];
+  List<CustomerBankModel>? myRedeems = [];
   String? title;
   String? description;
   bool isLoading = true;
@@ -67,15 +68,148 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
       idContact: _userData!.idContact!,
       onSuccess: (msg) => null,
       onError: (e) => showSnackBar(context, e),
-      onCompleted: () => setState(() => isLoading = false),
+      onCompleted: () => _getUserRedeemList(),
     );
     setState(() {
       myBanks = data;
     });
   }
 
+  void _getUserRedeemList() async {
+    final data = await CustomerBankApiService().banks(
+      idContact: _userData!.idContact!,
+      onSuccess: (msg) => null,
+      onError: (e) => showSnackBar(context, e),
+      onCompleted: () => setState(() => isLoading = false),
+    );
+    setState(() {
+      myRedeems?.add(data![0]);
+      myRedeems?.add(data![0]);
+      myRedeems?.add(data![0]);
+      myRedeems?.add(data![0]);
+      myRedeems?.add(data![0]);
+      myRedeems?.add(data![0]);
+      myRedeems?.add(data![0]);
+      myRedeems?.add(data![0]);
+      myRedeems?.add(data![0]);
+      myRedeems?.add(data![0]);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    Widget cardBank = Container();
+    Widget aboutRedeem = Container();
+    Widget redeemList = Container();
+    if (myBanks != null && myBanks!.isNotEmpty) {
+      cardBank = CardRekening(
+        bankName: myBanks![0].namaBank!,
+        rekening: myBanks![0].toAccount!,
+        rekeningName: myBanks![0].toName!,
+        rightIcon: Icons.mode_edit,
+        action: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => NewRekeningScreen(
+                userData: _userData,
+                rekeningId: myBanks![0].idRekeningToko!,
+                onSuccess: (bool? state) {
+                  if (state != null && state) {
+                    setState(() => isLoading = true);
+                    _getUserBanks();
+                  }
+                },
+              ),
+            ),
+          );
+        },
+      );
+
+      aboutRedeem = Container(
+        color: cDark500,
+        width: double.infinity,
+        padding: const EdgeInsets.all(12),
+        child: Text(
+          'Informasi Penukaran',
+          style: Theme.of(context)
+              .textTheme
+              .titleSmall!
+              .copyWith(fontWeight: FontWeight.bold),
+        ),
+      );
+
+      if (myRedeems != null && myRedeems!.isNotEmpty) {
+        redeemList = Expanded(
+          child: ListView.builder(
+            padding: const EdgeInsets.all(0),
+            itemCount: myRedeems!.length,
+            itemBuilder: (context, i) {
+              final bankItem = myRedeems![i];
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(24),
+                    width: double.infinity,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Tukang Rafli Ramadani',
+                          softWrap: true,
+                          overflow: TextOverflow.visible,
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
+                        Text(
+                          '06 September 2024',
+                          softWrap: true,
+                          overflow: TextOverflow.visible,
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium!
+                              .copyWith(fontStyle: FontStyle.italic),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Divider(
+                    height: 1,
+                    color: cDark500,
+                  ),
+                ],
+              );
+            },
+          ),
+        );
+      }
+    }
+    Widget emptyCardBank = Container();
+    if (myBanks == null || myBanks!.isEmpty) {
+      emptyCardBank = SizedBox(
+        width: double.infinity,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const SizedBox(height: 24),
+            const Text('Anda belum menambahkan rekening!'),
+            const SizedBox(height: 12),
+            MElevatedButton(
+              title: 'Tambah Rekening',
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => NewRekeningScreen(
+                      userData: _userData,
+                      onSuccess: (bool? state) {},
+                    ),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      );
+    }
     return Scaffold(
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -87,15 +221,13 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
           Expanded(
             child: Stack(
               children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 24,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Column(
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          top: 24, right: 24, left: 24, bottom: 12),
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
@@ -111,68 +243,46 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
                             overflow: TextOverflow.visible,
                             style: Theme.of(context).textTheme.bodySmall,
                           ),
+                          const SizedBox(height: 12),
+                          cardBank,
+                          emptyCardBank
                         ],
                       ),
-                      const SizedBox(height: 12),
-                      if (myBanks != null && myBanks!.isNotEmpty)
-                        Expanded(
-                          child: ListView.builder(
-                            padding: const EdgeInsets.all(0),
-                            itemCount: myBanks!.length,
-                            itemBuilder: (context, i) {
-                              final bankItem = myBanks![i];
-                              return CardRekening(
-                                bankName: bankItem.namaBank!,
-                                rekening: bankItem.toAccount!,
-                                rekeningName: bankItem.toName!,
-                                rightIcon: Icons.mode_edit,
-                                action: () {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (context) => NewRekeningScreen(
-                                        userData: _userData,
-                                        rekeningId: bankItem.idRekeningToko!,
-                                        onSuccess: (bool? state) {
-                                          if (state != null && state) {
-                                            setState(() => isLoading = true);
-                                            _getUserBanks();
-                                          }
-                                        },
-                                      ),
-                                    ),
-                                  );
-                                },
-                              );
-                            },
-                          ),
-                        ),
-                      if (myBanks == null || myBanks!.isEmpty)
-                        SizedBox(
-                          width: double.infinity,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              const SizedBox(height: 24),
-                              const Text('Anda belum menambahkan rekening!'),
-                              const SizedBox(height: 12),
-                              MElevatedButton(
-                                title: 'Tambah Rekening',
-                                onPressed: () {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (context) => NewRekeningScreen(
-                                        userData: _userData,
-                                        onSuccess: (bool? state) {},
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                    ],
-                  ),
+                    ),
+                    aboutRedeem,
+                    redeemList,
+                    // Expanded(
+                    //   child: ListView.builder(
+                    //     padding: const EdgeInsets.all(0),
+                    //     itemCount: myBanks!.length,
+                    //     itemBuilder: (context, i) {
+                    //       final bankItem = myBanks![i];
+                    //       return CardRekening(
+                    //         bankName: bankItem.namaBank!,
+                    //         rekening: bankItem.toAccount!,
+                    //         rekeningName: bankItem.toName!,
+                    //         rightIcon: Icons.mode_edit,
+                    //         action: () {
+                    //           Navigator.of(context).push(
+                    //             MaterialPageRoute(
+                    //               builder: (context) => NewRekeningScreen(
+                    //                 userData: _userData,
+                    //                 rekeningId: bankItem.idRekeningToko!,
+                    //                 onSuccess: (bool? state) {
+                    //                   if (state != null && state) {
+                    //                     setState(() => isLoading = true);
+                    //                     _getUserBanks();
+                    //                   }
+                    //                 },
+                    //               ),
+                    //             ),
+                    //           );
+                    //         },
+                    //       );
+                    //     },
+                    //   ),
+                    // ),
+                  ],
                 ),
                 if (isLoading) const LoadingModal()
               ],
