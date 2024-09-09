@@ -127,6 +127,9 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
     Widget redeemList = Container();
     Widget emptyRedeemList = Container();
 
+    // final quotaPriority = _userData!.quotaPriority;
+    var availableQuota = 0;
+
     if (myBanks != null && myBanks!.isNotEmpty) {
       cardBank = CardRekening(
         bankName: myBanks![0].namaBank!,
@@ -151,20 +154,8 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
         },
       );
 
-      aboutRedeem = Container(
-        color: cDark500,
-        width: double.infinity,
-        padding: const EdgeInsets.all(12),
-        child: Text(
-          'Informasi Penukaran',
-          style: Theme.of(context)
-              .textTheme
-              .titleSmall!
-              .copyWith(fontWeight: FontWeight.bold),
-        ),
-      );
-
       if (myRedeems != null && myRedeems!.isNotEmpty) {
+        // availableQuota = int.parse(_userData!.quotaPriority!) - myRedeems!.length;
         redeemList = Expanded(
           child: ListView.builder(
             padding: const EdgeInsets.all(0),
@@ -209,6 +200,19 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
           ),
         );
       }
+
+      aboutRedeem = Container(
+        color: cDark500,
+        width: double.infinity,
+        padding: const EdgeInsets.all(12),
+        child: Text(
+          'Informasi Penukaran ($availableQuota kuota tersisa)',
+          style: Theme.of(context)
+              .textTheme
+              .titleSmall!
+              .copyWith(fontWeight: FontWeight.bold),
+        ),
+      );
     }
 
     if (myBanks == null || myBanks!.isEmpty) {
