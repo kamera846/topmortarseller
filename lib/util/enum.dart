@@ -15,6 +15,8 @@ enum TagHero {
 
 enum GlobalEnum {
   isLoggedIn,
+  loggedInPhone,
+  loggedInPassword,
   contactModel,
   skipCreateBank,
 }

@@ -22,12 +22,18 @@ class ContactModel {
     this.paymentMethod,
     this.tagihMingguan,
     this.nomorhp2,
+    this.integrationId,
     this.nomorCat1,
     this.nomorCat2,
     this.passContact,
+    this.isPriority,
+    this.qrToko,
     this.namaCity,
+    this.quotaPriority,
     this.kodeCity,
     this.idDistributor,
+    this.noRekCity,
+    this.bankCode,
   });
 
   final String? idContact;
@@ -47,12 +53,18 @@ class ContactModel {
   final String? paymentMethod;
   final String? tagihMingguan;
   final String? nomorhp2;
+  final String? integrationId;
   final String? nomorCat1;
   final String? nomorCat2;
   final String? passContact;
+  final String? isPriority;
+  final String? qrToko;
+  final String? quotaPriority;
   final String? namaCity;
   final String? kodeCity;
   final String? idDistributor;
+  final String? noRekCity;
+  final String? bankCode;
 
   Map<String, dynamic> toJson() => {
         'id_contact': idContact ?? '',
@@ -72,12 +84,18 @@ class ContactModel {
         'payment_method': paymentMethod ?? '',
         'tagih_mingguan': tagihMingguan ?? '',
         'nomorhp_2': nomorhp2 ?? '',
+        'integration_id': integrationId ?? '',
         'nomor_cat_1': nomorCat1 ?? '',
         'nomor_cat_2': nomorCat2 ?? '',
         'pass_contact': passContact ?? '',
+        'is_priority': isPriority ?? '',
+        'qr_toko': qrToko ?? '',
         'nama_city': namaCity ?? '',
+        'quota_priority': quotaPriority ?? '',
         'kode_city': kodeCity ?? '',
         'id_distributor': idDistributor ?? '',
+        'no_rek_city': noRekCity ?? '',
+        'bank_code': bankCode ?? '',
       };
 
   factory ContactModel.fromJson(Map<String, dynamic> json) {
@@ -99,12 +117,17 @@ class ContactModel {
       paymentMethod: json['payment_method'] ?? '',
       tagihMingguan: json['tagih_mingguan'] ?? '',
       nomorhp2: json['nomorhp_2'] ?? '',
+      integrationId: json['integration_id'] ?? '',
       nomorCat1: json['nomor_cat_1'] ?? '',
       nomorCat2: json['nomor_cat_2'] ?? '',
       passContact: json['pass_contact'] ?? '',
+      isPriority: json['is_priority'] ?? '',
       namaCity: json['nama_city'] ?? '',
+      quotaPriority: json['quota_priority'] ?? '',
       kodeCity: json['kode_city'] ?? '',
       idDistributor: json['id_distributor'] ?? '',
+      noRekCity: json['no_rek_city'] ?? '',
+      bankCode: json['bank_code'] ?? '',
     );
   }
 }
