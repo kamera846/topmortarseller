@@ -155,7 +155,8 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
       );
 
       if (myRedeems != null && myRedeems!.isNotEmpty) {
-        // availableQuota = int.parse(_userData!.quotaPriority!) - myRedeems!.length;
+        availableQuota =
+            int.parse(_userData!.quotaPriority!) - myRedeems!.length;
         redeemList = Expanded(
           child: ListView.builder(
             padding: const EdgeInsets.all(0),
