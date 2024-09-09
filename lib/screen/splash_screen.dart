@@ -1,6 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:topmortarseller/model/contact_model.dart';
 import 'package:topmortarseller/screen/home_screen.dart';
+import 'package:topmortarseller/services/api.dart';
+import 'package:topmortarseller/services/auth_api.dart';
 import 'package:topmortarseller/util/auth_settings.dart';
 import 'package:topmortarseller/util/enum.dart';
 import 'package:topmortarseller/screen/auth_screen.dart';
@@ -13,6 +17,8 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  var tryToLoginChance = 2;
+
   @override
   void initState() {
     super.initState();
@@ -20,9 +26,57 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   void _delayNavigate() async {
-    await Future.delayed(const Duration(milliseconds: 2000), () {});
+    await Future.delayed(const Duration(milliseconds: 1000), () {});
     final loginState = await getLoginState();
     if (loginState) {
+      loginHandler();
+    } else {
+      _returnAuthScreen();
+    }
+  }
+
+  void loginHandler() async {
+    var phoneNumber = await getLoginPhone();
+    final password = await getLoginPassword();
+
+    try {
+      final response = await AuthApiService().login(
+        phoneNumber: phoneNumber,
+        password: password,
+      );
+
+      if (response.statusCode == 200) {
+        final responseBody = json.decode(response.body);
+        final apiResponse = ApiResponse.fromJson(responseBody);
+
+        if (apiResponse.code == 200) {
+          if (apiResponse.data != null) {
+            final userData = ContactModel.fromJson(apiResponse.data!);
+            await saveLoginState(phoneNumber, password);
+            await saveContactModel(userData);
+            print('userData: ${apiResponse.msg}');
+            _returnHomeScreen(userData);
+          } else {
+            print('userData: Response data is null!');
+            tryToLogin();
+          }
+        } else {
+          print('userData: ${apiResponse.msg}');
+          tryToLogin();
+        }
+      } else {
+        print(
+            'userData: $failedRequestText. Status Code: ${response.statusCode}');
+        tryToLogin();
+      }
+    } catch (e) {
+      print('userData: $failedRequestText. Exception: $e');
+      tryToLogin();
+    }
+  }
+
+  void tryToLogin() async {
+    if (tryToLoginChance <= 0) {
       final userData = await getContactModel();
       if (userData != null) {
         _returnHomeScreen(userData);
@@ -30,7 +84,9 @@ class _SplashScreenState extends State<SplashScreen> {
         _returnAuthScreen();
       }
     } else {
-      _returnAuthScreen();
+      tryToLoginChance -= 1;
+      print('userData: Relogin Chance $tryToLoginChance');
+      loginHandler();
     }
   }
 

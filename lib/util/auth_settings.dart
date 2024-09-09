@@ -40,9 +40,11 @@ const authSettings = {
   ),
 };
 
-Future<void> saveLoginState() async {
+Future<void> saveLoginState(String phone, String password) async {
   final prefs = await SharedPreferences.getInstance();
   await prefs.setBool(GlobalEnum.isLoggedIn.toString(), true);
+  await prefs.setString(GlobalEnum.loggedInPhone.toString(), phone);
+  await prefs.setString(GlobalEnum.loggedInPassword.toString(), password);
 }
 
 Future<bool> getLoginState() async {
@@ -54,7 +56,27 @@ Future<bool> getLoginState() async {
   return false;
 }
 
+Future<String> getLoginPhone() async {
+  final prefs = await SharedPreferences.getInstance();
+  final loginPhone = prefs.getString(GlobalEnum.loggedInPhone.toString());
+  if (loginPhone != null) {
+    return loginPhone;
+  }
+  return '';
+}
+
+Future<String> getLoginPassword() async {
+  final prefs = await SharedPreferences.getInstance();
+  final loginPassword = prefs.getString(GlobalEnum.loggedInPassword.toString());
+  if (loginPassword != null) {
+    return loginPassword;
+  }
+  return '';
+}
+
 Future<void> removeLoginState() async {
   final prefs = await SharedPreferences.getInstance();
   await prefs.remove(GlobalEnum.isLoggedIn.toString());
+  await prefs.remove(GlobalEnum.loggedInPhone.toString());
+  await prefs.remove(GlobalEnum.loggedInPassword.toString());
 }

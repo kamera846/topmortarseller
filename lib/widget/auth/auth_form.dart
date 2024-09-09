@@ -151,7 +151,7 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
         if (apiResponse.code == 200) {
           if (apiResponse.data != null) {
             final userData = ContactModel.fromJson(apiResponse.data!);
-            await saveLoginState();
+            await saveLoginState(phoneNumber, password);
             await saveContactModel(userData);
             Navigator.pushReplacement(
               context,
