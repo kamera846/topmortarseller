@@ -127,14 +127,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
     if (!isFeedLoading) {
       if (listFeed != null && listFeed!.isNotEmpty) {
-        listFeedContent = Expanded(
-          child: ListView.builder(
-              itemCount: listFeed!.length,
-              itemBuilder: (conxtext, i) {
-                final item = listFeed![i];
-                return CardFeed(feed: item);
-              }),
-        );
+        listFeedContent = ListView.builder(
+            itemCount: listFeed!.length,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemBuilder: (conxtext, i) {
+              final item = listFeed![i];
+              return CardFeed(feed: item);
+            });
       } else {
         listFeedContent = Padding(
           padding: const EdgeInsets.all(12),
@@ -192,23 +192,25 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
             drawer: MainDrawer(userData: _userData),
-            body: Center(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  CardPromoScanner(userData: widget.userData),
-                  Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Text(
-                      'Informasi menarik untuk anda',
-                      style: Theme.of(context).textTheme.titleSmall!.copyWith(
-                            color: cDark100,
-                            fontWeight: FontWeight.bold,
-                          ),
+            body: SingleChildScrollView(
+              child: Center(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    CardPromoScanner(userData: widget.userData),
+                    Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Text(
+                        'Informasi menarik untuk anda',
+                        style: Theme.of(context).textTheme.titleSmall!.copyWith(
+                              color: cDark100,
+                              fontWeight: FontWeight.bold,
+                            ),
+                      ),
                     ),
-                  ),
-                  listFeedContent
-                ],
+                    listFeedContent
+                  ],
+                ),
               ),
             ),
           ),
