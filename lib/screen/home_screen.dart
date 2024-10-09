@@ -8,7 +8,9 @@ import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/widget/drawer/main_drawer.dart';
 import 'package:topmortarseller/widget/card/card_promo_scanner.dart';
 import 'package:topmortarseller/widget/modal/loading_modal.dart';
+import 'package:topmortarseller/widget/snackbar/show_snackbar.dart';
 import 'package:upgrader/upgrader.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
@@ -107,14 +109,73 @@ class _HomeScreenState extends State<HomeScreen> {
             drawer: MainDrawer(userData: _userData),
             body: Center(
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   CardPromoScanner(userData: widget.userData),
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        left: 12, top: 12, right: 12, bottom: 0),
+                    child: Text(
+                      'Informasi menarik untuk anda',
+                      style: Theme.of(context).textTheme.titleSmall!.copyWith(
+                          color: cDark100, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  const CardFeed(
+                    feedUrl:
+                        'https://www.instagram.com/p/DAzx9UHyNcb/?utm_source=ig_web_copy_link',
+                  )
                 ],
               ),
             ),
           ),
           if (isLoading) const LoadingModal()
         ],
+      ),
+    );
+  }
+}
+
+class CardFeed extends StatelessWidget {
+  const CardFeed({super.key, this.feedUrl});
+
+  final String? feedUrl;
+
+  void _launchNavigation(context, url) async {
+    if (await canLaunchUrlString(url)) {
+      await launchUrlString(url);
+    } else {
+      showSnackBar(context, 'Gagal membuka url konten');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Setting image card feed on 3:2 ratio
+    final screenWidth = MediaQuery.of(context).size.width - 24;
+    final cardFeedHeight = screenWidth * (2 / 3);
+
+    return InkWell(
+      onTap: () => _launchNavigation(context, feedUrl),
+      child: Card(
+        elevation: 5,
+        margin: const EdgeInsets.all(12),
+        shape: RoundedRectangleBorder(
+          borderRadius:
+              BorderRadius.circular(16), // Menentukan sudut melengkung
+        ),
+        child: Container(
+          width: double.maxFinite,
+          height: cardFeedHeight,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            image: const DecorationImage(
+                image: NetworkImage(
+                  'https://blue.kumparan.com/image/upload/fl_progressive,fl_lossy,c_fill,q_auto:best,w_640/v1634025439/01gqh05gx6ptyce3wqe5cwzevm.jpg',
+                ),
+                fit: BoxFit.cover),
+          ),
+        ),
       ),
     );
   }
