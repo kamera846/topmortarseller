@@ -108,11 +108,6 @@ class _HomeScreenState extends State<HomeScreen> {
     } catch (e) {
       showSnackBar(context, '$failedRequestText. Exception: $e');
     } finally {
-      data!.add(data[0]);
-      data.add(data[0]);
-      data.add(data[0]);
-      data.add(data[0]);
-      data.add(data[0]);
       setState(() {
         isFeedLoading = false;
         listFeed = data;
@@ -242,11 +237,11 @@ class CardFeed extends StatelessWidget {
 
     return InkWell(
       onTap: () => _launchNavigation(
-          context,
-          // feed!.link_konten!,
-          'https://www.youtube.com/watch?v=01dn67QubYQ'),
+        context,
+        feed!.link_konten!,
+      ),
       child: Card(
-        elevation: 5,
+        elevation: 2,
         margin: const EdgeInsets.only(left: 12, top: 0, right: 12, bottom: 12),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
@@ -257,10 +252,9 @@ class CardFeed extends StatelessWidget {
           decoration: BoxDecoration(
             color: cDark400,
             borderRadius: BorderRadius.circular(16),
-            image: const DecorationImage(
+            image: DecorationImage(
                 image: NetworkImage(
-                  // feed!.img_konten
-                  'https://blue.kumparan.com/image/upload/fl_progressive,fl_lossy,c_fill,q_auto:best,w_640/v1634025439/01gqh05gx6ptyce3wqe5cwzevm.jpg',
+                  feed!.img_konten!,
                 ),
                 fit: BoxFit.cover),
           ),
