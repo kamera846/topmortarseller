@@ -1,7 +1,7 @@
-// const baseUrl = 'seller.topmortarindonesia.com';
-// const baseUrlSales = 'saleswa.topmortarindonesia.com';
-const baseUrl = 'dev-seller.topmortarindonesia.com';
-const baseUrlSales = 'dev-saleswa.topmortarindonesia.com';
+const baseUrl = 'seller.topmortarindonesia.com';
+const baseUrlSales = 'saleswa.topmortarindonesia.com';
+// const baseUrl = 'dev-seller.topmortarindonesia.com';
+// const baseUrlSales = 'dev-saleswa.topmortarindonesia.com';
 
 const headerSetup = {'Content-Type': 'application/json'};
 const failedRequestText = 'Gagal memproses data';
