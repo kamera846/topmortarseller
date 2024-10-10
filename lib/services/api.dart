@@ -13,6 +13,7 @@ class ApiResponse {
   final Map<String, dynamic>? data;
   final List<dynamic>? listData;
   final List<dynamic>? results;
+  final String? mediaLink;
 
   ApiResponse({
     required this.code,
@@ -21,6 +22,7 @@ class ApiResponse {
     this.data,
     this.listData,
     this.results,
+    this.mediaLink,
   });
 
   factory ApiResponse.fromJson(Map<String, dynamic> json) {
@@ -29,6 +31,7 @@ class ApiResponse {
       status: json['status'] ?? '',
       msg: json['msg'] ?? '',
       data: json['data'],
+      mediaLink: json['media_link'],
     );
   }
 
@@ -39,6 +42,7 @@ class ApiResponse {
       msg: json['msg'] ?? '',
       listData: json['data'],
       results: json['results'],
+      mediaLink: json['media_link'],
     );
   }
 }
