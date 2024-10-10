@@ -34,6 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
   bool isLoading = true;
   bool isFeedLoading = true;
   List<FeedModel>? listFeed;
+  String? mediaLink;
 
   @override
   void initState() {
@@ -94,9 +95,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
         if (apiResponse.code == 200) {
           if (apiResponse.listData != null) {
+            mediaLink = apiResponse.mediaLink;
             data = apiResponse.listData
                 ?.map((item) => FeedModel.fromJson(item))
                 .toList();
+            return;
           }
         }
 
@@ -112,7 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
         isFeedLoading = false;
         listFeed = data;
       });
-      print('List Feed: ${jsonEncode(listFeed)}');
+      // print('List Feed: ${jsonEncode(listFeed)}');
     }
   }
 
@@ -128,7 +131,7 @@ class _HomeScreenState extends State<HomeScreen> {
             physics: const NeverScrollableScrollPhysics(),
             itemBuilder: (conxtext, i) {
               final item = listFeed![i];
-              return CardFeed(feed: item);
+              return CardFeed(feed: item, mediaLink: mediaLink);
             });
       } else {
         listFeedContent = Padding(
@@ -217,9 +220,10 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class CardFeed extends StatelessWidget {
-  const CardFeed({super.key, this.feed});
+  const CardFeed({super.key, this.feed, this.mediaLink});
 
   final FeedModel? feed;
+  final String? mediaLink;
 
   void _launchNavigation(context, String url) async {
     try {
@@ -238,7 +242,7 @@ class CardFeed extends StatelessWidget {
     return InkWell(
       onTap: () => _launchNavigation(
         context,
-        feed!.link_konten!,
+        feed!.linkKonten!,
       ),
       child: Card(
         elevation: 2,
@@ -254,7 +258,7 @@ class CardFeed extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
             image: DecorationImage(
                 image: NetworkImage(
-                  feed!.img_konten!,
+                  '${mediaLink ?? ''}${feed!.imgKonten!}',
                 ),
                 fit: BoxFit.cover),
           ),
@@ -266,38 +270,38 @@ class CardFeed extends StatelessWidget {
 
 class FeedModel {
   const FeedModel({
-    this.id_konten,
-    this.title_konten,
-    this.img_konten,
-    this.created_at,
-    this.udpated_at,
-    this.link_konten,
+    this.idKonten,
+    this.titleKonten,
+    this.imgKonten,
+    this.createdAt,
+    this.udpatedAt,
+    this.linkKonten,
   });
 
-  final String? id_konten;
-  final String? title_konten;
-  final String? img_konten;
-  final String? created_at;
-  final String? udpated_at;
-  final String? link_konten;
+  final String? idKonten;
+  final String? titleKonten;
+  final String? imgKonten;
+  final String? createdAt;
+  final String? udpatedAt;
+  final String? linkKonten;
 
   Map<String, dynamic> toJson() => {
-        'id_konten': id_konten ?? '',
-        'title_konten': title_konten ?? '',
-        'img_konten': img_konten ?? '',
-        'created_at': created_at ?? '',
-        'udpated_at': udpated_at ?? '',
-        'link_konten': link_konten ?? '',
+        'id_konten': idKonten ?? '',
+        'title_konten': titleKonten ?? '',
+        'img_konten': imgKonten ?? '',
+        'created_at': createdAt ?? '',
+        'udpated_at': udpatedAt ?? '',
+        'link_konten': linkKonten ?? '',
       };
 
   factory FeedModel.fromJson(Map<String, dynamic> json) {
     return FeedModel(
-      id_konten: json['id_konten'] ?? '',
-      title_konten: json['title_konten'] ?? '',
-      img_konten: json['img_konten'] ?? '',
-      created_at: json['created_at'] ?? '',
-      udpated_at: json['udpated_at'] ?? '',
-      link_konten: json['link_konten'] ?? '',
+      idKonten: json['id_konten'] ?? '',
+      titleKonten: json['title_konten'] ?? '',
+      imgKonten: json['img_konten'] ?? '',
+      createdAt: json['created_at'] ?? '',
+      udpatedAt: json['udpated_at'] ?? '',
+      linkKonten: json['link_konten'] ?? '',
     );
   }
 }
