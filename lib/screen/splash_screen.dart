@@ -5,6 +5,7 @@ import 'package:topmortarseller/model/contact_model.dart';
 import 'package:topmortarseller/screen/home_screen.dart';
 import 'package:topmortarseller/services/api.dart';
 import 'package:topmortarseller/services/auth_api.dart';
+// import 'package:topmortarseller/services/contact_api.dart';
 import 'package:topmortarseller/util/auth_settings.dart';
 import 'package:topmortarseller/util/enum.dart';
 import 'package:topmortarseller/screen/auth_screen.dart';
@@ -27,6 +28,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   void _delayNavigate() async {
     await Future.delayed(const Duration(milliseconds: 1000), () {});
+    // getContact(); // Until now, it is just for debugging only
     final loginState = await getLoginState();
     if (loginState) {
       loginHandler();
@@ -34,6 +36,32 @@ class _SplashScreenState extends State<SplashScreen> {
       _returnAuthScreen();
     }
   }
+
+  // Until now, it is just for debugging only
+  // void getContact() async {
+  //   const idContact = "";
+  //   const idDistributor = "";
+
+  //   try {
+  //     final data = await ContactApiService().byId(
+  //       idContact: idContact,
+  //       idDistributor: idDistributor,
+  //       onSuccess: (data) => print('get user data: $data'),
+  //       onError: (e) => print('get user error: $e'),
+  //       onCompleted: () => print('get user complete'),
+  //     );
+
+  //     if (data != null) {
+  //         final ContactModel userData = data[0];
+  //           await saveLoginState("nomorhp", "password");
+  //           await saveContactModel(userData);
+  //           _returnHomeScreen(userData);
+  //     }
+
+  //   } catch (e) {
+  //     print('get user catch: $failedRequestText. Exception: $e');
+  //   }
+  // }
 
   void loginHandler() async {
     var phoneNumber = await getLoginPhone();
@@ -54,23 +82,23 @@ class _SplashScreenState extends State<SplashScreen> {
             final userData = ContactModel.fromJson(apiResponse.data!);
             await saveLoginState(phoneNumber, password);
             await saveContactModel(userData);
-            print('userData: ${apiResponse.msg}');
+            // print('userData: ${apiResponse.msg}');
             _returnHomeScreen(userData);
           } else {
-            print('userData: Response data is null!');
+            // print('userData: Response data is null!');
             tryToLogin();
           }
         } else {
-          print('userData: ${apiResponse.msg}');
+          // print('userData: ${apiResponse.msg}');
           tryToLogin();
         }
       } else {
-        print(
-            'userData: $failedRequestText. Status Code: ${response.statusCode}');
+        // print(
+        //     'userData: $failedRequestText. Status Code: ${response.statusCode}');
         tryToLogin();
       }
     } catch (e) {
-      print('userData: $failedRequestText. Exception: $e');
+      // print('userData: $failedRequestText. Exception: $e');
       tryToLogin();
     }
   }
@@ -85,7 +113,7 @@ class _SplashScreenState extends State<SplashScreen> {
       }
     } else {
       tryToLoginChance -= 1;
-      print('userData: Relogin Chance $tryToLoginChance');
+      // print('userData: Relogin Chance $tryToLoginChance');
       loginHandler();
     }
   }

@@ -1,5 +1,8 @@
-const baseUrl = 'seller.topmortarindonesia.com';
-// const baseUrl = 'dev-seller.topmortarindonesia.com';
+// const baseUrl = 'seller.topmortarindonesia.com';
+// const baseUrlSales = 'saleswa.topmortarindonesia.com';
+const baseUrl = 'dev-seller.topmortarindonesia.com';
+const baseUrlSales = 'dev-saleswa.topmortarindonesia.com';
+
 const headerSetup = {'Content-Type': 'application/json'};
 const failedRequestText = 'Gagal memproses data';
 
@@ -9,6 +12,8 @@ class ApiResponse {
   final String msg;
   final Map<String, dynamic>? data;
   final List<dynamic>? listData;
+  final List<dynamic>? results;
+  final String? mediaLink;
 
   ApiResponse({
     required this.code,
@@ -16,23 +21,28 @@ class ApiResponse {
     required this.msg,
     this.data,
     this.listData,
+    this.results,
+    this.mediaLink,
   });
 
   factory ApiResponse.fromJson(Map<String, dynamic> json) {
     return ApiResponse(
-      code: json['code'],
-      status: json['status'],
-      msg: json['msg'],
+      code: json['code'] ?? 0,
+      status: json['status'] ?? '',
+      msg: json['msg'] ?? '',
       data: json['data'],
+      mediaLink: json['media_link'],
     );
   }
 
   factory ApiResponse.fromJsonList(Map<String, dynamic> json) {
     return ApiResponse(
-      code: json['code'],
-      status: json['status'],
-      msg: json['msg'],
+      code: json['code'] ?? 0,
+      status: json['status'] ?? '',
+      msg: json['msg'] ?? '',
       listData: json['data'],
+      results: json['results'],
+      mediaLink: json['media_link'],
     );
   }
 }
