@@ -60,5 +60,7 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>Akses Kamera</string>
 </dict>
 </plist>
