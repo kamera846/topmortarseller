@@ -55,6 +55,7 @@ android {
             storePassword 'topmortarseller'
             keyPassword 'topmortarseller'
             keyAlias 'release-keystore'
+            // storeFile file('/Users/masple/Projects/Flutter/topmortarseller/android/app/release-keystore.jks')
             storeFile file('E:/Pekerjaan/Flutter/topmortarseller/android/app/release-keystore.jks')
             // if (project.hasProperty('keystorePropertiesFile')) {
             //     def keystoreProperties = new Properties()
