@@ -52,7 +52,7 @@ class MainDrawerItems extends StatelessWidget {
       children: [
         ListTile(
           leading: const Icon(
-            CupertinoIcons.person_crop_circle,
+            CupertinoIcons.person_alt_circle,
             size: 26,
             color: cDark100,
           ),
@@ -70,13 +70,40 @@ class MainDrawerItems extends StatelessWidget {
                 ),
           ),
           onTap: () {
-            Navigator.of(context).pop();
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (ctx) => DetailProfileScreen(userData: userData),
               ),
             );
           },
+        ),
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 32),
+          child: Divider(
+            height: 1,
+            color: cDark500,
+          ),
+        ),
+        ListTile(
+          leading: const Icon(
+            CupertinoIcons.person_crop_circle_badge_plus,
+            size: 26,
+            color: cDark100,
+          ),
+          title: Text(
+            'Input Tukang',
+            style: Theme.of(context)
+                .textTheme
+                .titleSmall!
+                .copyWith(color: cDark100, fontWeight: FontWeight.bold),
+          ),
+          subtitle: Text(
+            'Daftarkan data tukang',
+            style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                  color: cDark200,
+                ),
+          ),
+          onTap: () {},
         ),
         const Padding(
           padding: EdgeInsets.symmetric(horizontal: 32),
@@ -105,7 +132,6 @@ class MainDrawerItems extends StatelessWidget {
                 ),
           ),
           onTap: () {
-            Navigator.of(context).pop();
             _showConfirmlogout(context);
           },
         ),

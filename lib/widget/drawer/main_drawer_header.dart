@@ -30,18 +30,18 @@ class MainDrawerHeader extends StatelessWidget {
           end: Alignment.bottomRight,
         ),
       ),
-      child: Hero(
-        tag: TagHero.mainDrawerHeader,
-        child: SizedBox(
-          width: double.infinity,
-          child: Column(
-            children: [
-              // const Icon(
-              //   Icons.storefront,
-              //   size: 48,
-              //   color: cWhite,
-              // ),
-              Container(
+      child: SizedBox(
+        width: double.infinity,
+        child: Column(
+          children: [
+            // const Icon(
+            //   Icons.storefront,
+            //   size: 48,
+            //   color: cWhite,
+            // ),
+            Hero(
+              tag: TagHero.mainDrawerHeader,
+              child: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: const BoxDecoration(
                   color: cPrimary100,
@@ -64,29 +64,29 @@ class MainDrawerHeader extends StatelessWidget {
                   size: 48,
                 ),
               ),
-              const SizedBox(height: 8),
-              title == null
-                  ? const LoadingItem()
-                  : Text(
-                      title!,
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                            color: cWhite,
-                          ),
-                    ),
-              description == null
-                  ? const LoadingItem()
-                  : Text(
-                      description!,
-                      softWrap: true,
-                      overflow: TextOverflow.visible,
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                            color: cPrimary600,
-                          ),
-                    ),
-            ],
-          ),
+            ),
+            const SizedBox(height: 8),
+            title == null
+                ? const LoadingItem()
+                : Text(
+                    title!,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                          color: cWhite,
+                        ),
+                  ),
+            description == null
+                ? const LoadingItem()
+                : Text(
+                    description!,
+                    softWrap: true,
+                    overflow: TextOverflow.visible,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                          color: cPrimary600,
+                        ),
+                  ),
+          ],
         ),
       ),
     );
