@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:topmortarseller/model/contact_model.dart';
 import 'package:topmortarseller/screen/auth_screen.dart';
 import 'package:topmortarseller/screen/profile/detail_profile_screen.dart';
+import 'package:topmortarseller/screen/tukang/new_tukang_screen.dart';
 import 'package:topmortarseller/util/auth_settings.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/widget/modal/info_modal.dart';
@@ -103,7 +104,16 @@ class MainDrawerItems extends StatelessWidget {
                   color: cDark200,
                 ),
           ),
-          onTap: () {},
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (ctx) => NewTukangScreen(
+                  userData: userData,
+                  onSuccess: (state) {},
+                ),
+              ),
+            );
+          },
         ),
         const Padding(
           padding: EdgeInsets.symmetric(horizontal: 32),
