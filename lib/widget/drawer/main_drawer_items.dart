@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:topmortarseller/model/contact_model.dart';
 import 'package:topmortarseller/screen/auth_screen.dart';
 import 'package:topmortarseller/screen/profile/detail_profile_screen.dart';
-import 'package:topmortarseller/screen/tukang/new_tukang_screen.dart';
 import 'package:topmortarseller/util/auth_settings.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/widget/modal/info_modal.dart';
@@ -85,36 +84,36 @@ class MainDrawerItems extends StatelessWidget {
             color: cDark500,
           ),
         ),
-        ListTile(
-          leading: const Icon(
-            CupertinoIcons.person_crop_circle_badge_plus,
-            size: 26,
-            color: cDark100,
-          ),
-          title: Text(
-            'Input Tukang',
-            style: Theme.of(context)
-                .textTheme
-                .titleSmall!
-                .copyWith(color: cDark100, fontWeight: FontWeight.bold),
-          ),
-          subtitle: Text(
-            'Daftarkan data tukang',
-            style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                  color: cDark200,
-                ),
-          ),
-          onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (ctx) => NewTukangScreen(
-                  userData: userData,
-                  onSuccess: (state) {},
-                ),
-              ),
-            );
-          },
-        ),
+        // ListTile(
+        //   leading: const Icon(
+        //     CupertinoIcons.person_crop_circle_badge_plus,
+        //     size: 26,
+        //     color: cDark100,
+        //   ),
+        //   title: Text(
+        //     'Input Tukang',
+        //     style: Theme.of(context)
+        //         .textTheme
+        //         .titleSmall!
+        //         .copyWith(color: cDark100, fontWeight: FontWeight.bold),
+        //   ),
+        //   subtitle: Text(
+        //     'Daftarkan data tukang',
+        //     style: Theme.of(context).textTheme.bodySmall!.copyWith(
+        //           color: cDark200,
+        //         ),
+        //   ),
+        //   onTap: () {
+        //     Navigator.of(context).push(
+        //       MaterialPageRoute(
+        //         builder: (ctx) => NewTukangScreen(
+        //           userData: userData,
+        //           onSuccess: (state) {},
+        //         ),
+        //       ),
+        //     );
+        //   },
+        // ),
         const Padding(
           padding: EdgeInsets.symmetric(horizontal: 32),
           child: Divider(
