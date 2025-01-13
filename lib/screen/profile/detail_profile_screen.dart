@@ -135,6 +135,7 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
         bankName: myBanks![0].namaBank!,
         rekening: myBanks![0].toAccount!,
         rekeningName: myBanks![0].toName!,
+        badge: 'default',
         rightIcon: Icons.mode_edit,
         action: () {
           Navigator.of(context).push(

@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:topmortarseller/model/bank_model.dart';
@@ -10,11 +9,9 @@ import 'package:topmortarseller/services/customer_bank_api.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/util/enum.dart';
 import 'package:topmortarseller/util/loading_item.dart';
-import 'package:topmortarseller/util/validator/validator.dart';
 import 'package:topmortarseller/widget/form/button/elevated_button.dart';
 import 'package:topmortarseller/widget/form/button/text_button.dart';
 import 'package:topmortarseller/widget/form/textfield/text_field.dart';
-import 'package:topmortarseller/widget/modal/info_modal.dart';
 import 'package:topmortarseller/widget/modal/loading_modal.dart';
 import 'package:topmortarseller/widget/snackbar/show_snackbar.dart';
 
@@ -163,42 +160,42 @@ class _NewTukangScreenState extends State<NewTukangScreen> {
 
   void _saveRekening() async {
     return;
-    final bankId = _selectedBank?.idBank;
-    final noRek = _noRekeningController.text;
-    final nameRek = _nameRekeningController.text;
+    // final bankId = _selectedBank?.idBank;
+    // final noRek = _noRekeningController.text;
+    // final nameRek = _nameRekeningController.text;
 
-    setState(() {
-      _selectedErrorText = Validator.bankDropdown(bankId);
-      _noRekeningErrorText = Validator.isRequired(noRek);
-      _nameRekeningErrorText = Validator.isRequired(nameRek);
-    });
+    // setState(() {
+    //   _selectedErrorText = Validator.bankDropdown(bankId);
+    //   _noRekeningErrorText = Validator.isRequired(noRek);
+    //   _nameRekeningErrorText = Validator.isRequired(nameRek);
+    // });
 
-    if (_selectedErrorText != null ||
-        _noRekeningErrorText != null ||
-        _nameRekeningErrorText != null) {
-      return;
-    }
-    showCupertinoDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return MInfoModal(
-          contentName: 'Pengecekan Ulang',
-          contentDescription: 'Pastikan data yang anda masukkan sudah benar!',
-          contentIcon: Icons.warning_rounded,
-          contentIconColor: cPrimary100,
-          cancelText: 'Batal',
-          onCancel: () {
-            Navigator.of(context).pop();
-          },
-          confirmText: 'Lanjutkan',
-          onConfirm: () async {
-            Navigator.of(context).pop();
-            setState(() => isLoading = true);
-            submitSaveRekening();
-          },
-        );
-      },
-    );
+    // if (_selectedErrorText != null ||
+    //     _noRekeningErrorText != null ||
+    //     _nameRekeningErrorText != null) {
+    //   return;
+    // }
+    // showCupertinoDialog(
+    //   context: context,
+    //   builder: (BuildContext context) {
+    //     return MInfoModal(
+    //       contentName: 'Pengecekan Ulang',
+    //       contentDescription: 'Pastikan data yang anda masukkan sudah benar!',
+    //       contentIcon: Icons.warning_rounded,
+    //       contentIconColor: cPrimary100,
+    //       cancelText: 'Batal',
+    //       onCancel: () {
+    //         Navigator.of(context).pop();
+    //       },
+    //       confirmText: 'Lanjutkan',
+    //       onConfirm: () async {
+    //         Navigator.of(context).pop();
+    //         setState(() => isLoading = true);
+    //         submitSaveRekening();
+    //       },
+    //     );
+    //   },
+    // );
   }
 
   void submitSaveRekening() async {

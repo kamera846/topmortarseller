@@ -58,6 +58,7 @@ class _ScannerResultScreenState extends State<ScannerResultScreen> {
     );
     setState(() {
       myBanks = data;
+      if (myBanks != null && myBanks!.isNotEmpty) selectedPosition = 0;
     });
   }
 
@@ -78,6 +79,7 @@ class _ScannerResultScreenState extends State<ScannerResultScreen> {
               bankName: bankItem.namaBank!,
               rekening: bankItem.toAccount!,
               rekeningName: bankItem.toName!,
+              badge: index == selectedPosition ? 'default' : null,
               backgroundColor: index == selectedPosition ? cPrimary600 : cWhite,
               withDeleteAction: false,
               action: () {
