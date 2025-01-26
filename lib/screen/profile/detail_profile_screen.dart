@@ -81,7 +81,11 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
     final data = await ClaimCashbackServices().claimed(
       idContact: _userData!.idContact!,
       onSuccess: (msg) => null,
-      onError: (e) => showSnackBar(context, e),
+      onError: (e) {
+        if (e != 'Tidak ada data') {
+          showSnackBar(context, e);
+        }
+      },
       onCompleted: () => setState(() => isLoading = false),
     );
     setState(() {

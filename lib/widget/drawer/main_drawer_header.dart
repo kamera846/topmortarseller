@@ -50,11 +50,10 @@ class MainDrawerHeader extends StatelessWidget {
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: cPrimary200, // Warna bayangan dengan transparansi
-                      spreadRadius: 1, // Jarak penyebaran bayangan
-                      blurRadius: 2, // Jarak kabur bayangan
-                      offset: Offset(
-                          1, 1.5), // Posisi bayangan (horizontal, vertikal)
+                      color: cPrimary200,
+                      spreadRadius: 1,
+                      blurRadius: 2,
+                      offset: Offset(1, 1.5),
                     ),
                   ],
                 ),
@@ -80,7 +79,8 @@ class MainDrawerHeader extends StatelessWidget {
                 : Text(
                     description!,
                     softWrap: true,
-                    overflow: TextOverflow.visible,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.bodySmall!.copyWith(
                           color: cPrimary600,
