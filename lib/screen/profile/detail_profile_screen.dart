@@ -81,7 +81,11 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
     final data = await ClaimCashbackServices().claimed(
       idContact: _userData!.idContact!,
       onSuccess: (msg) => null,
-      onError: (e) => showSnackBar(context, e),
+      onError: (e) {
+        if (e != 'Tidak ada data') {
+          showSnackBar(context, e);
+        }
+      },
       onCompleted: () => setState(() => isLoading = false),
     );
     setState(() {
@@ -135,6 +139,7 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
         bankName: myBanks![0].namaBank!,
         rekening: myBanks![0].toAccount!,
         rekeningName: myBanks![0].toName!,
+        badge: 'default',
         rightIcon: Icons.mode_edit,
         action: () {
           Navigator.of(context).push(
@@ -416,56 +421,54 @@ class DetailProfileHeader extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          Hero(
-            tag: TagHero.mainDrawerHeader,
-            child: Row(
-              children: [
-                const SizedBox(width: 12),
-                const Icon(
+          Row(
+            children: [
+              const SizedBox(width: 12),
+              const Hero(
+                tag: TagHero.mainDrawerHeader,
+                child: Icon(
                   Icons.storefront,
                   size: 48,
                   color: cWhite,
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      title == null
-                          ? const LoadingItem(
-                              isPrimaryTheme: true,
-                            )
-                          : Text(
-                              title!,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium!
-                                  .copyWith(
-                                    color: cWhite,
-                                  ),
-                            ),
-                      description == null
-                          ? const LoadingItem(
-                              isPrimaryTheme: true,
-                            )
-                          : Text(
-                              description!,
-                              softWrap: true,
-                              overflow: TextOverflow.visible,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodySmall!
-                                  .copyWith(
-                                    color: cPrimary600,
-                                  ),
-                            )
-                    ],
-                  ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    title == null
+                        ? const LoadingItem(
+                            isPrimaryTheme: true,
+                          )
+                        : Text(
+                            title!,
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium!
+                                .copyWith(
+                                  color: cWhite,
+                                ),
+                          ),
+                    description == null
+                        ? const LoadingItem(
+                            isPrimaryTheme: true,
+                          )
+                        : Text(
+                            description!,
+                            softWrap: true,
+                            overflow: TextOverflow.visible,
+                            style:
+                                Theme.of(context).textTheme.bodySmall!.copyWith(
+                                      color: cPrimary600,
+                                    ),
+                          )
+                  ],
                 ),
-                const SizedBox(width: 12),
-              ],
-            ),
+              ),
+              const SizedBox(width: 12),
+            ],
           ),
         ],
       ),

@@ -7,6 +7,7 @@ class CardRekening extends StatefulWidget {
     required this.bankName,
     required this.rekening,
     required this.rekeningName,
+    this.badge,
     this.backgroundColor = cWhite,
     this.rightIcon = Icons.keyboard_arrow_right_rounded,
     this.rightIconColor = cDark200,
@@ -17,6 +18,7 @@ class CardRekening extends StatefulWidget {
   final String bankName;
   final String rekening;
   final String rekeningName;
+  final String? badge;
   final Color backgroundColor;
   final IconData rightIcon;
   final Color rightIconColor;
@@ -79,6 +81,14 @@ class _CardRekeningState extends State<CardRekening> {
                 ],
               ),
             ),
+            if (widget.badge != null && widget.badge!.isNotEmpty)
+              Text(
+                widget.badge!,
+                style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                      color: cPrimary100,
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
             IconButton(
               onPressed: widget.action ?? () {},
               icon: Icon(
