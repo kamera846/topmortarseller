@@ -147,7 +147,7 @@ class _ScannerResultScreenState extends State<ScannerResultScreen> {
               ),
         ),
         Text(
-          'Cashback akan diteruskan ke rekening yang anda pilih',
+          'Cashback akan diteruskan ke rekening berikut',
           style: Theme.of(context).textTheme.bodySmall!,
         ),
         const SizedBox(height: 12),
