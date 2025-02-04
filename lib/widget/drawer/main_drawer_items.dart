@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:topmortarseller/model/contact_model.dart';
 import 'package:topmortarseller/screen/auth_screen.dart';
+import 'package:topmortarseller/screen/products/catalog_screen.dart';
 import 'package:topmortarseller/screen/profile/detail_profile_screen.dart';
 import 'package:topmortarseller/util/auth_settings.dart';
 import 'package:topmortarseller/util/colors/color.dart';
@@ -50,24 +51,13 @@ class MainDrawerItems extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        ListTile(
-          leading: const Icon(
+        DrawerItem(
+          title: 'Profil Saya',
+          description: 'Atur bank anda disini',
+          icon: const Icon(
             CupertinoIcons.person_alt_circle,
             size: 26,
             color: cDark100,
-          ),
-          title: Text(
-            'Profil saya',
-            style: Theme.of(context)
-                .textTheme
-                .titleSmall!
-                .copyWith(color: cDark100, fontWeight: FontWeight.bold),
-          ),
-          subtitle: Text(
-            'Atur bank anda disini',
-            style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                  color: cDark200,
-                ),
           ),
           onTap: () {
             Navigator.of(context).push(
@@ -77,13 +67,32 @@ class MainDrawerItems extends StatelessWidget {
             );
           },
         ),
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 32),
-          child: Divider(
-            height: 1,
-            color: cDark500,
+        DrawerItem(
+          title: 'Order',
+          description: 'Dapatkan produk terbaik kami',
+          icon: const Icon(
+            Icons.monetization_on,
+            size: 26,
+            color: cDark100,
           ),
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (ctx) => const CatalogScreen(),
+              ),
+            );
+          },
         ),
+        DrawerItem(
+          title: 'Logout',
+          description: 'Anda akan keluar dari akun saat ini',
+          icon: const Icon(
+            CupertinoIcons.power,
+            size: 26,
+            color: cDark100,
+          ),
+          onTap: () => _showConfirmlogout(context),
+        )
         // ListTile(
         //   leading: const Icon(
         //     CupertinoIcons.person_crop_circle_badge_plus,
@@ -114,35 +123,82 @@ class MainDrawerItems extends StatelessWidget {
         //     );
         //   },
         // ),
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 32),
-          child: Divider(
-            height: 1,
-            color: cDark500,
-          ),
-        ),
+        // const Padding(
+        //   padding: EdgeInsets.symmetric(horizontal: 32),
+        //   child: Divider(
+        //     height: 1,
+        //     color: cDark500,
+        //   ),
+        // ),
+        // ListTile(
+        //   leading: const Icon(
+        //     CupertinoIcons.power,
+        //     size: 26,
+        //     color: cDark100,
+        //   ),
+        //   title: Text(
+        //     'Keluar',
+        //     style: Theme.of(context)
+        //         .textTheme
+        //         .titleSmall!
+        //         .copyWith(color: cDark100, fontWeight: FontWeight.bold),
+        //   ),
+        //   subtitle: Text(
+        //     'Anda akan keluar dari akun saat ini',
+        //     style: Theme.of(context).textTheme.bodySmall!.copyWith(
+        //           color: cDark200,
+        //         ),
+        //   ),
+        //   onTap: () {
+        //     _showConfirmlogout(context);
+        //   },
+        // ),
+      ],
+    );
+  }
+}
+
+class DrawerItem extends StatelessWidget {
+  const DrawerItem({
+    super.key,
+    required this.onTap,
+    required this.title,
+    required this.description,
+    required this.icon,
+  });
+
+  final Function() onTap;
+  final String title;
+  final String description;
+  final Icon icon;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
         ListTile(
-          leading: const Icon(
-            CupertinoIcons.power,
-            size: 26,
-            color: cDark100,
-          ),
+          leading: icon,
           title: Text(
-            'Keluar',
+            title,
             style: Theme.of(context)
                 .textTheme
                 .titleSmall!
                 .copyWith(color: cDark100, fontWeight: FontWeight.bold),
           ),
           subtitle: Text(
-            'Anda akan keluar dari akun saat ini',
+            description,
             style: Theme.of(context).textTheme.bodySmall!.copyWith(
                   color: cDark200,
                 ),
           ),
-          onTap: () {
-            _showConfirmlogout(context);
-          },
+          onTap: onTap,
+        ),
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 32),
+          child: Divider(
+            height: 1,
+            color: cDark500,
+          ),
         ),
       ],
     );
