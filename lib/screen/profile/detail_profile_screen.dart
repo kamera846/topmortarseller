@@ -428,48 +428,39 @@ class DetailProfileHeader extends StatelessWidget {
                 tag: TagHero.mainDrawerHeader,
                 child: Icon(
                   Icons.storefront,
-                  size: 48,
+                  size: 24,
                   color: cWhite,
                 ),
               ),
               const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    title == null
-                        ? const LoadingItem(
-                            isPrimaryTheme: true,
-                          )
-                        : Text(
-                            title!,
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium!
-                                .copyWith(
-                                  color: cWhite,
-                                ),
+              title == null
+                  ? const LoadingItem(
+                      isPrimaryTheme: true,
+                    )
+                  : Text(
+                      title!,
+                      style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                            color: cWhite,
                           ),
-                    description == null
-                        ? const LoadingItem(
-                            isPrimaryTheme: true,
-                          )
-                        : Text(
-                            description!,
-                            softWrap: true,
-                            overflow: TextOverflow.visible,
-                            style:
-                                Theme.of(context).textTheme.bodySmall!.copyWith(
-                                      color: cPrimary600,
-                                    ),
-                          )
-                  ],
-                ),
-              ),
-              const SizedBox(width: 12),
+                    ),
             ],
           ),
+          const SizedBox(height: 6),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: description == null
+                ? const LoadingItem(
+                    isPrimaryTheme: true,
+                  )
+                : Text(
+                    description!,
+                    softWrap: true,
+                    overflow: TextOverflow.visible,
+                    style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                          color: cPrimary600,
+                        ),
+                  ),
+          )
         ],
       ),
     );

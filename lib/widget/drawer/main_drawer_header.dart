@@ -33,6 +33,7 @@ class MainDrawerHeader extends StatelessWidget {
       child: SizedBox(
         width: double.infinity,
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // const Icon(
             //   Icons.storefront,
@@ -69,7 +70,7 @@ class MainDrawerHeader extends StatelessWidget {
                 ? const LoadingItem()
                 : Text(
                     title!,
-                    textAlign: TextAlign.center,
+                    textAlign: TextAlign.start,
                     style: Theme.of(context).textTheme.titleMedium!.copyWith(
                           color: cWhite,
                         ),
@@ -81,7 +82,7 @@ class MainDrawerHeader extends StatelessWidget {
                     softWrap: true,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
+                    textAlign: TextAlign.start,
                     style: Theme.of(context).textTheme.bodySmall!.copyWith(
                           color: cPrimary600,
                         ),
