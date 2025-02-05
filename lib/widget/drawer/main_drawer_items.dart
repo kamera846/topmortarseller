@@ -68,10 +68,10 @@ class MainDrawerItems extends StatelessWidget {
           },
         ),
         DrawerItem(
-          title: 'Order',
+          title: 'Katalog Produk',
           description: 'Dapatkan produk terbaik kami',
           icon: const Icon(
-            Icons.monetization_on,
+            Icons.trolley,
             size: 26,
             color: cDark100,
           ),
