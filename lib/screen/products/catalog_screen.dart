@@ -3,9 +3,12 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:topmortarseller/model/product_model.dart';
+import 'package:topmortarseller/services/product_api.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/util/currency_format.dart';
 import 'package:topmortarseller/widget/form/button/elevated_button.dart';
+import 'package:topmortarseller/widget/modal/loading_modal.dart';
+import 'package:topmortarseller/widget/snackbar/show_snackbar.dart';
 
 class CatalogScreen extends StatefulWidget {
   const CatalogScreen({super.key});
@@ -18,73 +21,37 @@ class _CatalogScreenState extends State<CatalogScreen> {
   List<ProductModel> items = [];
   List<ProductModel> checkoutedItems = [];
   bool _showOverlay = false;
+  bool _isLoading = true;
   ProductModel? _selectedItem;
   int totalPrice = 0;
   int totalItems = 0;
 
   @override
   void initState() {
-    items.add(const ProductModel(
-      idProduk: '1',
-      namaProduk: 'TOP MORTAR THINBED',
-      hargaProduk: '67500',
-      idCity: '1',
-      stok: '200',
-      checkoutCount: '',
-      imageProduk:
-          'https://topmortar.com/wp-content/uploads/2018/11/TOP-THINBED-696x1096.png',
-    ));
-    items.add(const ProductModel(
-      idProduk: '2',
-      namaProduk: 'TOP MORTAR ACIAN',
-      hargaProduk: '72500',
-      idCity: '1',
-      stok: '250',
-      checkoutCount: '',
-      imageProduk:
-          'https://topmortar.com/wp-content/uploads/2019/05/TOP-KERAMIK-696x1096.png',
-    ));
-    items.add(const ProductModel(
-      idProduk: '3',
-      namaProduk: 'TOP MORTAR PLASTER',
-      hargaProduk: '95000',
-      idCity: '1',
-      stok: '150',
-      checkoutCount: '',
-      imageProduk:
-          'https://topmortar.com/wp-content/uploads/2021/10/top-kalender.jpeg',
-    ));
-    items.add(const ProductModel(
-      idProduk: '4',
-      namaProduk: 'TOP MORTAR THINBED',
-      hargaProduk: '67500',
-      idCity: '1',
-      stok: '200',
-      checkoutCount: '',
-      imageProduk:
-          'https://topmortar.com/wp-content/uploads/2018/11/TOP-THINBED-696x1096.png',
-    ));
-    items.add(const ProductModel(
-      idProduk: '5',
-      namaProduk: 'TOP MORTAR ACIAN',
-      hargaProduk: '72500',
-      idCity: '1',
-      stok: '250',
-      checkoutCount: '',
-      imageProduk:
-          'https://topmortar.com/wp-content/uploads/2019/05/TOP-KERAMIK-696x1096.png',
-    ));
-    items.add(const ProductModel(
-      idProduk: '6',
-      namaProduk: 'TOP MORTAR PLASTER',
-      hargaProduk: '95000',
-      idCity: '1',
-      stok: '150',
-      checkoutCount: '',
-      imageProduk:
-          'https://topmortar.com/wp-content/uploads/2021/10/top-kalender.jpeg',
-    ));
+    getList();
     super.initState();
+  }
+
+  void getList() async {
+    await ProductApiService().list(
+      onError: (e) {
+        showSnackBar(context, e);
+      },
+      onCompleted: (data) {
+        items = [];
+        for (var item in data) {
+          var dummyObject = item.copyWith(
+            checkoutCount: '',
+            imageProduk:
+                'https://topmortar.com/wp-content/uploads/2021/10/TOP-THINBED-2.png',
+          );
+          items.add(dummyObject);
+        }
+        setState(() {
+          _isLoading = false;
+        });
+      },
+    );
   }
 
   @override
@@ -103,138 +70,149 @@ class _CatalogScreenState extends State<CatalogScreen> {
             backgroundColor: cWhite,
             foregroundColor: cDark100,
           ),
-          body: Column(
-            children: [
-              Expanded(
-                child: GridView(
-                  padding: const EdgeInsets.all(12),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    childAspectRatio: 3 / 5,
-                    crossAxisSpacing: 6,
-                    mainAxisSpacing: 6,
-                  ),
+          body: _isLoading
+              ? const LoadingModal()
+              : Column(
                   children: [
-                    for (final item in items)
-                      Card(
-                        color: cWhite,
-                        clipBehavior: Clip.antiAliasWithSaveLayer,
-                        child: InkWell(
-                          onTap: () {
-                            setState(() {
-                              _selectedItem = item;
-                              _showOverlay = true;
-                            });
-                          },
-                          child: SizedBox(
-                            width: double.infinity,
-                            height: double.infinity,
-                            child: Column(
-                              children: [
-                                Expanded(
-                                  flex: 5,
-                                  child: Container(
-                                    color: cDark600,
-                                    width: double.infinity,
-                                    height: double.infinity,
-                                    child: Image.network(
-                                      item.imageProduk ?? '',
-                                      fit: BoxFit.contain,
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  flex: 2,
-                                  child: Container(
-                                    color: Colors.white,
-                                    padding: const EdgeInsets.all(12),
-                                    width: double.infinity,
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              item.namaProduk ?? '',
-                                            ),
-                                            Text(
-                                              CurrencyFormat().format(
-                                                  double.parse(
-                                                      item.hargaProduk!)),
-                                              style: const TextStyle(
-                                                color: cPrimary400,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ],
+                    Expanded(
+                      child: GridView(
+                        padding: const EdgeInsets.all(12),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          childAspectRatio: 1 / 1.5,
+                          crossAxisSpacing: 6,
+                          mainAxisSpacing: 6,
+                        ),
+                        children: [
+                          for (final item in items)
+                            Card(
+                              color: cWhite,
+                              clipBehavior: Clip.antiAliasWithSaveLayer,
+                              child: InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    _selectedItem = item;
+                                    _showOverlay = true;
+                                  });
+                                },
+                                child: SizedBox(
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                  child: Column(
+                                    children: [
+                                      Expanded(
+                                        flex: 3,
+                                        child: Container(
+                                          color: cDark600,
+                                          width: double.infinity,
+                                          height: double.infinity,
+                                          child: Image.network(
+                                            item.imageProduk ?? '',
+                                            fit: BoxFit.cover,
+                                          ),
                                         ),
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: Text(
-                                                'Stok ${item.stok}',
-                                                style: const TextStyle(
-                                                    color: cDark200),
-                                              ),
-                                            ),
-                                            if (item.checkoutCount!
-                                                    .isNotEmpty &&
-                                                item.checkoutCount != '0') ...[
-                                              const Icon(Icons.trolley),
-                                              Container(
-                                                width: 20,
-                                                height: 20,
-                                                decoration: BoxDecoration(
-                                                  color: cPrimary100,
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          100),
-                                                ),
-                                                child: Center(
-                                                  child: Text(
-                                                    item.checkoutCount ?? '',
+                                      ),
+                                      Expanded(
+                                        flex: 2,
+                                        child: Container(
+                                          color: Colors.white,
+                                          padding: const EdgeInsets.all(12),
+                                          width: double.infinity,
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    item.namaProduk ?? '',
+                                                    maxLines: 2,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                  Text(
+                                                    CurrencyFormat().format(
+                                                        double.parse(
+                                                            item.hargaProduk!)),
                                                     style: const TextStyle(
-                                                      color: cWhite,
-                                                      fontSize: 10,
+                                                      color: cPrimary400,
                                                       fontWeight:
                                                           FontWeight.bold,
                                                     ),
                                                   ),
-                                                ),
+                                                ],
+                                              ),
+                                              Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: Text(
+                                                      'Stok ${item.stok != null && item.stok!.isNotEmpty && item.stok! != '0' ? 'Tersedia' : 'Habis'}',
+                                                      style: const TextStyle(
+                                                        color: cDark200,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  if (item.checkoutCount!
+                                                          .isNotEmpty &&
+                                                      item.checkoutCount !=
+                                                          '0') ...[
+                                                    const Icon(Icons.trolley),
+                                                    Container(
+                                                      width: 20,
+                                                      height: 20,
+                                                      decoration: BoxDecoration(
+                                                        color: cPrimary100,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(100),
+                                                      ),
+                                                      child: Center(
+                                                        child: Text(
+                                                          item.checkoutCount ??
+                                                              '',
+                                                          style:
+                                                              const TextStyle(
+                                                            color: cWhite,
+                                                            fontSize: 10,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    )
+                                                  ]
+                                                ],
                                               )
-                                            ]
-                                          ],
-                                        )
-                                      ],
-                                    ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              ],
-                            ),
-                          ),
-                        ),
+                              ),
+                            )
+                        ],
+                      ),
+                    ),
+                    if (checkoutedItems.isNotEmpty)
+                      CheckoutedItems(
+                        items: checkoutedItems,
+                        totalItems: totalItems,
+                        totalPrice: totalPrice,
+                        onCheckout: () {
+                          print('Printed: ${checkoutedItems[0].checkoutCount}');
+                        },
                       )
                   ],
                 ),
-              ),
-              if (checkoutedItems.isNotEmpty)
-                CheckoutedItems(
-                  items: checkoutedItems,
-                  totalItems: totalItems,
-                  totalPrice: totalPrice,
-                  onCheckout: () {
-                    print('Printed: ${checkoutedItems[0].checkoutCount}');
-                  },
-                )
-            ],
-          ),
         ),
-        if (_showOverlay && _selectedItem != null)
+        if (_showOverlay && _selectedItem != null && !_isLoading)
           OverlayItem(
             selectedItem: _selectedItem!,
             onClear: () {
@@ -476,7 +454,7 @@ class _OverlayItemState extends State<OverlayItem> {
                       style: const TextStyle(fontSize: 18),
                     ),
                     Text(
-                      'Stok ${widget.selectedItem.stok}',
+                      'Stok ${widget.selectedItem.stok != null && widget.selectedItem.stok!.isNotEmpty && widget.selectedItem.stok! != '0' ? 'Tersedia' : 'Habis'}',
                       style: const TextStyle(color: cDark200),
                     ),
                     // Text(
@@ -487,88 +465,95 @@ class _OverlayItemState extends State<OverlayItem> {
                     //       fontWeight: FontWeight.bold),
                     // ),
                     const SizedBox(height: 32),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        IconButton.filled(
-                          onPressed: () => minusCountItem(2),
-                          icon: const Icon(Icons.exposure_minus_2),
-                        ),
-                        IconButton.filled(
-                          onPressed: () => minusCountItem(1),
-                          icon: const Icon(Icons.exposure_minus_1),
-                        ),
-                        Expanded(
-                          child: TextFormField(
-                            controller: _itemCountController,
-                            keyboardType: TextInputType.number,
-                            textAlign: TextAlign.center,
-                            textAlignVertical: TextAlignVertical.center,
-                            decoration: InputDecoration(
-                              contentPadding: const EdgeInsets.all(0),
-                              border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(100),
-                                  borderSide: const BorderSide(
-                                    color: cDark100,
-                                    width: 1,
-                                  )),
-                            ),
+                    if (widget.selectedItem.stok != null &&
+                        widget.selectedItem.stok!.isNotEmpty &&
+                        widget.selectedItem.stok! != '0') ...[
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          IconButton.filled(
+                            onPressed: () => minusCountItem(2),
+                            icon: const Icon(Icons.exposure_minus_2),
                           ),
-                        ),
-                        IconButton.filled(
-                          onPressed: () => plusCountItem(1),
-                          icon: const Icon(Icons.exposure_plus_1),
-                        ),
-                        IconButton.filled(
-                          onPressed: () => plusCountItem(2),
-                          icon: const Icon(Icons.exposure_plus_2),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        if (widget.selectedItem.checkoutCount != null &&
-                            widget.selectedItem.checkoutCount!.isNotEmpty) ...[
-                          IconButton(
-                            onPressed: widget.onClear,
-                            style: IconButton.styleFrom(
-                              backgroundColor: cDark200,
-                              foregroundColor: cWhite,
-                            ),
-                            icon: const Icon(CupertinoIcons.trash),
+                          IconButton.filled(
+                            onPressed: () => minusCountItem(1),
+                            icon: const Icon(Icons.exposure_minus_1),
                           ),
-                          const SizedBox(width: 6)
-                        ],
-                        Expanded(
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: _itemCountController.text == "0"
-                                  ? cPrimary600
-                                  : cPrimary200,
-                              foregroundColor: cWhite,
-                              iconColor: cWhite,
-                              overlayColor: cWhite,
-                              shadowColor: cDark600,
-                            ),
-                            onPressed: _itemCountController.text == "0"
-                                ? null
-                                : () {
-                                    widget.onSubmit(_itemCountController.text);
-                                  },
-                            // onPressed: () => print('Hello there..'),
-                            child: const Text(
-                              'Tambahkan',
+                          Expanded(
+                            child: TextFormField(
+                              controller: _itemCountController,
+                              keyboardType: TextInputType.number,
                               textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
+                              textAlignVertical: TextAlignVertical.center,
+                              decoration: InputDecoration(
+                                contentPadding: const EdgeInsets.all(0),
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(100),
+                                    borderSide: const BorderSide(
+                                      color: cDark100,
+                                      width: 1,
+                                    )),
                               ),
                             ),
                           ),
-                        ),
-                      ],
-                    )
+                          IconButton.filled(
+                            onPressed: () => plusCountItem(1),
+                            icon: const Icon(Icons.exposure_plus_1),
+                          ),
+                          IconButton.filled(
+                            onPressed: () => plusCountItem(2),
+                            icon: const Icon(Icons.exposure_plus_2),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          if (widget.selectedItem.checkoutCount != null &&
+                              widget
+                                  .selectedItem.checkoutCount!.isNotEmpty) ...[
+                            IconButton(
+                              onPressed: widget.onClear,
+                              style: IconButton.styleFrom(
+                                backgroundColor: cDark200,
+                                foregroundColor: cWhite,
+                              ),
+                              icon: const Icon(CupertinoIcons.trash),
+                            ),
+                            const SizedBox(width: 6)
+                          ],
+                          Expanded(
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    _itemCountController.text == "0"
+                                        ? cPrimary600
+                                        : cPrimary200,
+                                foregroundColor: cWhite,
+                                iconColor: cWhite,
+                                overlayColor: cWhite,
+                                shadowColor: cDark600,
+                              ),
+                              onPressed: _itemCountController.text == "0"
+                                  ? null
+                                  : () {
+                                      widget
+                                          .onSubmit(_itemCountController.text);
+                                    },
+                              // onPressed: () => print('Hello there..'),
+                              child: const Text(
+                                'Tambahkan',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ],
                 ),
               ),

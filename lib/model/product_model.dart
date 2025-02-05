@@ -35,4 +35,24 @@ class ProductModel {
       checkoutCount: checkoutCount ?? this.checkoutCount,
     );
   }
+
+  Map<String, dynamic> toJson() => {
+        'id_produk': idProduk ?? '',
+        'nama_produk': namaProduk ?? '',
+        'id_city': idCity ?? '',
+        'harga_produk': hargaProduk ?? '',
+        'image_produk': imageProduk ?? '',
+        'stok': stok ?? '',
+      };
+
+  factory ProductModel.fromJson(Map<String, dynamic> json) {
+    return ProductModel(
+      idProduk: json['id_produk'] ?? '',
+      namaProduk: json['nama_produk'] ?? '',
+      idCity: json['id_city'] ?? '',
+      hargaProduk: json['harga_produk'] ?? '',
+      imageProduk: json['image_produk'] ?? '',
+      stok: json['stok'] ?? '',
+    );
+  }
 }
