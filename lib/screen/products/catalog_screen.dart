@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:topmortarseller/model/contact_model.dart';
 import 'package:topmortarseller/model/product_model.dart';
 import 'package:topmortarseller/services/product_api.dart';
 import 'package:topmortarseller/util/colors/color.dart';
@@ -11,13 +12,19 @@ import 'package:topmortarseller/widget/modal/loading_modal.dart';
 import 'package:topmortarseller/widget/snackbar/show_snackbar.dart';
 
 class CatalogScreen extends StatefulWidget {
-  const CatalogScreen({super.key});
+  const CatalogScreen({
+    super.key,
+    this.userData,
+  });
+
+  final ContactModel? userData;
 
   @override
   State<CatalogScreen> createState() => _CatalogScreenState();
 }
 
 class _CatalogScreenState extends State<CatalogScreen> {
+  ContactModel? _userData;
   List<ProductModel> items = [];
   List<ProductModel> checkoutedItems = [];
   bool _showOverlay = false;
@@ -28,12 +35,22 @@ class _CatalogScreenState extends State<CatalogScreen> {
 
   @override
   void initState() {
-    getList();
+    _getUserData();
     super.initState();
   }
 
-  void getList() async {
+  void _getUserData() async {
+    final data = widget.userData ?? await getContactModel();
+    setState(() {
+      _userData = data;
+    });
+
+    _getList();
+  }
+
+  void _getList() async {
     await ProductApiService().list(
+      idCity: _userData != null ? _userData!.idCity : '',
       onError: (e) {
         showSnackBar(context, e);
       },

@@ -6,13 +6,14 @@ import 'package:topmortarseller/services/api.dart';
 
 class ProductApiService {
   Future<List<ProductModel>?> list({
+    String? idCity,
     Function(String e)? onError,
     Function(String e)? onSuccess,
     required Function(List<ProductModel> data) onCompleted,
   }) async {
     List<ProductModel> data = [];
     try {
-      final url = Uri.https(baseUrl, 'api/produk');
+      final url = Uri.https(baseUrl, 'api/produk', {'city': idCity ?? ''});
       final response = await http.get(
         url,
         headers: headerSetup,

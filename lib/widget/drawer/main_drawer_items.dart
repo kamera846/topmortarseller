@@ -1,5 +1,3 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:topmortarseller/model/contact_model.dart';
@@ -35,12 +33,14 @@ class MainDrawerItems extends StatelessWidget {
           onConfirm: () async {
             await removeLoginState();
             await removeContactModel();
-            Navigator.of(context).pop();
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
-                builder: (ctx) => const AuthScreen(),
-              ),
-            );
+            if (context.mounted) {
+              Navigator.of(context).pop();
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(
+                  builder: (ctx) => const AuthScreen(),
+                ),
+              );
+            }
           },
         );
       },
@@ -78,7 +78,7 @@ class MainDrawerItems extends StatelessWidget {
           onTap: () {
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (ctx) => const CatalogScreen(),
+                builder: (ctx) => CatalogScreen(userData: userData),
               ),
             );
           },

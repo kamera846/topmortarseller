@@ -50,9 +50,7 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
         if (data.nama != null && data.nama != null && data.nama!.isNotEmpty) {
           title = data.nama!;
         }
-        if (data.address != null &&
-            data.address != null &&
-            data.address!.isNotEmpty) {
+        if (data.address != null && data.address!.isNotEmpty) {
           description = data.address!;
         } else if (data.nomorhp != null &&
             data.nomorhp != null &&
