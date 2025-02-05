@@ -1,9 +1,10 @@
 import 'dart:ui';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:money_formatter/money_formatter.dart';
 import 'package:topmortarseller/model/product_model.dart';
 import 'package:topmortarseller/util/colors/color.dart';
+import 'package:topmortarseller/util/currency_format.dart';
 import 'package:topmortarseller/widget/form/button/elevated_button.dart';
 
 class CatalogScreen extends StatefulWidget {
@@ -86,20 +87,6 @@ class _CatalogScreenState extends State<CatalogScreen> {
     super.initState();
   }
 
-  String formatCurrency(double amount) {
-    var formatted = MoneyFormatter(
-      amount: amount,
-      settings: MoneyFormatterSettings(
-          symbol: 'RP',
-          thousandSeparator: '.',
-          decimalSeparator: ',',
-          symbolAndNumberSeparator: ' ',
-          fractionDigits: 0,
-          compactFormatType: CompactFormatType.short),
-    );
-    return formatted.output.symbolOnLeft;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -176,8 +163,9 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                               item.namaProduk ?? '',
                                             ),
                                             Text(
-                                              formatCurrency(double.parse(
-                                                  item.hargaProduk!)),
+                                              CurrencyFormat().format(
+                                                  double.parse(
+                                                      item.hargaProduk!)),
                                               style: const TextStyle(
                                                 color: cPrimary400,
                                                 fontWeight: FontWeight.bold,
@@ -239,7 +227,9 @@ class _CatalogScreenState extends State<CatalogScreen> {
                   items: checkoutedItems,
                   totalItems: totalItems,
                   totalPrice: totalPrice,
-                  onCheckout: () {},
+                  onCheckout: () {
+                    print('Printed: ${checkoutedItems[0].checkoutCount}');
+                  },
                 )
             ],
           ),
@@ -247,6 +237,44 @@ class _CatalogScreenState extends State<CatalogScreen> {
         if (_showOverlay && _selectedItem != null)
           OverlayItem(
             selectedItem: _selectedItem!,
+            onClear: () {
+              setState(() {
+                var indexOfItems = items.indexWhere(
+                    (data) => data.idProduk == _selectedItem?.idProduk);
+                items[indexOfItems] =
+                    items[indexOfItems].copyWith(checkoutCount: "");
+
+                var indexOfCheckoutItems = checkoutedItems.indexWhere(
+                    (data) => data.idProduk == _selectedItem?.idProduk);
+                if (indexOfCheckoutItems == -1) {
+                  checkoutedItems.add(
+                    _selectedItem!.copyWith(checkoutCount: ""),
+                  );
+                } else {
+                  checkoutedItems[indexOfCheckoutItems] =
+                      checkoutedItems[indexOfCheckoutItems]
+                          .copyWith(checkoutCount: "");
+                }
+
+                totalPrice = 0;
+                totalItems = 0;
+
+                for (var item in checkoutedItems) {
+                  if (item.checkoutCount!.isNotEmpty) {
+                    totalPrice += int.parse(item.hargaProduk!) *
+                        int.parse(item.checkoutCount!);
+                    totalItems += int.parse(item.checkoutCount!);
+                  }
+                }
+
+                if (totalItems == 0 && totalPrice == 0) {
+                  checkoutedItems.clear();
+                }
+
+                _selectedItem = null;
+                _showOverlay = false;
+              });
+            },
             onSubmit: (checkoutCount) {
               setState(() {
                 var indexOfItems = items.indexWhere(
@@ -268,6 +296,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
 
                 totalPrice = 0;
                 totalItems = 0;
+
                 for (var item in checkoutedItems) {
                   totalPrice += int.parse(item.hargaProduk!) *
                       int.parse(item.checkoutCount!);
@@ -304,20 +333,6 @@ class CheckoutedItems extends StatelessWidget {
   final int totalItems;
   final Function() onCheckout;
 
-  String formatCurrency(double amount) {
-    var formatted = MoneyFormatter(
-      amount: amount,
-      settings: MoneyFormatterSettings(
-          symbol: 'RP',
-          thousandSeparator: '.',
-          decimalSeparator: ',',
-          symbolAndNumberSeparator: ' ',
-          fractionDigits: 0,
-          compactFormatType: CompactFormatType.short),
-    );
-    return formatted.output.symbolOnLeft;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -339,7 +354,7 @@ class CheckoutedItems extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  formatCurrency(double.parse('$totalPrice')),
+                  CurrencyFormat().format(double.parse('$totalPrice')),
                   style: const TextStyle(
                     color: cPrimary100,
                     fontWeight: FontWeight.bold,
@@ -361,11 +376,13 @@ class OverlayItem extends StatefulWidget {
   const OverlayItem({
     super.key,
     required this.selectedItem,
+    required this.onClear,
     required this.onSubmit,
     required this.onClose,
   });
 
   final ProductModel selectedItem;
+  final Function() onClear;
   final Function(String checkoutCount) onSubmit;
   final Function() onClose;
 
@@ -416,20 +433,6 @@ class _OverlayItemState extends State<OverlayItem> {
     });
   }
 
-  String formatCurrency(double amount) {
-    var formatted = MoneyFormatter(
-      amount: amount,
-      settings: MoneyFormatterSettings(
-          symbol: 'RP',
-          thousandSeparator: '.',
-          decimalSeparator: ',',
-          symbolAndNumberSeparator: ' ',
-          fractionDigits: 0,
-          compactFormatType: CompactFormatType.short),
-    );
-    return formatted.output.symbolOnLeft;
-  }
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -461,7 +464,7 @@ class _OverlayItemState extends State<OverlayItem> {
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      formatCurrency(
+                      CurrencyFormat().format(
                           double.parse(widget.selectedItem.hargaProduk!)),
                       style: const TextStyle(
                           color: cPrimary400,
@@ -523,34 +526,49 @@ class _OverlayItemState extends State<OverlayItem> {
                       ],
                     ),
                     const SizedBox(height: 12),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: _itemCountController.text == "0"
-                            ? cPrimary600
-                            : cPrimary200,
-                        foregroundColor: cWhite,
-                        iconColor: cWhite,
-                        overlayColor: cWhite,
-                        shadowColor: cDark600,
-                      ),
-                      onPressed: _itemCountController.text == "0"
-                          ? null
-                          : () {
-                              widget.onSubmit(_itemCountController.text);
-                            },
-                      // onPressed: () => print('Hello there..'),
-                      child: const SizedBox(
-                        width: double.infinity,
-                        child: Text(
-                          'Tambahkan',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
+                    Row(
+                      children: [
+                        if (widget.selectedItem.checkoutCount != null &&
+                            widget.selectedItem.checkoutCount!.isNotEmpty) ...[
+                          IconButton(
+                            onPressed: widget.onClear,
+                            style: IconButton.styleFrom(
+                              backgroundColor: cDark200,
+                              foregroundColor: cWhite,
+                            ),
+                            icon: const Icon(CupertinoIcons.trash),
+                          ),
+                          const SizedBox(width: 6)
+                        ],
+                        Expanded(
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: _itemCountController.text == "0"
+                                  ? cPrimary600
+                                  : cPrimary200,
+                              foregroundColor: cWhite,
+                              iconColor: cWhite,
+                              overlayColor: cWhite,
+                              shadowColor: cDark600,
+                            ),
+                            onPressed: _itemCountController.text == "0"
+                                ? null
+                                : () {
+                                    widget.onSubmit(_itemCountController.text);
+                                  },
+                            // onPressed: () => print('Hello there..'),
+                            child: const Text(
+                              'Tambahkan',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                    ),
+                      ],
+                    )
                   ],
                 ),
               ),
