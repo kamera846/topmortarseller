@@ -13,7 +13,7 @@ class ProductModel {
   final String? idCity;
   final String? hargaProduk;
   final String? imageProduk;
-  final String? stok;
+  final int? stok;
   final String? checkoutCount;
 
   ProductModel copyWith({
@@ -22,7 +22,7 @@ class ProductModel {
     String? idCity,
     String? hargaProduk,
     String? imageProduk,
-    String? stok,
+    int? stok,
     String? checkoutCount,
   }) {
     return ProductModel(
@@ -42,7 +42,7 @@ class ProductModel {
         'id_city': idCity ?? '',
         'harga_produk': hargaProduk ?? '',
         'image_produk': imageProduk ?? '',
-        'stok': stok ?? '',
+        'stok': stok ?? 0,
       };
 
   factory ProductModel.fromJson(Map<String, dynamic> json) {
@@ -52,7 +52,7 @@ class ProductModel {
       idCity: json['id_city'] ?? '',
       hargaProduk: json['harga_produk'] ?? '',
       imageProduk: json['image_produk'] ?? '',
-      stok: json['stok'] ?? '',
+      stok: json['stok'] ?? 0,
     );
   }
 }

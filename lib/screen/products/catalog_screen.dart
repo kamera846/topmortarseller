@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:topmortarseller/model/contact_model.dart';
 import 'package:topmortarseller/model/product_model.dart';
+import 'package:topmortarseller/screen/products/checkout_screen.dart';
 import 'package:topmortarseller/services/product_api.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/util/currency_format.dart';
@@ -59,7 +60,6 @@ class _CatalogScreenState extends State<CatalogScreen> {
         for (var item in data) {
           var dummyObject = item.copyWith(
             checkoutCount: '',
-            // stok: '150',
             imageProduk:
                 'https://topmortar.com/wp-content/uploads/2021/10/TOP-THINBED-2.png',
           );
@@ -108,9 +108,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                               color: cWhite,
                               clipBehavior: Clip.antiAliasWithSaveLayer,
                               child: InkWell(
-                                onTap: item.stok == null ||
-                                        item.stok!.isEmpty ||
-                                        item.stok! == '0'
+                                onTap: item.stok == null || item.stok! == 0
                                     ? null
                                     : () {
                                         setState(() {
@@ -177,7 +175,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                                     children: [
                                                       Expanded(
                                                         child: Text(
-                                                          'Stok ${item.stok != null && item.stok!.isNotEmpty && item.stok! != '0' ? 'Tersedia' : 'Habis'}',
+                                                          'Stok ${item.stok != null && item.stok! != 0 ? 'tersedia' : 'habis'}',
                                                           style:
                                                               const TextStyle(
                                                             color: cDark200,
@@ -225,9 +223,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                           ),
                                         ],
                                       ),
-                                      if (item.stok == null ||
-                                          item.stok!.isEmpty ||
-                                          item.stok! == '0')
+                                      if (item.stok == null || item.stok! == 0)
                                         BackdropFilter(
                                           filter: ImageFilter.blur(
                                               sigmaX: 1.5, sigmaY: 1.5),
@@ -259,7 +255,14 @@ class _CatalogScreenState extends State<CatalogScreen> {
                         totalItems: totalItems,
                         totalPrice: totalPrice,
                         onCheckout: () {
-                          print('Printed: ${checkoutedItems[0].checkoutCount}');
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (ctx) => CheckoutScreen(
+                                items: checkoutedItems,
+                              ),
+                            ),
+                          );
                         },
                       )
                   ],
@@ -392,11 +395,12 @@ class CheckoutedItems extends StatelessWidget {
                     fontSize: 16,
                   ),
                 ),
-                Text('Total $totalItems item'),
+                Text('Total ${items.length} produk'),
+                // Text('${items.length} produk $totalItems item'),
               ],
             ),
           ),
-          MElevatedButton(onPressed: onCheckout, title: 'Checkout Sekarang'),
+          MElevatedButton(onPressed: onCheckout, title: 'Checkout'),
         ],
       ),
     );
@@ -441,7 +445,7 @@ class _OverlayItemState extends State<OverlayItem> {
     super.dispose();
   }
 
-  void minusCountItem(int value) {
+  void _minusCountItem(int value) {
     var countNow = int.parse(_itemCountController.text);
     if (countNow > 0) {
       var countMinus = countNow - value;
@@ -457,11 +461,41 @@ class _OverlayItemState extends State<OverlayItem> {
     }
   }
 
-  void plusCountItem(int value) {
+  void _plusCountItem(int value) {
     var countNow = int.parse(_itemCountController.text);
-    setState(() {
-      _itemCountController.text = '${countNow + value}';
-    });
+    if (countNow < widget.selectedItem.stok!) {
+      setState(() {
+        int countPlus = countNow + value;
+        if (countPlus < widget.selectedItem.stok!) {
+          _itemCountController.text = '$countPlus';
+        } else {
+          _itemCountController.text = '${widget.selectedItem.stok!}';
+        }
+      });
+    }
+  }
+
+  void _itemCountControllerChanged(String value) {
+    if (value.isNotEmpty && int.tryParse(value) != null) {
+      if (int.parse(value) > widget.selectedItem.stok!) {
+        setState(() {
+          _itemCountController.text =
+              widget.selectedItem.stok!.toStringAsFixed(0);
+        });
+      } else if (int.parse(value) <= 0) {
+        setState(() {
+          _itemCountController.text = '0';
+        });
+      } else {
+        setState(() {
+          _itemCountController.text = value;
+        });
+      }
+    } else {
+      setState(() {
+        _itemCountController.text = '0';
+      });
+    }
   }
 
   @override
@@ -507,7 +541,7 @@ class _OverlayItemState extends State<OverlayItem> {
                       style: const TextStyle(fontSize: 18),
                     ),
                     Text(
-                      'Stok ${widget.selectedItem.stok != null && widget.selectedItem.stok!.isNotEmpty && widget.selectedItem.stok! != '0' ? 'Tersedia' : 'Habis'}',
+                      'Stok ${widget.selectedItem.stok != null && widget.selectedItem.stok! != 0 ? 'tersedia ${widget.selectedItem.stok!}' : 'habis'}',
                       style: const TextStyle(color: cDark200),
                     ),
                     // Text(
@@ -519,17 +553,16 @@ class _OverlayItemState extends State<OverlayItem> {
                     // ),
                     const SizedBox(height: 32),
                     if (widget.selectedItem.stok != null &&
-                        widget.selectedItem.stok!.isNotEmpty &&
-                        widget.selectedItem.stok! != '0') ...[
+                        widget.selectedItem.stok! != 0) ...[
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           IconButton.filled(
-                            onPressed: () => minusCountItem(2),
+                            onPressed: () => _minusCountItem(2),
                             icon: const Icon(Icons.exposure_minus_2),
                           ),
                           IconButton.filled(
-                            onPressed: () => minusCountItem(1),
+                            onPressed: () => _minusCountItem(1),
                             icon: const Icon(Icons.exposure_minus_1),
                           ),
                           Expanded(
@@ -547,14 +580,15 @@ class _OverlayItemState extends State<OverlayItem> {
                                       width: 1,
                                     )),
                               ),
+                              onChanged: _itemCountControllerChanged,
                             ),
                           ),
                           IconButton.filled(
-                            onPressed: () => plusCountItem(1),
+                            onPressed: () => _plusCountItem(1),
                             icon: const Icon(Icons.exposure_plus_1),
                           ),
                           IconButton.filled(
-                            onPressed: () => plusCountItem(2),
+                            onPressed: () => _plusCountItem(2),
                             icon: const Icon(Icons.exposure_plus_2),
                           ),
                         ],
