@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:topmortarseller/model/contact_model.dart';
 import 'package:topmortarseller/screen/auth_screen.dart';
 import 'package:topmortarseller/screen/products/catalog_screen.dart';
+import 'package:topmortarseller/screen/products/order_screen.dart';
 import 'package:topmortarseller/screen/profile/detail_profile_screen.dart';
 import 'package:topmortarseller/util/auth_settings.dart';
 import 'package:topmortarseller/util/colors/color.dart';
@@ -79,6 +80,22 @@ class MainDrawerItems extends StatelessWidget {
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (ctx) => CatalogScreen(userData: userData),
+              ),
+            );
+          },
+        ),
+        DrawerItem(
+          title: 'Pesananan Saya',
+          description: 'Pantau status pesanan anda',
+          icon: const Icon(
+            CupertinoIcons.square_favorites_fill,
+            size: 26,
+            color: cDark100,
+          ),
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (ctx) => OrderScreen(userData: userData),
               ),
             );
           },
