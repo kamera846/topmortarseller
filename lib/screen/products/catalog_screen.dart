@@ -161,8 +161,9 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                                       ),
                                                       Text(
                                                         CurrencyFormat().format(
-                                                            double.parse(item
-                                                                .hargaProduk!)),
+                                                          amount: double.parse(
+                                                              item.hargaProduk!),
+                                                        ),
                                                         style: const TextStyle(
                                                           color: cPrimary400,
                                                           fontWeight:
@@ -388,7 +389,9 @@ class CheckoutedItems extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  CurrencyFormat().format(double.parse('$totalPrice')),
+                  CurrencyFormat().format(
+                    amount: double.parse('$totalPrice'),
+                  ),
                   style: const TextStyle(
                     color: cPrimary100,
                     fontWeight: FontWeight.bold,
@@ -530,7 +533,8 @@ class _OverlayItemState extends State<OverlayItem> {
                     const SizedBox(height: 12),
                     Text(
                       CurrencyFormat().format(
-                          double.parse(widget.selectedItem.hargaProduk!)),
+                        amount: double.parse(widget.selectedItem.hargaProduk!),
+                      ),
                       style: const TextStyle(
                           color: cPrimary400,
                           fontSize: 18,

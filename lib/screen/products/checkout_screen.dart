@@ -5,6 +5,16 @@ import 'package:topmortarseller/util/currency_format.dart';
 import 'package:topmortarseller/widget/form/button/elevated_button.dart';
 import 'package:topmortarseller/widget/modal/loading_modal.dart';
 
+class ProductDiskonModel {
+  const ProductDiskonModel({
+    required this.title,
+    required this.diskon,
+  });
+
+  final String title;
+  final double diskon;
+}
+
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({
     super.key,
@@ -20,8 +30,11 @@ class CheckoutScreen extends StatefulWidget {
 class _CheckoutScreenState extends State<CheckoutScreen> {
   List<ProductModel> items = [];
   List<ProductModel> checkoutedItems = [];
-  double totalPrice = 0.0;
+  List<ProductDiskonModel> diskons = [];
   bool _isLoading = true;
+  double totalPrice = 0.0;
+  double totalDiskon = 0.0;
+  double totalAfterDiskon = 0.0;
 
   @override
   void initState() {
@@ -32,12 +45,19 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   void _getList() async {
     setState(() {
       items = widget.items;
+      diskons.add(
+          const ProductDiskonModel(title: 'Diskon aplikasi', diskon: -10000));
+      diskons.add(const ProductDiskonModel(
+          title: 'Diskon toko priority', diskon: -15000));
+      diskons.add(
+          const ProductDiskonModel(title: 'Voucher 10.000', diskon: -10000));
+      diskons.add(const ProductDiskonModel(title: 'Biaya admin', diskon: 500));
       _isLoading = false;
     });
   }
 
   String getTotalPrices() {
-    totalPrice = 0.0;
+    var totalPrice = 0.0;
     for (var item in items) {
       double totalPriceProduct = double.parse(item.hargaProduk ?? '0') *
           double.parse(item.checkoutCount ?? '0');
@@ -45,7 +65,24 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         totalPrice += totalPriceProduct;
       });
     }
-    return CurrencyFormat().format(totalPrice);
+    return CurrencyFormat().format(amount: totalPrice, fractionDigits: 2);
+  }
+
+  String getTotalAfterDiskon() {
+    var totalPrice = 0.0;
+    var totalDiskon = 0.0;
+    for (var item in items) {
+      double totalPriceProduct = double.parse(item.hargaProduk ?? '0') *
+          double.parse(item.checkoutCount ?? '0');
+      setState(() {
+        totalPrice += totalPriceProduct;
+      });
+    }
+    for (var item in diskons) {
+      totalDiskon += item.diskon;
+    }
+    var totalAfterDiskon = totalPrice + totalDiskon;
+    return CurrencyFormat().format(amount: totalAfterDiskon, fractionDigits: 2);
   }
 
   @override
@@ -161,7 +198,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                               ),
                                               Expanded(
                                                 child: Text(
-                                                    '${CurrencyFormat().format(double.parse(item.hargaProduk ?? '0'))} / satuan'),
+                                                    '${CurrencyFormat().format(amount: double.parse(item.hargaProduk ?? '0'))} / satuan'),
                                               ),
                                               Text('x ${item.checkoutCount}'),
                                             ],
@@ -169,13 +206,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                         ),
                                         Center(
                                           child: Text(
-                                            CurrencyFormat().format((int.parse(
-                                                        item.hargaProduk ??
-                                                            '0') *
-                                                    int.parse(
-                                                        item.checkoutCount ??
-                                                            '0'))
-                                                .toDouble()),
+                                            CurrencyFormat().format(
+                                                amount: (int.parse(
+                                                            item.hargaProduk ??
+                                                                '0') *
+                                                        int.parse(
+                                                            item.checkoutCount ??
+                                                                '0'))
+                                                    .toDouble()),
                                             style: const TextStyle(
                                               color: cPrimary100,
                                             ),
@@ -201,7 +239,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                 children: [
                                   const Expanded(
                                     child: Text(
-                                      'Harga Awal',
+                                      'Total Harga',
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold),
                                     ),
@@ -213,32 +251,31 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                 ],
                               ),
                               const SizedBox(height: 24),
-                              const Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      'Diskon aplikasi',
-                                    ),
-                                  ),
-                                  Text(
-                                    'Rp -10.000',
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 12),
-                              const Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      'Diskon Toko Priority',
-                                    ),
-                                  ),
-                                  Text(
-                                    'Rp -5.000',
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 12),
+                              ListView.builder(
+                                  itemCount: diskons.length,
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  padding: const EdgeInsets.all(0),
+                                  itemBuilder: (ctx, idx) {
+                                    var diskonItem = diskons[idx];
+                                    return Container(
+                                      margin: const EdgeInsets.only(bottom: 12),
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              diskonItem.title,
+                                            ),
+                                          ),
+                                          Text(
+                                            CurrencyFormat().format(
+                                                amount: diskonItem.diskon,
+                                                fractionDigits: 2),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  })
                             ],
                           ),
                         ),
@@ -258,13 +295,23 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                   ),
                                 ),
                               ),
-                              Text(
-                                getTotalPrices(),
-                                style: const TextStyle(
-                                    color: cPrimary200,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold),
-                              ),
+                              Column(
+                                children: [
+                                  Text(
+                                    getTotalAfterDiskon(),
+                                    style: const TextStyle(
+                                        color: cPrimary200,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  Text(
+                                    getTotalPrices(),
+                                    style: const TextStyle(
+                                        color: cPrimary200,
+                                        decoration: TextDecoration.lineThrough),
+                                  ),
+                                ],
+                              )
                             ],
                           ),
                         ),
