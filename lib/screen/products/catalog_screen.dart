@@ -527,7 +527,7 @@ class _OverlayItemState extends State<OverlayItem> {
                       borderRadius: BorderRadius.circular(12),
                       child: Image.network(
                         widget.selectedItem.imageProduk ?? '',
-                        fit: BoxFit.contain,
+                        fit: BoxFit.cover,
                       ),
                     ),
                     const SizedBox(height: 12),

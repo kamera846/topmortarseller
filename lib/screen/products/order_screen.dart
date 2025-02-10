@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:topmortarseller/model/contact_model.dart';
+import 'package:topmortarseller/model/order_model.dart';
+import 'package:topmortarseller/model/product_model.dart';
 import 'package:topmortarseller/util/colors/color.dart';
+import 'package:topmortarseller/util/currency_format.dart';
 import 'package:topmortarseller/widget/modal/loading_modal.dart';
 
 class OrderScreen extends StatefulWidget {
@@ -17,6 +20,7 @@ class OrderScreen extends StatefulWidget {
 
 class _OrderScreenState extends State<OrderScreen> {
   ContactModel? _userData;
+  List<OrderModel> _items = [];
   bool _isLoading = true;
 
   @override
@@ -35,8 +39,53 @@ class _OrderScreenState extends State<OrderScreen> {
   }
 
   void _getList() async {
+    var product1 = const ProductModel(
+        idProduk: '1',
+        idCity: '1',
+        namaProduk: 'Thinbed',
+        hargaProduk: '78000',
+        imageProduk:
+            'https://topmortar.com/wp-content/uploads/2021/10/TOP-THINBED-2.png',
+        checkoutCount: '2',
+        stok: 500);
+    var product2 = const ProductModel(
+        idProduk: '2',
+        idCity: '1',
+        namaProduk: 'Plaster',
+        hargaProduk: '69000',
+        imageProduk:
+            'https://topmortar.com/wp-content/uploads/2021/10/MOCKUP-TA-1000-x-1000.png',
+        checkoutCount: '1',
+        stok: 200);
     Future.delayed(const Duration(seconds: 1), () {
       setState(() {
+        _items.add(OrderModel(
+            orderDate: '09 Februari 2025',
+            orderStatus: 'sedang diproses',
+            orderStatusColors: List.of({Colors.grey[400]!, Colors.grey[800]!}),
+            orderItems: List.of({product1, product2})));
+        _items.add(OrderModel(
+            orderDate: '08 Februari 2025',
+            orderStatus: 'dalam perjalanan',
+            orderStatusColors: List.of({Colors.blue[100]!, Colors.blue[800]!}),
+            orderItems: List.of({product1})));
+        _items.add(OrderModel(
+            orderDate: '07 Februari 2025',
+            orderStatus: 'dalam perjalanan',
+            orderStatusColors: List.of({Colors.blue[100]!, Colors.blue[800]!}),
+            orderItems: List.of({product2})));
+        _items.add(OrderModel(
+            orderDate: '06 Februari 2025',
+            orderStatus: 'belum lunas',
+            orderStatusColors:
+                List.of({Colors.orange[100]!, Colors.orange[800]!}),
+            orderItems: List.of({product1, product2})));
+        _items.add(OrderModel(
+            orderDate: '05 Februari 2025',
+            orderStatus: 'lunas',
+            orderStatusColors:
+                List.of({Colors.green[100]!, Colors.green[800]!}),
+            orderItems: List.of({product1})));
         _isLoading = false;
       });
     });
@@ -63,9 +112,10 @@ class _OrderScreenState extends State<OrderScreen> {
                 horizontal: 12,
               ),
               child: ListView.builder(
-                itemCount: 5,
+                itemCount: _items.length,
                 itemBuilder: (ctx, idx) {
-                  return const CardOrder();
+                  var orderItem = _items[idx];
+                  return CardOrder(item: orderItem);
                 },
               ),
             ),
@@ -74,7 +124,18 @@ class _OrderScreenState extends State<OrderScreen> {
 }
 
 class CardOrder extends StatelessWidget {
-  const CardOrder({super.key});
+  const CardOrder({super.key, required this.item});
+
+  final OrderModel item;
+
+  String _countPrice(List<ProductModel> products) {
+    var totalPrices = 0.0;
+    for (var product in products) {
+      totalPrices += double.parse(product.hargaProduk ?? '0') *
+          double.parse(product.checkoutCount ?? '0');
+    }
+    return CurrencyFormat().format(amount: totalPrices);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -92,16 +153,16 @@ class CardOrder extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Row(
+                Row(
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.calendar_month_rounded,
                       color: cDark200,
                     ),
-                    SizedBox(width: 8),
+                    const SizedBox(width: 8),
                     Text(
-                      '2025-02-08',
-                      style: TextStyle(color: cDark200),
+                      item.orderDate,
+                      style: const TextStyle(color: cDark200),
                     ),
                   ],
                 ),
@@ -109,15 +170,15 @@ class CardOrder extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Colors.green[100],
+                    color: item.orderStatusColors[0].withOpacity(0.4),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
-                    'Selesai',
+                    item.orderStatus.toUpperCase(),
                     style: TextStyle(
-                      color: Colors.green[800],
+                      color: item.orderStatusColors[1],
                       fontWeight: FontWeight.bold,
-                      fontSize: 12,
+                      fontSize: 10,
                     ),
                   ),
                 ),
@@ -132,9 +193,10 @@ class CardOrder extends StatelessWidget {
             ),
             ListView.builder(
               shrinkWrap: true,
-              itemCount: 2,
+              itemCount: item.orderItems.length,
               physics: const NeverScrollableScrollPhysics(),
               itemBuilder: (context, index) {
+                final product = item.orderItems[index];
                 return Container(
                   width: double.infinity,
                   height: 50,
@@ -146,34 +208,34 @@ class CardOrder extends StatelessWidget {
                         margin: const EdgeInsets.only(right: 12),
                         decoration: BoxDecoration(
                           color: cDark600,
-                          borderRadius: BorderRadius.circular(12),
-                          image: const DecorationImage(
+                          borderRadius: BorderRadius.circular(8),
+                          image: DecorationImage(
                             image: NetworkImage(
-                              '',
+                              product.imageProduk ?? '',
                             ),
-                            fit: BoxFit.contain,
+                            fit: BoxFit.cover,
                           ),
                         ),
                       ),
-                      const Column(
+                      Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Lorem ipsum sit dolor amet',
+                            product.namaProduk ?? '',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                           Row(
                             children: [
                               Text(
-                                'Rp 45.000 (2x)',
-                                style:
-                                    TextStyle(fontSize: 12, color: cPrimary100),
+                                '${CurrencyFormat().format(amount: double.parse(product.hargaProduk ?? '0'))} (${product.checkoutCount}x)',
+                                style: const TextStyle(
+                                    fontSize: 12, color: cPrimary100),
                               ),
-                              SizedBox(width: 8),
-                              Text(
-                                'Rp 50.000',
+                              const SizedBox(width: 8),
+                              const Text(
+                                'Rp 100.000',
                                 style: TextStyle(
                                   fontSize: 12,
                                   decoration: TextDecoration.lineThrough,
@@ -189,30 +251,64 @@ class CardOrder extends StatelessWidget {
               },
             ),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              // mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Total 2 produk',
-                    ),
-                    Text(
-                      'Rp 180.000',
-                      style: TextStyle(
-                          color: cPrimary100, fontWeight: FontWeight.bold),
-                    ),
-                  ],
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Total ${item.orderItems.length} produk',
+                      ),
+                      Text(
+                        _countPrice(item.orderItems),
+                        style: const TextStyle(
+                            color: cPrimary100, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
                 ),
+                if (item.orderStatus == 'belum lunas' ||
+                    item.orderStatus == 'lunas') ...[
+                  InkWell(
+                    onTap: () {},
+                    child: Material(
+                      color: Colors.transparent,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.transparent,
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(
+                            color: cPrimary100.withAlpha(200),
+                            width: 1,
+                          ),
+                        ),
+                        child: const Text(
+                          'Lihat Invoice',
+                          style: TextStyle(
+                            color: cPrimary100,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                ],
                 InkWell(
                   onTap: () {},
+                  splashColor: cDark100,
                   child: Material(
+                    color: Colors.transparent,
                     child: Container(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 8, vertical: 6),
                       decoration: BoxDecoration(
-                        color: Colors.blue.withAlpha(200),
+                        color: cPrimary100.withAlpha(200),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: const Text(

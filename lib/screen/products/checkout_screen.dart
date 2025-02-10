@@ -178,7 +178,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                               image: NetworkImage(
                                                 item.imageProduk ?? '',
                                               ),
-                                              fit: BoxFit.contain,
+                                              fit: BoxFit.cover,
                                             ),
                                           ),
                                         ),
