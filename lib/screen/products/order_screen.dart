@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:topmortarseller/model/contact_model.dart';
 import 'package:topmortarseller/model/order_model.dart';
+import 'package:topmortarseller/model/order_tabs_model.dart';
 import 'package:topmortarseller/model/product_model.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/util/currency_format.dart';
@@ -18,27 +21,135 @@ class OrderScreen extends StatefulWidget {
   State<OrderScreen> createState() => _OrderScreenState();
 }
 
-class _OrderScreenState extends State<OrderScreen> {
-  ContactModel? _userData;
-  List<OrderModel> _items = [];
-  bool _isLoading = true;
+class _OrderScreenState extends State<OrderScreen>
+    with TickerProviderStateMixin {
+  late final TabController _tabController;
+  late final List<OrderTabsModel> _tabsData = [];
+  // ContactModel? _userData;
 
   @override
   void initState() {
+    _tabController = TabController(length: 5, vsync: this);
     _getUserData();
     super.initState();
   }
 
-  void _getUserData() async {
-    final data = widget.userData ?? await getContactModel();
-    setState(() {
-      _userData = data;
-    });
-
-    _getList();
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
-  void _getList() async {
+  void _getUserData() async {
+    // final data = widget.userData ?? await getContactModel();
+    setState(() {
+      // _userData = data;
+      _tabsData.add(
+        OrderTabsModel(
+          header: const Tab(
+            icon: Icon(Icons.border_all_rounded),
+          ),
+          body: const ListOrder(),
+        ),
+      );
+      _tabsData.add(
+        OrderTabsModel(
+          header: const Tab(
+            icon: Icon(Icons.inventory_2_outlined),
+          ),
+          body: const ListOrder(status: 'diproses'),
+        ),
+      );
+      _tabsData.add(
+        OrderTabsModel(
+          header: const Tab(
+            icon: Icon(Icons.fire_truck_rounded),
+          ),
+          body: const ListOrder(status: 'dikirim'),
+        ),
+      );
+      _tabsData.add(
+        OrderTabsModel(
+          header: const Tab(
+            icon: Icon(Icons.payment_rounded),
+          ),
+          body: const ListOrder(
+            status: 'invoice',
+          ),
+        ),
+      );
+      _tabsData.add(
+        OrderTabsModel(
+          header: const Tab(
+            icon: Icon(Icons.check_circle_sharp),
+          ),
+          body: const ListOrder(status: 'selesai'),
+        ),
+      );
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        title: const Text('Pesanan Saya'),
+        centerTitle: false,
+        backgroundColor: cDark600,
+        foregroundColor: cDark100,
+        bottom: TabBar(
+          controller: _tabController,
+          tabs: _tabsData.map(
+            (item) {
+              return item.header;
+            },
+          ).toList(),
+        ),
+      ),
+      backgroundColor: cDark600,
+      body: TabBarView(
+        controller: _tabController,
+        children: _tabsData.map(
+          (item) {
+            return item.body;
+          },
+        ).toList(),
+      ),
+    );
+  }
+}
+
+class ListOrder extends StatefulWidget {
+  const ListOrder({super.key, this.status});
+
+  final String? status;
+
+  @override
+  State<ListOrder> createState() => _ListOrderState();
+}
+
+class _ListOrderState extends State<ListOrder> {
+  final List<OrderModel> _items = [];
+  bool _isLoading = true;
+  late Timer _getItemTimer;
+
+  @override
+  void initState() {
+    _getList();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _getItemTimer.cancel();
+    super.dispose();
+  }
+
+  void _getList() {
     var product1 = const ProductModel(
         idProduk: '1',
         idCity: '1',
@@ -57,35 +168,71 @@ class _OrderScreenState extends State<OrderScreen> {
             'https://topmortar.com/wp-content/uploads/2021/10/MOCKUP-TA-1000-x-1000.png',
         checkoutCount: '1',
         stok: 200);
-    Future.delayed(const Duration(seconds: 1), () {
+    _getItemTimer = Timer(const Duration(seconds: 1), () {
       setState(() {
-        _items.add(OrderModel(
-            orderDate: '09 Februari 2025',
-            orderStatus: 'sedang diproses',
-            orderStatusColors: List.of({Colors.grey[400]!, Colors.grey[800]!}),
-            orderItems: List.of({product1, product2})));
-        _items.add(OrderModel(
-            orderDate: '08 Februari 2025',
-            orderStatus: 'dalam perjalanan',
-            orderStatusColors: List.of({Colors.blue[100]!, Colors.blue[800]!}),
-            orderItems: List.of({product1})));
-        _items.add(OrderModel(
-            orderDate: '07 Februari 2025',
-            orderStatus: 'dalam perjalanan',
-            orderStatusColors: List.of({Colors.blue[100]!, Colors.blue[800]!}),
-            orderItems: List.of({product2})));
-        _items.add(OrderModel(
-            orderDate: '06 Februari 2025',
-            orderStatus: 'belum lunas',
-            orderStatusColors:
-                List.of({Colors.orange[100]!, Colors.orange[800]!}),
-            orderItems: List.of({product1, product2})));
-        _items.add(OrderModel(
-            orderDate: '05 Februari 2025',
-            orderStatus: 'lunas',
-            orderStatusColors:
-                List.of({Colors.green[100]!, Colors.green[800]!}),
-            orderItems: List.of({product1})));
+        if (widget.status == null || widget.status == 'diproses') {
+          _items.add(
+            OrderModel(
+              orderDate: '09 Februari 2025',
+              orderStatus: 'diproses',
+              orderStatusColors:
+                  List.of({Colors.grey[400]!, Colors.grey[800]!}),
+              orderItems: List.of(
+                {product1, product2},
+              ),
+            ),
+          );
+        }
+        if (widget.status == null || widget.status == 'dikirim') {
+          _items.add(
+            OrderModel(
+              orderDate: '08 Februari 2025',
+              orderStatus: 'dikirim',
+              orderStatusColors:
+                  List.of({Colors.blue[100]!, Colors.blue[800]!}),
+              orderItems: List.of(
+                {product1},
+              ),
+            ),
+          );
+          _items.add(
+            OrderModel(
+              orderDate: '07 Februari 2025',
+              orderStatus: 'dikirim',
+              orderStatusColors:
+                  List.of({Colors.blue[100]!, Colors.blue[800]!}),
+              orderItems: List.of(
+                {product2},
+              ),
+            ),
+          );
+        }
+        if (widget.status == null || widget.status == 'invoice') {
+          _items.add(
+            OrderModel(
+              orderDate: '06 Februari 2025',
+              orderStatus: 'invoice',
+              orderStatusColors:
+                  List.of({Colors.orange[100]!, Colors.orange[800]!}),
+              orderItems: List.of(
+                {product1, product2},
+              ),
+            ),
+          );
+        }
+        if (widget.status == null || widget.status == 'selesai') {
+          _items.add(
+            OrderModel(
+              orderDate: '05 Februari 2025',
+              orderStatus: 'selesai',
+              orderStatusColors:
+                  List.of({Colors.green[100]!, Colors.green[800]!}),
+              orderItems: List.of(
+                {product1},
+              ),
+            ),
+          );
+        }
         _isLoading = false;
       });
     });
@@ -93,33 +240,35 @@ class _OrderScreenState extends State<OrderScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: const Text('Pesanan Saya'),
-        centerTitle: false,
-        backgroundColor: cDark600,
-        foregroundColor: cDark100,
-      ),
-      backgroundColor: cDark600,
-      body: _isLoading
-          ? const LoadingModal()
-          : Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 12,
-              ),
-              child: ListView.builder(
-                itemCount: _items.length,
-                itemBuilder: (ctx, idx) {
-                  var orderItem = _items[idx];
-                  return CardOrder(item: orderItem);
-                },
-              ),
-            ),
-    );
+    return _isLoading
+        ? const LoadingModal()
+        : Padding(
+            padding: _items.isEmpty
+                ? const EdgeInsets.all(12)
+                : const EdgeInsets.symmetric(horizontal: 12),
+            child: _items.isEmpty
+                ? const Text(
+                    'Belum ada pesananan',
+                    textAlign: TextAlign.center,
+                  )
+                : ListView.separated(
+                    itemCount: _items.length,
+                    separatorBuilder: (context, index) {
+                      return const SizedBox(height: 12);
+                    },
+                    itemBuilder: (ctx, idx) {
+                      var orderItem = _items[idx];
+                      return Padding(
+                        padding: idx == 0
+                            ? const EdgeInsets.only(top: 12)
+                            : idx == _items.length - 1
+                                ? const EdgeInsets.only(bottom: 12)
+                                : const EdgeInsets.all(0),
+                        child: CardOrder(item: orderItem),
+                      );
+                    },
+                  ),
+          );
   }
 }
 
@@ -141,7 +290,6 @@ class CardOrder extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       color: cWhite,
-      margin: const EdgeInsets.only(bottom: 12),
       clipBehavior: Clip.antiAliasWithSaveLayer,
       elevation: 0,
       shadowColor: cDark600,
@@ -269,8 +417,8 @@ class CardOrder extends StatelessWidget {
                     ],
                   ),
                 ),
-                if (item.orderStatus == 'belum lunas' ||
-                    item.orderStatus == 'lunas') ...[
+                if (item.orderStatus == 'invoice' ||
+                    item.orderStatus == 'selesai') ...[
                   InkWell(
                     onTap: () {},
                     child: Material(
@@ -297,7 +445,7 @@ class CardOrder extends StatelessWidget {
                       ),
                     ),
                   ),
-                  SizedBox(width: 8),
+                  const SizedBox(width: 8),
                 ],
                 InkWell(
                   onTap: () {},
