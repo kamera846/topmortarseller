@@ -72,6 +72,19 @@ class _CatalogScreenState extends State<CatalogScreen> {
     );
   }
 
+  Future<void> _onRefresh() async {
+    setState(() {
+      _isLoading = true;
+      items = [];
+      checkoutedItems = [];
+      _showOverlay = false;
+      _selectedItem = null;
+      totalPrice = 0;
+      totalItems = 0;
+    });
+    _getList();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -88,186 +101,195 @@ class _CatalogScreenState extends State<CatalogScreen> {
             backgroundColor: cWhite,
             foregroundColor: cDark100,
           ),
-          body: _isLoading
-              ? const LoadingModal()
-              : Column(
-                  children: [
-                    Expanded(
-                      child: GridView(
-                        padding: const EdgeInsets.all(12),
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          childAspectRatio: 1 / 1.5,
-                          crossAxisSpacing: 6,
-                          mainAxisSpacing: 6,
-                        ),
-                        children: [
-                          for (final item in items)
-                            Card(
-                              color: cWhite,
-                              clipBehavior: Clip.antiAliasWithSaveLayer,
-                              child: InkWell(
-                                onTap: item.stok == null || item.stok! == 0
-                                    ? null
-                                    : () {
-                                        setState(() {
-                                          _selectedItem = item;
-                                          _showOverlay = true;
-                                        });
-                                      },
-                                child: SizedBox(
-                                  width: double.infinity,
-                                  height: double.infinity,
-                                  child: Stack(
-                                    children: [
-                                      Column(
-                                        children: [
-                                          Expanded(
-                                            flex: 3,
-                                            child: Container(
-                                              color: cDark600,
-                                              width: double.infinity,
-                                              height: double.infinity,
-                                              child: Image.network(
-                                                item.imageProduk ?? '',
-                                                fit: BoxFit.cover,
+          body: RefreshIndicator(
+            onRefresh: () => _onRefresh(),
+            child: _isLoading
+                ? const LoadingModal()
+                : Column(
+                    children: [
+                      Expanded(
+                        child: GridView(
+                          padding: const EdgeInsets.all(12),
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            childAspectRatio: 1 / 1.5,
+                            crossAxisSpacing: 6,
+                            mainAxisSpacing: 6,
+                          ),
+                          children: [
+                            for (final item in items)
+                              Card(
+                                color: cWhite,
+                                clipBehavior: Clip.antiAliasWithSaveLayer,
+                                child: InkWell(
+                                  onTap: item.stok == null || item.stok! == 0
+                                      ? null
+                                      : () {
+                                          setState(() {
+                                            _selectedItem = item;
+                                            _showOverlay = true;
+                                          });
+                                        },
+                                  child: SizedBox(
+                                    width: double.infinity,
+                                    height: double.infinity,
+                                    child: Stack(
+                                      children: [
+                                        Column(
+                                          children: [
+                                            Expanded(
+                                              flex: 3,
+                                              child: Container(
+                                                color: cDark600,
+                                                width: double.infinity,
+                                                height: double.infinity,
+                                                child: Image.network(
+                                                  item.imageProduk ?? '',
+                                                  fit: BoxFit.cover,
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                          Expanded(
-                                            flex: 2,
-                                            child: Container(
-                                              color: Colors.white,
-                                              padding: const EdgeInsets.all(12),
-                                              width: double.infinity,
-                                              child: Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      Text(
-                                                        item.namaProduk ?? '',
-                                                        maxLines: 2,
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                      ),
-                                                      Text(
-                                                        CurrencyFormat().format(
-                                                          amount: double.parse(
-                                                              item.hargaProduk!),
+                                            Expanded(
+                                              flex: 2,
+                                              child: Container(
+                                                color: Colors.white,
+                                                padding:
+                                                    const EdgeInsets.all(12),
+                                                width: double.infinity,
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text(
+                                                          item.namaProduk ?? '',
+                                                          maxLines: 2,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
                                                         ),
-                                                        style: const TextStyle(
-                                                          color: cPrimary400,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  Row(
-                                                    children: [
-                                                      Expanded(
-                                                        child: Text(
-                                                          'Stok ${item.stok != null && item.stok! != 0 ? 'tersedia' : 'habis'}',
+                                                        Text(
+                                                          CurrencyFormat()
+                                                              .format(
+                                                            amount: double
+                                                                .parse(item
+                                                                    .hargaProduk!),
+                                                          ),
                                                           style:
                                                               const TextStyle(
-                                                            color: cDark200,
+                                                            color: cPrimary400,
+                                                            fontWeight:
+                                                                FontWeight.bold,
                                                           ),
                                                         ),
-                                                      ),
-                                                      if (item.checkoutCount!
-                                                              .isNotEmpty &&
-                                                          item.checkoutCount !=
-                                                              '0') ...[
-                                                        const Icon(
-                                                            Icons.trolley),
-                                                        Container(
-                                                          width: 20,
-                                                          height: 20,
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            color: cPrimary100,
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        100),
-                                                          ),
-                                                          child: Center(
-                                                            child: Text(
-                                                              item.checkoutCount ??
-                                                                  '',
-                                                              style:
-                                                                  const TextStyle(
-                                                                color: cWhite,
-                                                                fontSize: 10,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                              ),
+                                                      ],
+                                                    ),
+                                                    Row(
+                                                      children: [
+                                                        Expanded(
+                                                          child: Text(
+                                                            'Stok ${item.stok != null && item.stok! != 0 ? 'tersedia' : 'habis'}',
+                                                            style:
+                                                                const TextStyle(
+                                                              color: cDark200,
                                                             ),
                                                           ),
-                                                        )
-                                                      ]
-                                                    ],
-                                                  )
-                                                ],
+                                                        ),
+                                                        if (item.checkoutCount!
+                                                                .isNotEmpty &&
+                                                            item.checkoutCount !=
+                                                                '0') ...[
+                                                          const Icon(
+                                                              Icons.trolley),
+                                                          Container(
+                                                            width: 20,
+                                                            height: 20,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              color:
+                                                                  cPrimary100,
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          100),
+                                                            ),
+                                                            child: Center(
+                                                              child: Text(
+                                                                item.checkoutCount ??
+                                                                    '',
+                                                                style:
+                                                                    const TextStyle(
+                                                                  color: cWhite,
+                                                                  fontSize: 10,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          )
+                                                        ]
+                                                      ],
+                                                    )
+                                                  ],
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                        ],
-                                      ),
-                                      if (item.stok == null || item.stok! == 0)
-                                        BackdropFilter(
-                                          filter: ImageFilter.blur(
-                                              sigmaX: 1.5, sigmaY: 1.5),
-                                          child: Container(
-                                            color: cDark200.withOpacity(0.7),
-                                            width: double.infinity,
-                                            height: double.infinity,
-                                            child: const Center(
-                                              child: Text(
-                                                'Stok Habis',
-                                                style: TextStyle(
-                                                  color: cWhite,
+                                          ],
+                                        ),
+                                        if (item.stok == null ||
+                                            item.stok! == 0)
+                                          BackdropFilter(
+                                            filter: ImageFilter.blur(
+                                                sigmaX: 1.5, sigmaY: 1.5),
+                                            child: Container(
+                                              color: cDark200.withOpacity(0.7),
+                                              width: double.infinity,
+                                              height: double.infinity,
+                                              child: const Center(
+                                                child: Text(
+                                                  'Stok Habis',
+                                                  style: TextStyle(
+                                                    color: cWhite,
+                                                  ),
                                                 ),
                                               ),
                                             ),
                                           ),
-                                        ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                            )
-                        ],
+                              )
+                          ],
+                        ),
                       ),
-                    ),
-                    if (checkoutedItems.isNotEmpty)
-                      CheckoutedItems(
-                        items: checkoutedItems,
-                        totalItems: totalItems,
-                        totalPrice: totalPrice,
-                        onCheckout: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (ctx) => CheckoutScreen(
-                                items: checkoutedItems,
+                      if (checkoutedItems.isNotEmpty)
+                        CheckoutedItems(
+                          items: checkoutedItems,
+                          totalItems: totalItems,
+                          totalPrice: totalPrice,
+                          onCheckout: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (ctx) => CheckoutScreen(
+                                  items: checkoutedItems,
+                                ),
                               ),
-                            ),
-                          );
-                        },
-                      )
-                  ],
-                ),
+                            );
+                          },
+                        )
+                    ],
+                  ),
+          ),
         ),
         if (_showOverlay && _selectedItem != null && !_isLoading)
           OverlayItem(

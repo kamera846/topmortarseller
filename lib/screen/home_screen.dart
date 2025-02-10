@@ -42,6 +42,17 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
   }
 
+  Future<void> _onRefresh() async {
+    setState(() {
+      _userData = null;
+      isLoading = true;
+      isFeedLoading = true;
+      listFeed = null;
+      mediaLink = null;
+    });
+    _getUserData();
+  }
+
   void _getUserData() async {
     final data = widget.userData ?? await getContactModel();
     setState(() => _userData = data);
@@ -190,24 +201,28 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
             drawer: MainDrawer(userData: _userData),
-            body: SingleChildScrollView(
-              child: Center(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    CardPromoScanner(userData: widget.userData),
-                    Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: Text(
-                        'Informasi menarik untuk anda',
-                        style: Theme.of(context).textTheme.titleSmall!.copyWith(
-                              color: cDark100,
-                              fontWeight: FontWeight.bold,
-                            ),
+            body: RefreshIndicator(
+              onRefresh: () => _onRefresh(),
+              child: SingleChildScrollView(
+                child: Center(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      CardPromoScanner(userData: widget.userData),
+                      Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: Text(
+                          'Informasi menarik untuk anda',
+                          style:
+                              Theme.of(context).textTheme.titleSmall!.copyWith(
+                                    color: cDark100,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                        ),
                       ),
-                    ),
-                    listFeedContent
-                  ],
+                      listFeedContent
+                    ],
+                  ),
                 ),
               ),
             ),

@@ -149,6 +149,13 @@ class _ListOrderState extends State<ListOrder> {
     super.dispose();
   }
 
+  Future<void> _onRefresh() async {
+    setState(() {
+      _isLoading = true;
+    });
+    _getList();
+  }
+
   void _getList() {
     var product1 = const ProductModel(
         idProduk: '1',
@@ -240,35 +247,38 @@ class _ListOrderState extends State<ListOrder> {
 
   @override
   Widget build(BuildContext context) {
-    return _isLoading
-        ? const LoadingModal()
-        : Padding(
-            padding: _items.isEmpty
-                ? const EdgeInsets.all(12)
-                : const EdgeInsets.symmetric(horizontal: 12),
-            child: _items.isEmpty
-                ? const Text(
-                    'Belum ada pesananan',
-                    textAlign: TextAlign.center,
-                  )
-                : ListView.separated(
-                    itemCount: _items.length,
-                    separatorBuilder: (context, index) {
-                      return const SizedBox(height: 12);
-                    },
-                    itemBuilder: (ctx, idx) {
-                      var orderItem = _items[idx];
-                      return Padding(
-                        padding: idx == 0
-                            ? const EdgeInsets.only(top: 12)
-                            : idx == _items.length - 1
-                                ? const EdgeInsets.only(bottom: 12)
-                                : const EdgeInsets.all(0),
-                        child: CardOrder(item: orderItem),
-                      );
-                    },
-                  ),
-          );
+    return RefreshIndicator(
+      onRefresh: () => _onRefresh(),
+      child: _isLoading
+          ? const LoadingModal()
+          : Padding(
+              padding: _items.isEmpty
+                  ? const EdgeInsets.all(12)
+                  : const EdgeInsets.symmetric(horizontal: 12),
+              child: _items.isEmpty
+                  ? const Text(
+                      'Belum ada pesananan',
+                      textAlign: TextAlign.center,
+                    )
+                  : ListView.separated(
+                      itemCount: _items.length,
+                      separatorBuilder: (context, index) {
+                        return const SizedBox(height: 12);
+                      },
+                      itemBuilder: (ctx, idx) {
+                        var orderItem = _items[idx];
+                        return Padding(
+                          padding: idx == 0
+                              ? const EdgeInsets.only(top: 12)
+                              : idx == _items.length - 1
+                                  ? const EdgeInsets.only(bottom: 12)
+                                  : const EdgeInsets.all(0),
+                          child: CardOrder(item: orderItem),
+                        );
+                      },
+                    ),
+            ),
+    );
   }
 }
 
