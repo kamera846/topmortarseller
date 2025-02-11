@@ -5,6 +5,7 @@ import 'package:topmortarseller/model/contact_model.dart';
 import 'package:topmortarseller/model/order_model.dart';
 import 'package:topmortarseller/model/order_tabs_model.dart';
 import 'package:topmortarseller/model/product_model.dart';
+import 'package:topmortarseller/screen/products/checkout_screen.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/util/currency_format.dart';
 import 'package:topmortarseller/widget/modal/loading_modal.dart';
@@ -458,7 +459,17 @@ class CardOrder extends StatelessWidget {
                   const SizedBox(width: 8),
                 ],
                 InkWell(
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (ctx) => CheckoutScreen(
+                          items: item.orderItems,
+                          orderItem: item,
+                        ),
+                      ),
+                    );
+                  },
                   splashColor: cDark100,
                   child: Material(
                     color: Colors.transparent,

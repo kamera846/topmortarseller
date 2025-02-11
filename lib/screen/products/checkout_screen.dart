@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:topmortarseller/model/order_model.dart';
 import 'package:topmortarseller/model/product_model.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/util/currency_format.dart';
@@ -19,9 +20,11 @@ class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({
     super.key,
     required this.items,
+    this.orderItem,
   });
 
   final List<ProductModel> items;
+  final OrderModel? orderItem;
 
   @override
   State<CheckoutScreen> createState() => _CheckoutScreenState();
@@ -42,49 +45,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     super.initState();
   }
 
-  void _getList() async {
-    setState(() {
-      items = widget.items;
-      diskons.add(
-          const ProductDiskonModel(title: 'Diskon aplikasi', diskon: -10000));
-      diskons.add(const ProductDiskonModel(
-          title: 'Diskon toko priority', diskon: -15000));
-      diskons.add(
-          const ProductDiskonModel(title: 'Voucher 10.000', diskon: -10000));
-      diskons.add(const ProductDiskonModel(title: 'Biaya admin', diskon: 500));
-      _isLoading = false;
-    });
-  }
-
-  String getTotalPrices() {
-    var totalPrice = 0.0;
-    for (var item in items) {
-      double totalPriceProduct = double.parse(item.hargaProduk ?? '0') *
-          double.parse(item.checkoutCount ?? '0');
-      setState(() {
-        totalPrice += totalPriceProduct;
-      });
-    }
-    return CurrencyFormat().format(amount: totalPrice, fractionDigits: 2);
-  }
-
-  String getTotalAfterDiskon() {
-    var totalPrice = 0.0;
-    var totalDiskon = 0.0;
-    for (var item in items) {
-      double totalPriceProduct = double.parse(item.hargaProduk ?? '0') *
-          double.parse(item.checkoutCount ?? '0');
-      setState(() {
-        totalPrice += totalPriceProduct;
-      });
-    }
-    for (var item in diskons) {
-      totalDiskon += item.diskon;
-    }
-    var totalAfterDiskon = totalPrice + totalDiskon;
-    return CurrencyFormat().format(amount: totalAfterDiskon, fractionDigits: 2);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -94,7 +54,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: const Text('Checkout'),
+        title: Text(widget.orderItem != null ? 'Pesanan Saya' : 'Checkout'),
         centerTitle: false,
         backgroundColor: cWhite,
         foregroundColor: cDark100,
@@ -110,23 +70,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                         Container(
                           margin: const EdgeInsets.only(bottom: 24),
                           padding: const EdgeInsets.all(24),
-                          color: Colors.yellow[700]?.withAlpha(180),
+                          color: getReminderBackgroundColor(),
                           width: double.infinity,
-                          child: const Row(
+                          child: Row(
                             children: [
-                              Icon(Icons.info_outline),
-                              SizedBox(width: 12),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Periksa produk sebelum checkout',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
-                                  ),
-                                  Text('Pastikan setiap detail sudah sesuai'),
-                                ],
-                              )
+                              getReminderIcon(),
+                              const SizedBox(width: 12),
+                              getReminderTitleAndDescriptionText()
                             ],
                           ),
                         ),
@@ -319,26 +269,142 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     ),
                   ),
                 ),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(24),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    border: Border.symmetric(
-                      horizontal: BorderSide(
-                        color: cDark600,
-                        width: 1,
+                if (widget.orderItem == null)
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(24),
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      border: Border.symmetric(
+                        horizontal: BorderSide(
+                          color: cDark600,
+                          width: 1,
+                        ),
                       ),
                     ),
+                    child: MElevatedButton(
+                      onPressed: () {},
+                      title: 'Checkout Sekarang',
+                      isFullWidth: true,
+                    ),
                   ),
-                  child: MElevatedButton(
-                    onPressed: () {},
-                    title: 'Checkout Sekarang',
-                    isFullWidth: true,
-                  ),
-                ),
               ],
             ),
+    );
+  }
+
+  void _getList() async {
+    setState(() {
+      items = widget.items;
+      diskons.add(
+          const ProductDiskonModel(title: 'Diskon aplikasi', diskon: -10000));
+      diskons.add(const ProductDiskonModel(
+          title: 'Diskon toko priority', diskon: -15000));
+      diskons.add(
+          const ProductDiskonModel(title: 'Voucher 10.000', diskon: -10000));
+      diskons.add(const ProductDiskonModel(title: 'Biaya admin', diskon: 500));
+      _isLoading = false;
+    });
+  }
+
+  String getTotalPrices() {
+    var totalPrice = 0.0;
+    for (var item in items) {
+      double totalPriceProduct = double.parse(item.hargaProduk ?? '0') *
+          double.parse(item.checkoutCount ?? '0');
+      setState(() {
+        totalPrice += totalPriceProduct;
+      });
+    }
+    return CurrencyFormat().format(amount: totalPrice, fractionDigits: 2);
+  }
+
+  String getTotalAfterDiskon() {
+    var totalPrice = 0.0;
+    var totalDiskon = 0.0;
+    for (var item in items) {
+      double totalPriceProduct = double.parse(item.hargaProduk ?? '0') *
+          double.parse(item.checkoutCount ?? '0');
+      setState(() {
+        totalPrice += totalPriceProduct;
+      });
+    }
+    for (var item in diskons) {
+      totalDiskon += item.diskon;
+    }
+    var totalAfterDiskon = totalPrice + totalDiskon;
+    return CurrencyFormat().format(amount: totalAfterDiskon, fractionDigits: 2);
+  }
+
+  Color getReminderBackgroundColor() {
+    if (widget.orderItem != null) {
+      var orderStatus = widget.orderItem?.orderStatus;
+      if (orderStatus == 'diproses') {
+        return Colors.grey[400]!;
+      } else if (orderStatus == 'dikirim') {
+        return Colors.blue[100]!;
+      } else if (orderStatus == 'invoice') {
+        return Colors.orange[100]!;
+      } else if (orderStatus == 'selesai') {
+        return Colors.green[100]!;
+      } else {
+        return Colors.yellow[700]!.withAlpha(180);
+      }
+    } else {
+      return Colors.yellow[700]!.withAlpha(180);
+    }
+  }
+
+  Widget getReminderIcon() {
+    if (widget.orderItem != null) {
+      var orderStatus = widget.orderItem?.orderStatus;
+      if (orderStatus == 'diproses') {
+        return const Icon(Icons.inventory_2_outlined);
+      } else if (orderStatus == 'dikirim') {
+        return const Icon(Icons.fire_truck_rounded);
+      } else if (orderStatus == 'invoice') {
+        return const Icon(Icons.payment_rounded);
+      } else if (orderStatus == 'selesai') {
+        return const Icon(Icons.check_circle_sharp);
+      } else {
+        return const Icon(Icons.info_outline);
+      }
+    } else {
+      return const Icon(Icons.info_outline);
+    }
+  }
+
+  Column getReminderTitleAndDescriptionText() {
+    var title = 'Periksa produk sebelum checkout';
+    var description = 'Pastikan setiap detail sudah sesuai';
+    if (widget.orderItem != null) {
+      var orderStatus = widget.orderItem?.orderStatus;
+      if (orderStatus == 'diproses') {
+        title = 'Status pesanan sedang diproses';
+        description = 'Sabarr ngab :))';
+      } else if (orderStatus == 'dikirim') {
+        title = 'Status pesanan sedang dikirim';
+        description = 'Otewe niih :)';
+      } else if (orderStatus == 'invoice') {
+        title = 'Status pesanan sudah diterima';
+        description = 'Bayarr woyy';
+      } else if (orderStatus == 'selesai') {
+        title = 'Status pesanan sudah selesai';
+        description = 'Terimakasih bos, cair nih caiirr ..';
+      } else {
+        title = '-';
+        description = '-';
+      }
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        Text(description),
+      ],
     );
   }
 }
