@@ -3,6 +3,7 @@ import 'package:topmortarseller/model/order_model.dart';
 import 'package:topmortarseller/model/product_model.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/util/currency_format.dart';
+import 'package:topmortarseller/util/enum.dart';
 import 'package:topmortarseller/widget/form/button/elevated_button.dart';
 import 'package:topmortarseller/widget/modal/loading_modal.dart';
 
@@ -273,7 +274,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     ),
                   ),
                 ),
-                if (widget.orderItem == null)
+                if (widget.orderItem == null ||
+                    (widget.orderItem != null &&
+                        widget.orderItem!.orderStatus ==
+                            StatusOrder.invoice.name))
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(24),
@@ -288,7 +292,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     ),
                     child: MElevatedButton(
                       onPressed: () {},
-                      title: 'Checkout Sekarang',
+                      title: widget.orderItem != null &&
+                              widget.orderItem!.orderStatus ==
+                                  StatusOrder.invoice.name
+                          ? 'Bayar Sekarang'
+                          : 'Checkout Sekarang',
                       isFullWidth: true,
                     ),
                   ),
@@ -306,7 +314,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           title: 'Diskon toko priority', diskon: -15000));
       diskons.add(
           const ProductDiskonModel(title: 'Voucher 10.000', diskon: -10000));
-      diskons.add(const ProductDiskonModel(title: 'Biaya admin', diskon: 500));
+      diskons.add(const ProductDiskonModel(title: 'Biaya admin', diskon: 1000));
       _isLoading = false;
     });
   }

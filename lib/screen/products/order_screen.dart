@@ -8,6 +8,7 @@ import 'package:topmortarseller/model/product_model.dart';
 import 'package:topmortarseller/screen/products/checkout_screen.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/util/currency_format.dart';
+import 'package:topmortarseller/util/enum.dart';
 import 'package:topmortarseller/widget/modal/loading_modal.dart';
 
 class OrderScreen extends StatefulWidget {
@@ -543,9 +544,11 @@ class CardOrder extends StatelessWidget {
                             width: 1,
                           ),
                         ),
-                        child: const Text(
-                          'Lihat Invoice',
-                          style: TextStyle(
+                        child: Text(
+                          item.orderStatus == StatusOrder.invoice.name
+                              ? 'Bayar'
+                              : 'Lihat Invoice',
+                          style: const TextStyle(
                             color: cPrimary100,
                             fontWeight: FontWeight.bold,
                             fontSize: 12,
