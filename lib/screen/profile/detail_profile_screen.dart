@@ -421,7 +421,7 @@ class DetailProfileHeader extends StatelessWidget {
           const SizedBox(height: 12),
           Row(
             children: [
-              const SizedBox(width: 12),
+              const SizedBox(width: 24),
               const Hero(
                 tag: TagHero.mainDrawerHeader,
                 child: Icon(
@@ -441,11 +441,12 @@ class DetailProfileHeader extends StatelessWidget {
                             color: cWhite,
                           ),
                     ),
+              const SizedBox(width: 24),
             ],
           ),
           const SizedBox(height: 6),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 24),
             child: description == null
                 ? const LoadingItem(
                     isPrimaryTheme: true,
