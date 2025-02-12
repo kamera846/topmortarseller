@@ -295,12 +295,16 @@ class _ListOrderState extends State<ListOrder> {
             widget.status == StatusOrder.diproses.name) {
           _items.add(
             OrderModel(
+              idOrder: '1',
               orderDate: '09 Februari 2025',
               orderStatus: StatusOrder.diproses.name,
               orderStatusColors:
                   List.of({Colors.grey[400]!, Colors.grey[800]!}),
               orderItems: List.of(
-                {product1, product2},
+                {
+                  product1.copyWith(idProduk: '1'),
+                  product2.copyWith(idProduk: '2')
+                },
               ),
             ),
           );
@@ -309,23 +313,25 @@ class _ListOrderState extends State<ListOrder> {
             widget.status == StatusOrder.dikirim.name) {
           _items.add(
             OrderModel(
+              idOrder: '2',
               orderDate: '08 Februari 2025',
               orderStatus: StatusOrder.dikirim.name,
               orderStatusColors:
                   List.of({Colors.blue[100]!, Colors.blue[800]!}),
               orderItems: List.of(
-                {product1},
+                {product1.copyWith(idProduk: '3')},
               ),
             ),
           );
           _items.add(
             OrderModel(
+              idOrder: '3',
               orderDate: '07 Februari 2025',
               orderStatus: StatusOrder.dikirim.name,
               orderStatusColors:
                   List.of({Colors.blue[100]!, Colors.blue[800]!}),
               orderItems: List.of(
-                {product2},
+                {product2.copyWith(idProduk: '4')},
               ),
             ),
           );
@@ -334,12 +340,16 @@ class _ListOrderState extends State<ListOrder> {
             widget.status == StatusOrder.invoice.name) {
           _items.add(
             OrderModel(
+              idOrder: '4',
               orderDate: '06 Februari 2025',
               orderStatus: StatusOrder.invoice.name,
               orderStatusColors:
                   List.of({Colors.orange[100]!, Colors.orange[800]!}),
               orderItems: List.of(
-                {product1, product2},
+                {
+                  product1.copyWith(idProduk: '5'),
+                  product2.copyWith(idProduk: '6')
+                },
               ),
             ),
           );
@@ -348,12 +358,13 @@ class _ListOrderState extends State<ListOrder> {
             widget.status == StatusOrder.selesai.name) {
           _items.add(
             OrderModel(
+              idOrder: '5',
               orderDate: '05 Februari 2025',
               orderStatus: StatusOrder.selesai.name,
               orderStatusColors:
                   List.of({Colors.green[100]!, Colors.green[800]!}),
               orderItems: List.of(
-                {product1},
+                {product1.copyWith(idProduk: '7')},
               ),
             ),
           );
@@ -447,17 +458,19 @@ class CardOrder extends StatelessWidget {
                   margin: const EdgeInsets.only(bottom: 12),
                   child: Row(
                     children: [
-                      Container(
-                        width: 50,
-                        margin: const EdgeInsets.only(right: 12),
-                        decoration: BoxDecoration(
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Container(
                           color: cDark600,
-                          borderRadius: BorderRadius.circular(8),
-                          image: DecorationImage(
-                            image: NetworkImage(
+                          width: 50,
+                          height: 50,
+                          margin: const EdgeInsets.only(right: 12),
+                          child: Hero(
+                            tag: 'product-${product.idProduk}-${item.idOrder}',
+                            child: Image.network(
                               product.imageProduk ?? '',
+                              fit: BoxFit.cover,
                             ),
-                            fit: BoxFit.cover,
                           ),
                         ),
                       ),

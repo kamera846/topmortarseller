@@ -118,17 +118,21 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        Container(
-                                          width: 90,
-                                          decoration: BoxDecoration(
+                                        ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          child: Container(
                                             color: cDark600,
-                                            borderRadius:
-                                                BorderRadius.circular(12),
-                                            image: DecorationImage(
-                                              image: NetworkImage(
+                                            width: 90,
+                                            height: 90,
+                                            child: Hero(
+                                              tag: widget.orderItem != null
+                                                  ? 'product-${item.idProduk}-${widget.orderItem!.idOrder}'
+                                                  : 'product-${item.idProduk}',
+                                              child: Image.network(
                                                 item.imageProduk ?? '',
+                                                fit: BoxFit.cover,
                                               ),
-                                              fit: BoxFit.cover,
                                             ),
                                           ),
                                         ),

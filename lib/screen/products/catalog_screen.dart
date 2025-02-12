@@ -144,9 +144,13 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                                 color: cDark600,
                                                 width: double.infinity,
                                                 height: double.infinity,
-                                                child: Image.network(
-                                                  item.imageProduk ?? '',
-                                                  fit: BoxFit.cover,
+                                                child: Hero(
+                                                  tag:
+                                                      'product-${item.idProduk}',
+                                                  child: Image.network(
+                                                    item.imageProduk ?? '',
+                                                    fit: BoxFit.cover,
+                                                  ),
                                                 ),
                                               ),
                                             ),
