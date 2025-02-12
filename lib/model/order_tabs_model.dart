@@ -1,12 +1,5 @@
 import 'package:flutter/material.dart';
 
-enum StatusOrder {
-  diproses,
-  dikirim,
-  invoice,
-  selesai,
-}
-
 class OrderTabsModel {
   final Widget header;
   final Widget body;

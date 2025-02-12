@@ -20,3 +20,18 @@ enum GlobalEnum {
   contactModel,
   skipCreateBank,
 }
+
+enum AuthType {
+  login,
+  register,
+  forgot,
+  otp,
+  resetPassword,
+}
+
+enum StatusOrder {
+  diproses,
+  dikirim,
+  invoice,
+  selesai,
+}

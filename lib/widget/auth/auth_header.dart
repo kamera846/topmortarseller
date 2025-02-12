@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:topmortarseller/util/auth_settings.dart';
 import 'package:topmortarseller/util/enum.dart';
-import 'package:topmortarseller/model/auth_settings_model.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 
 class AuthHeaderWidget extends StatelessWidget {
