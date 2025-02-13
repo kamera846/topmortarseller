@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:topmortarseller/model/order_model.dart';
 import 'package:topmortarseller/model/product_model.dart';
+import 'package:topmortarseller/screen/products/invoice_screen.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/util/currency_format.dart';
 import 'package:topmortarseller/util/enum.dart';
@@ -291,7 +292,20 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       ),
                     ),
                     child: MElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        if (widget.orderItem != null &&
+                            widget.orderItem!.orderStatus ==
+                                StatusOrder.invoice.name) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (ctx) => InvoiceScreen(
+                                orderItem: widget.orderItem!,
+                              ),
+                            ),
+                          );
+                        }
+                      },
                       title: widget.orderItem != null &&
                               widget.orderItem!.orderStatus ==
                                   StatusOrder.invoice.name

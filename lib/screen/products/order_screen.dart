@@ -6,6 +6,7 @@ import 'package:topmortarseller/model/order_model.dart';
 import 'package:topmortarseller/model/order_tabs_model.dart';
 import 'package:topmortarseller/model/product_model.dart';
 import 'package:topmortarseller/screen/products/checkout_screen.dart';
+import 'package:topmortarseller/screen/products/invoice_screen.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/util/currency_format.dart';
 import 'package:topmortarseller/util/enum.dart';
@@ -530,29 +531,35 @@ class CardOrder extends StatelessWidget {
                 if (item.orderStatus == StatusOrder.invoice.name ||
                     item.orderStatus == StatusOrder.selesai.name) ...[
                   InkWell(
-                    onTap: () {},
-                    child: Material(
-                      color: Colors.transparent,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: Colors.transparent,
-                          borderRadius: BorderRadius.circular(6),
-                          border: Border.all(
-                            color: cPrimary100.withAlpha(200),
-                            width: 1,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (ctx) => InvoiceScreen(
+                            orderItem: item,
                           ),
                         ),
-                        child: Text(
-                          item.orderStatus == StatusOrder.invoice.name
-                              ? 'Bayar'
-                              : 'Lihat Invoice',
-                          style: const TextStyle(
-                            color: cPrimary100,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
-                          ),
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.transparent,
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(
+                          color: cPrimary100.withAlpha(200),
+                          width: 1,
+                        ),
+                      ),
+                      child: Text(
+                        item.orderStatus == StatusOrder.invoice.name
+                            ? 'Bayar'
+                            : 'Lihat Invoice',
+                        style: const TextStyle(
+                          color: cPrimary100,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
                         ),
                       ),
                     ),
@@ -571,23 +578,19 @@ class CardOrder extends StatelessWidget {
                       ),
                     );
                   },
-                  splashColor: cDark100,
-                  child: Material(
-                    color: Colors.transparent,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: cPrimary100.withAlpha(200),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: const Text(
-                        'Detail Pesanan',
-                        style: TextStyle(
-                          color: cWhite,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
-                        ),
+                  child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: cPrimary100,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: const Text(
+                      'Detail Pesanan',
+                      style: TextStyle(
+                        color: cWhite,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
                       ),
                     ),
                   ),
