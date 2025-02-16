@@ -41,7 +41,8 @@ class _CatalogScreenState extends State<CatalogScreen> {
   }
 
   void _getUserData() async {
-    final data = widget.userData ?? await getContactModel();
+    // final data = widget.userData ?? await getContactModel();
+    final data = await getContactModel();
     setState(() {
       _userData = data;
     });

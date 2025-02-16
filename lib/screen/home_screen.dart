@@ -54,7 +54,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _getUserData() async {
-    final data = widget.userData ?? await getContactModel();
+    // final data = widget.userData ?? await getContactModel();
+    final data = await getContactModel();
     setState(() => _userData = data);
     final prefs = await SharedPreferences.getInstance();
     final isSkipCreateBank =

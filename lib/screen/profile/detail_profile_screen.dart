@@ -42,7 +42,8 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
   void _getUserData() async {
     setState(() => isLoading = true);
 
-    final data = widget.userData ?? await getContactModel();
+    // // final data = widget.userData ?? await getContactModel();
+    final data = await getContactModel();
     setState(() {
       _userData = data;
 
@@ -176,7 +177,7 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          redeemItem.nama!,
+                          redeemItem.nama!.isEmpty ? 'null' : redeemItem.nama!,
                           softWrap: true,
                           overflow: TextOverflow.visible,
                           style: Theme.of(context).textTheme.bodyLarge,
@@ -432,8 +433,10 @@ class DetailProfileHeader extends StatelessWidget {
               ),
               const SizedBox(width: 12),
               title == null
-                  ? const LoadingItem(
-                      isPrimaryTheme: true,
+                  ? const Expanded(
+                      child: LoadingItem(
+                        isPrimaryTheme: true,
+                      ),
                     )
                   : Text(
                       title!,
@@ -448,8 +451,10 @@ class DetailProfileHeader extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: description == null
-                ? const LoadingItem(
-                    isPrimaryTheme: true,
+                ? const Expanded(
+                    child: LoadingItem(
+                      isPrimaryTheme: true,
+                    ),
                   )
                 : Text(
                     description!,

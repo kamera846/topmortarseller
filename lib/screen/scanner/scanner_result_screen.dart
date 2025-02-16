@@ -41,7 +41,8 @@ class _ScannerResultScreenState extends State<ScannerResultScreen> {
   void _getUserData() async {
     setState(() => isLoading = true);
 
-    final data = widget.userData ?? await getContactModel();
+    // final data = widget.userData ?? await getContactModel();
+    final data = await getContactModel();
     setState(() {
       _userData = data;
     });
