@@ -460,10 +460,8 @@ class DetailProfileHeader extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: description == null
-                ? const Expanded(
-                    child: LoadingItem(
-                      isPrimaryTheme: true,
-                    ),
+                ? const LoadingItem(
+                    isPrimaryTheme: true,
                   )
                 : Text(
                     description!,
