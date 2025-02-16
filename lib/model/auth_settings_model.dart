@@ -1,11 +1,3 @@
-enum AuthType {
-  login,
-  register,
-  forgot,
-  otp,
-  resetPassword,
-}
-
 class AuthSettingsModel {
   const AuthSettingsModel(
     this.title,

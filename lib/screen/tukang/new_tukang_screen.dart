@@ -61,7 +61,8 @@ class _NewTukangScreenState extends State<NewTukangScreen> {
 
   void _getUserData() async {
     setState(() => isSelectBankLoading = true);
-    final data = widget.userData ?? await getContactModel();
+    // final data = widget.userData ?? await getContactModel();
+    final data = await getContactModel();
     setState(() => _userData = data);
     final initPrefs = await SharedPreferences.getInstance();
     setState(() {

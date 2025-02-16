@@ -14,6 +14,7 @@ class ApiResponse {
   final List<dynamic>? listData;
   final List<dynamic>? results;
   final String? mediaLink;
+  final String? quota;
 
   ApiResponse({
     required this.code,
@@ -23,6 +24,7 @@ class ApiResponse {
     this.listData,
     this.results,
     this.mediaLink,
+    this.quota,
   });
 
   factory ApiResponse.fromJson(Map<String, dynamic> json) {
@@ -32,6 +34,7 @@ class ApiResponse {
       msg: json['msg'] ?? '',
       data: json['data'],
       mediaLink: json['media_link'],
+      quota: json['quota'],
     );
   }
 
@@ -43,6 +46,7 @@ class ApiResponse {
       listData: json['data'],
       results: json['results'],
       mediaLink: json['media_link'],
+      quota: json['quota'],
     );
   }
 }

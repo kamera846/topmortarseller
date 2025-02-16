@@ -31,6 +31,7 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
   List<ClaimedModel>? myRedeems = [];
   String? title;
   String? description;
+  int totalQuota = 0;
   bool isLoading = true;
 
   @override
@@ -42,7 +43,8 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
   void _getUserData() async {
     setState(() => isLoading = true);
 
-    final data = widget.userData ?? await getContactModel();
+    // // final data = widget.userData ?? await getContactModel();
+    final data = await getContactModel();
     setState(() {
       _userData = data;
 
@@ -50,9 +52,7 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
         if (data.nama != null && data.nama != null && data.nama!.isNotEmpty) {
           title = data.nama!;
         }
-        if (data.address != null &&
-            data.address != null &&
-            data.address!.isNotEmpty) {
+        if (data.address != null && data.address!.isNotEmpty) {
           description = data.address!;
         } else if (data.nomorhp != null &&
             data.nomorhp != null &&
@@ -86,7 +86,15 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
           showSnackBar(context, e);
         }
       },
-      onCompleted: () => setState(() => isLoading = false),
+      onCompleted: (apiResponse) {
+        setState(() {
+          if (apiResponse!.quota != null &&
+              int.tryParse(apiResponse.quota!) != null) {
+            totalQuota = int.parse(apiResponse.quota ?? '0');
+          }
+          isLoading = false;
+        });
+      },
     );
     setState(() {
       myRedeems = data;
@@ -160,8 +168,7 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
       );
 
       if (myRedeems != null && myRedeems!.isNotEmpty) {
-        availableQuota =
-            int.parse(_userData!.quotaPriority!) - myRedeems!.length;
+        availableQuota = totalQuota - myRedeems!.length;
         redeemList = Expanded(
           child: ListView.builder(
             padding: const EdgeInsets.all(0),
@@ -178,7 +185,7 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          redeemItem.nama!,
+                          redeemItem.nama ?? 'null',
                           softWrap: true,
                           overflow: TextOverflow.visible,
                           style: Theme.of(context).textTheme.bodyLarge,
@@ -423,53 +430,49 @@ class DetailProfileHeader extends StatelessWidget {
           const SizedBox(height: 12),
           Row(
             children: [
-              const SizedBox(width: 12),
+              const SizedBox(width: 24),
               const Hero(
                 tag: TagHero.mainDrawerHeader,
                 child: Icon(
                   Icons.storefront,
-                  size: 48,
+                  size: 24,
                   color: cWhite,
                 ),
               ),
               const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    title == null
-                        ? const LoadingItem(
-                            isPrimaryTheme: true,
-                          )
-                        : Text(
-                            title!,
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium!
-                                .copyWith(
-                                  color: cWhite,
-                                ),
+              title == null
+                  ? const Expanded(
+                      child: LoadingItem(
+                        isPrimaryTheme: true,
+                      ),
+                    )
+                  : Text(
+                      title!,
+                      style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                            color: cWhite,
                           ),
-                    description == null
-                        ? const LoadingItem(
-                            isPrimaryTheme: true,
-                          )
-                        : Text(
-                            description!,
-                            softWrap: true,
-                            overflow: TextOverflow.visible,
-                            style:
-                                Theme.of(context).textTheme.bodySmall!.copyWith(
-                                      color: cPrimary600,
-                                    ),
-                          )
-                  ],
-                ),
-              ),
-              const SizedBox(width: 12),
+                    ),
+              const SizedBox(width: 24),
             ],
           ),
+          const SizedBox(height: 6),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: description == null
+                ? const Expanded(
+                    child: LoadingItem(
+                      isPrimaryTheme: true,
+                    ),
+                  )
+                : Text(
+                    description!,
+                    softWrap: true,
+                    overflow: TextOverflow.visible,
+                    style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                          color: cPrimary600,
+                        ),
+                  ),
+          )
         ],
       ),
     );

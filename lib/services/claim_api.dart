@@ -57,9 +57,10 @@ class ClaimCashbackServices {
     required String idContact,
     required Function(String e) onSuccess,
     required Function(String e) onError,
-    required Function() onCompleted,
+    required Function(ApiResponse? apiResponse) onCompleted,
   }) async {
     List<ClaimedModel>? data;
+    ApiResponse? apiResponse;
     try {
       final url = Uri.https(baseUrl, 'api/voucher/claimed/$idContact');
       final response = await http.get(
@@ -69,7 +70,7 @@ class ClaimCashbackServices {
 
       if (response.statusCode == 200) {
         final responseBody = json.decode(response.body);
-        final apiResponse = ApiResponse.fromJsonList(responseBody);
+        apiResponse = ApiResponse.fromJsonList(responseBody);
 
         if (apiResponse.code == 200) {
           if (apiResponse.listData != null) {
@@ -91,7 +92,7 @@ class ClaimCashbackServices {
       onError('$failedRequestText. Exception: $e');
       return data;
     } finally {
-      onCompleted();
+      onCompleted(apiResponse);
     }
   }
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:topmortarseller/model/contact_model.dart';
-import 'package:topmortarseller/model/auth_settings_model.dart';
+import 'package:topmortarseller/util/enum.dart';
 import 'package:topmortarseller/widget/auth/auth_footer.dart';
 import 'package:topmortarseller/widget/auth/auth_form.dart';
 import 'package:topmortarseller/widget/auth/auth_header.dart';
