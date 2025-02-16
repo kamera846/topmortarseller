@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -31,6 +32,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   ContactModel? _userData;
+  late Timer loadUiTimer;
   bool isLoading = true;
   bool isFeedLoading = true;
   List<FeedModel>? listFeed;
@@ -38,8 +40,19 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
-    _getUserData();
+    loadUiTimer = Timer(
+      const Duration(seconds: 1),
+      () {
+        _getUserData();
+      },
+    );
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    loadUiTimer.cancel();
+    super.dispose();
   }
 
   Future<void> _onRefresh() async {
