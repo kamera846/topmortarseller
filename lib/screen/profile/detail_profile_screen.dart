@@ -31,6 +31,7 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
   List<ClaimedModel>? myRedeems = [];
   String? title;
   String? description;
+  int totalQuota = 0;
   bool isLoading = true;
 
   @override
@@ -85,7 +86,15 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
           showSnackBar(context, e);
         }
       },
-      onCompleted: () => setState(() => isLoading = false),
+      onCompleted: (apiResponse) {
+        setState(() {
+          if (apiResponse!.quota != null &&
+              int.tryParse(apiResponse.quota!) != null) {
+            totalQuota = int.parse(apiResponse.quota ?? '0');
+          }
+          isLoading = false;
+        });
+      },
     );
     setState(() {
       myRedeems = data;
@@ -159,8 +168,7 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
       );
 
       if (myRedeems != null && myRedeems!.isNotEmpty) {
-        availableQuota =
-            int.parse(_userData!.quotaPriority!) - myRedeems!.length;
+        availableQuota = totalQuota - myRedeems!.length;
         redeemList = Expanded(
           child: ListView.builder(
             padding: const EdgeInsets.all(0),
@@ -177,7 +185,7 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          redeemItem.nama!.isEmpty ? 'null' : redeemItem.nama!,
+                          redeemItem.nama ?? 'null',
                           softWrap: true,
                           overflow: TextOverflow.visible,
                           style: Theme.of(context).textTheme.bodyLarge,
