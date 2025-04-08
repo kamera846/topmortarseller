@@ -36,7 +36,12 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   flutter_launcher_icons: ^0.13.1
-  qr_code_scanner: ^1.0.1
+  # qr_code_scanner: ^1.0.1
+  qr_code_scanner_plus: ^2.0.10+1
+  # qr_code_scanner:
+  #   git:
+  #     url: https://github.com/ErikGraciano/qr_code_scanner.git
+  #     ref: fix/android-gradle-plugin-namespace
   file_picker: ^7.0.2
   http: ^1.1.0
   shared_preferences: ^2.2.2
