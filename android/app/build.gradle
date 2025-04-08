@@ -20,8 +20,8 @@ apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
     namespace "com.topmortar.topmortarseller"
-    compileSdkVersion 34
-    ndkVersion "27.0.0"
+    compileSdkVersion 35
+    ndkVersion "27.0.12077973"
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -42,7 +42,7 @@ android {
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
         minSdkVersion 21
-        targetSdkVersion 34
+        targetSdkVersion 35
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         ndk {
@@ -55,8 +55,8 @@ android {
             storePassword 'topmortarseller'
             keyPassword 'topmortarseller'
             keyAlias 'release-keystore'
-            // storeFile file('/Users/masple/Projects/Flutter/topmortarseller/android/app/release-keystore.jks')
-            storeFile file('E:/Pekerjaan/Flutter/topmortarseller/android/app/release-keystore.jks')
+            storeFile file('/Users/masple/Projects/Flutter/topmortarseller/android/app/release-keystore.jks')
+            // storeFile file('E:/Pekerjaan/Flutter/topmortarseller/android/app/release-keystore.jks')
             // if (project.hasProperty('keystorePropertiesFile')) {
             //     def keystoreProperties = new Properties()
             //     def keystorePropertiesFile = rootProject.file(keystorePropertiesFile)
