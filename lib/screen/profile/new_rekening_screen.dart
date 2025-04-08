@@ -273,114 +273,117 @@ class _NewRekeningScreenState extends State<NewRekeningScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text(widget.rekeningId == '-1'
             ? 'Tambah Rekening Baru'
             : 'Edit Rekening'),
       ),
-      body: Stack(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 24),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    const Icon(Icons.info_outline),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        'Rekening anda akan digunakan sebagai tujuan transfer dari promo-promo kami.',
-                        style: Theme.of(context).textTheme.bodyMedium,
+      body: SafeArea(
+        child: Stack(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 24),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.info_outline),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          'Rekening anda akan digunakan sebagai tujuan transfer dari promo-promo kami.',
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
                       ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  SelectBankField(
+                    options: options,
+                    errorText: _selectedErrorText,
+                    isLoading: isSelectBankLoading,
+                    selectedBank: _selectedBank ?? defaultBank,
+                    onChange: (value) {
+                      setState(() {
+                        _selectedBank = value;
+                        _selectedErrorText = null;
+                      });
+                    },
+                  ),
+                  MTextField(
+                    controller: _noRekeningController,
+                    label: 'Nomor Rekening atau E-Wallet',
+                    keyboardType: TextInputType.number,
+                    errorText: _noRekeningErrorText,
+                    onChanged: (value) {
+                      setState(() {
+                        _noRekeningErrorText = null;
+                      });
+                    },
+                  ),
+                  MTextField(
+                    controller: _nameRekeningController,
+                    label: 'Nama Pemilik',
+                    helper:
+                        'Pastikan nama sesuai dengan nama pemilik pada Bank atau E-Wallet anda untuk menghindari terjadinya error.',
+                    errorText: _nameRekeningErrorText,
+                    onChanged: (value) {
+                      setState(() {
+                        _nameRekeningErrorText = null;
+                      });
+                    },
+                  ),
+                  // MElevatedButton(
+                  //   title: 'Cek Nama Pemilik',
+                  //   onPressed: _checkOwnerName,
+                  // ),
+                  // const SizedBox(height: 12),
+                  // if (_ownerNameController.text.isNotEmpty)
+                  //   Container(
+                  //     width: double.infinity,
+                  //     padding: const EdgeInsets.all(16),
+                  //     decoration: BoxDecoration(
+                  //       color: Theme.of(context).scaffoldBackgroundColor,
+                  //       borderRadius: BorderRadius.circular(8),
+                  //       border: Border.all(width: 1, color: cDark400),
+                  //     ),
+                  //     child: Text(
+                  //       _ownerNameController.text,
+                  //       textAlign: TextAlign.center,
+                  //       style: Theme.of(context)
+                  //           .textTheme
+                  //           .titleMedium!
+                  //           .copyWith(color: cDark200, fontWeight: FontWeight.bold),
+                  //     ),
+                  //   ),
+                  // if (_ownerNameErrorText != null && _ownerNameErrorText!.isNotEmpty)
+                  //   Text(
+                  //     _ownerNameErrorText!,
+                  //     style: const TextStyle(color: cPrimary100),
+                  //   ),
+                  Expanded(
+                    child: Container(),
+                  ),
+                  if (!isSelectBankLoading)
+                    MElevatedButton(
+                      title: 'Simpan Rekening',
+                      isFullWidth: true,
+                      // enabled: isValidForm ? true : false,
+                      onPressed: _saveRekening,
                     ),
-                  ],
-                ),
-                const SizedBox(height: 24),
-                SelectBankField(
-                  options: options,
-                  errorText: _selectedErrorText,
-                  isLoading: isSelectBankLoading,
-                  selectedBank: _selectedBank ?? defaultBank,
-                  onChange: (value) {
-                    setState(() {
-                      _selectedBank = value;
-                      _selectedErrorText = null;
-                    });
-                  },
-                ),
-                MTextField(
-                  controller: _noRekeningController,
-                  label: 'Nomor Rekening atau E-Wallet',
-                  keyboardType: TextInputType.number,
-                  errorText: _noRekeningErrorText,
-                  onChanged: (value) {
-                    setState(() {
-                      _noRekeningErrorText = null;
-                    });
-                  },
-                ),
-                MTextField(
-                  controller: _nameRekeningController,
-                  label: 'Nama Pemilik',
-                  helper:
-                      'Pastikan nama sesuai dengan nama pemilik pada Bank atau E-Wallet anda untuk menghindari terjadinya error.',
-                  errorText: _nameRekeningErrorText,
-                  onChanged: (value) {
-                    setState(() {
-                      _nameRekeningErrorText = null;
-                    });
-                  },
-                ),
-                // MElevatedButton(
-                //   title: 'Cek Nama Pemilik',
-                //   onPressed: _checkOwnerName,
-                // ),
-                // const SizedBox(height: 12),
-                // if (_ownerNameController.text.isNotEmpty)
-                //   Container(
-                //     width: double.infinity,
-                //     padding: const EdgeInsets.all(16),
-                //     decoration: BoxDecoration(
-                //       color: Theme.of(context).scaffoldBackgroundColor,
-                //       borderRadius: BorderRadius.circular(8),
-                //       border: Border.all(width: 1, color: cDark400),
-                //     ),
-                //     child: Text(
-                //       _ownerNameController.text,
-                //       textAlign: TextAlign.center,
-                //       style: Theme.of(context)
-                //           .textTheme
-                //           .titleMedium!
-                //           .copyWith(color: cDark200, fontWeight: FontWeight.bold),
-                //     ),
-                //   ),
-                // if (_ownerNameErrorText != null && _ownerNameErrorText!.isNotEmpty)
-                //   Text(
-                //     _ownerNameErrorText!,
-                //     style: const TextStyle(color: cPrimary100),
-                //   ),
-                Expanded(
-                  child: Container(),
-                ),
-                if (!isSelectBankLoading)
-                  MElevatedButton(
-                    title: 'Simpan Rekening',
-                    isFullWidth: true,
-                    // enabled: isValidForm ? true : false,
-                    onPressed: _saveRekening,
-                  ),
-                if (prefs != null &&
-                    (isSkipCreateBank == null || isSkipCreateBank == false))
-                  MTextButton(
-                    title: 'Atur Nanti',
-                    onPressed: _skipCreateBank,
-                  ),
-              ],
+                  if (prefs != null &&
+                      (isSkipCreateBank == null || isSkipCreateBank == false))
+                    MTextButton(
+                      title: 'Atur Nanti',
+                      onPressed: _skipCreateBank,
+                    ),
+                ],
+              ),
             ),
-          ),
-          if (isLoading) const LoadingModal()
-        ],
+            if (isLoading) const LoadingModal()
+          ],
+        ),
       ),
     );
   }
