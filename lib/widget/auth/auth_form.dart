@@ -570,12 +570,16 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            outlinedButtonDescription != null
-                ? Text(
-                    outlinedButtonDescription,
-                    style: Theme.of(context).textTheme.bodySmall,
-                  )
-                : Container(),
+            Flexible(
+              flex: 1,
+              child: outlinedButtonDescription != null
+                  ? Text(
+                      outlinedButtonDescription,
+                      maxLines: 2,
+                      style: Theme.of(context).textTheme.bodySmall,
+                    )
+                  : Container(),
+            ),
             const SizedBox(width: 8),
             outlinedButtonText != null
                 ? MOutlinedButton(
