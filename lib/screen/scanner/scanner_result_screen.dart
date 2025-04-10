@@ -124,49 +124,51 @@ class _ScannerResultScreenState extends State<ScannerResultScreen> {
       }
     }
 
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: const BoxDecoration(
-        color: cWhite,
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(24),
-          topRight: Radius.circular(24),
+    return SafeArea(
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: const BoxDecoration(
+          color: cWhite,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(24),
+            topRight: Radius.circular(24),
+          ),
         ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          const Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.drag_handle_rounded),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'Konfirmasi Rekening',
+            style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+          ),
+          Text(
+            'Cashback akan diteruskan ke rekening berikut',
+            style: Theme.of(context).textTheme.bodySmall!,
+          ),
+          const SizedBox(height: 12),
+          Expanded(
+            child: rekeningCards,
+          ),
+          MElevatedButton(
+            title: 'Lanjutkan',
+            isFullWidth: true,
+            enabled: selectedPosition != -1 ? true : false,
+            onPressed: () {
+              if (selectedPosition != -1) {
+                widget.onProcessedClaim(myBanks![selectedPosition]);
+                Navigator.pop(context);
+              }
+            },
+          )
+        ]),
       ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.drag_handle_rounded),
-          ],
-        ),
-        const SizedBox(height: 12),
-        Text(
-          'Konfirmasi Rekening',
-          style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-        ),
-        Text(
-          'Cashback akan diteruskan ke rekening berikut',
-          style: Theme.of(context).textTheme.bodySmall!,
-        ),
-        const SizedBox(height: 12),
-        Expanded(
-          child: rekeningCards,
-        ),
-        MElevatedButton(
-          title: 'Lanjutkan',
-          isFullWidth: true,
-          enabled: selectedPosition != -1 ? true : false,
-          onPressed: () {
-            if (selectedPosition != -1) {
-              widget.onProcessedClaim(myBanks![selectedPosition]);
-              Navigator.pop(context);
-            }
-          },
-        )
-      ]),
     );
   }
 }

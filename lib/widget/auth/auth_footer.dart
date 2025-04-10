@@ -42,6 +42,7 @@ class _AuthFooterWidgetState extends State<AuthFooterWidget> {
             ],
           ),
         ),
+        SizedBox(height: MediaQuery.of(context).padding.bottom),
       ],
     );
   }
