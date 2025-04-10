@@ -18,7 +18,7 @@ dependencies:
   #   git:
   #     url: https://github.com/ErikGraciano/qr_code_scanner.git
   #     ref: fix/android-gradle-plugin-namespace
-  file_picker: ^7.0.2
+  # file_picker: ^7.0.2
   http: ^1.1.0
   shared_preferences: ^2.2.2
   google_fonts: ^6.2.0
