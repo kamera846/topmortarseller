@@ -12,6 +12,9 @@ class AuthHeaderWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        SizedBox(
+          height: MediaQuery.of(context).padding.top,
+        ),
         Hero(
           tag: TagHero.faviconAuth,
           child: Semantics(

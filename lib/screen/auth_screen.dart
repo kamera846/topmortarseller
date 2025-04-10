@@ -44,30 +44,28 @@ class _AuthScreenState extends State<AuthScreen> {
       showReleaseNotes: false,
       showIgnore: false,
       child: Scaffold(
-        body: SafeArea(
-          child: Stack(children: [
-            SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 48),
-              child: Column(
-                children: [
-                  AuthHeaderWidget(authType: widget.authType),
-                  const SizedBox(height: 48),
-                  AuthFormWidget(
-                    authType: widget.authType,
-                    userData: _userData,
-                    isLoading: (state) {
-                      setState(() {
-                        _isLoading = state;
-                      });
-                    },
-                  ),
-                  AuthFooterWidget(authType: widget.authType),
-                ],
-              ),
+        body: Stack(children: [
+          SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 48),
+            child: Column(
+              children: [
+                AuthHeaderWidget(authType: widget.authType),
+                const SizedBox(height: 48),
+                AuthFormWidget(
+                  authType: widget.authType,
+                  userData: _userData,
+                  isLoading: (state) {
+                    setState(() {
+                      _isLoading = state;
+                    });
+                  },
+                ),
+                AuthFooterWidget(authType: widget.authType),
+              ],
             ),
-            if (_isLoading) const LoadingModal()
-          ]),
-        ),
+          ),
+          if (_isLoading) const LoadingModal()
+        ]),
       ),
     );
   }
