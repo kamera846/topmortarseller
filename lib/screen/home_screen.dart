@@ -128,19 +128,26 @@ class _HomeScreenState extends State<HomeScreen> {
           }
         }
 
-        showSnackBar(context, apiResponse.msg);
+        if (mounted) {
+          showSnackBar(context, apiResponse.msg);
+        }
       } else {
-        showSnackBar(
-            context, '$failedRequestText. Status Code: ${response.statusCode}');
+        if (mounted) {
+          showSnackBar(context,
+              '$failedRequestText. Status Code: ${response.statusCode}');
+        }
       }
     } catch (e) {
-      showSnackBar(context, '$failedRequestText. Exception: $e');
+      if (mounted) {
+        showSnackBar(context, '$failedRequestText. Exception: $e');
+      }
     } finally {
-      setState(() {
-        isFeedLoading = false;
-        listFeed = data;
-      });
-      // print('List Feed: ${jsonEncode(listFeed)}');
+      if (mounted) {
+        setState(() {
+          isFeedLoading = false;
+          listFeed = data;
+        });
+      }
     }
   }
 
