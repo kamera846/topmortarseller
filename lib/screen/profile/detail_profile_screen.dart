@@ -509,7 +509,7 @@ class DetailProfileHeader extends StatelessWidget {
         return MInfoModal(
           contentName: 'Apakah anda yakin ingin menghapus akun?',
           contentDescription:
-              'Dengan menghapus akun, data anda akan kami tangguhkan dan anda tidak dapat mengkases aplikasi kami.',
+              'Dengan menghapus akun, data anda akan kami hapus permanen dalam 7 hari.',
           contentIcon: Icons.warning_rounded,
           contentIconColor: cPrimary100,
           cancelText: 'Batal',
