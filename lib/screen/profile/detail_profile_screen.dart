@@ -4,6 +4,7 @@ import 'package:topmortarseller/model/claimed_model.dart';
 import 'package:topmortarseller/model/contact_model.dart';
 import 'package:topmortarseller/model/customer_bank_model.dart';
 import 'package:topmortarseller/screen/auth_screen.dart';
+import 'package:topmortarseller/services/auth_api.dart';
 import 'package:topmortarseller/services/claim_api.dart';
 import 'package:topmortarseller/services/customer_bank_api.dart';
 import 'package:topmortarseller/util/auth_settings.dart';
@@ -103,6 +104,34 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
     setState(() {
       myRedeems = data;
     });
+  }
+
+  deleteAccount() async {
+    await AuthApiService().requestDeleteAccount(
+      idContact: _userData?.idContact,
+      onError: (e) {
+        if (context.mounted) {
+          showSnackBar(context, e);
+        }
+      },
+      onSuccess: (e) async {
+        await removeLoginState();
+        await removeContactModel();
+        _clearAllScreenToAuth();
+      },
+    );
+  }
+
+  void _clearAllScreenToAuth() {
+    if (context.mounted) {
+      Navigator.pop(context);
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (ctx) => const AuthScreen(),
+        ),
+        (Route<dynamic> route) => false,
+      );
+    }
   }
 
   String _monthName(int month) {
@@ -281,6 +310,7 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
           DetailProfileHeader(
             title: title,
             description: description,
+            onRequestDeleteAccount: deleteAccount,
           ),
           Expanded(
             child: Stack(
@@ -374,14 +404,15 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
 }
 
 class DetailProfileHeader extends StatelessWidget {
-  const DetailProfileHeader({
-    super.key,
-    required this.title,
-    required this.description,
-  });
+  const DetailProfileHeader(
+      {super.key,
+      required this.title,
+      required this.description,
+      required this.onRequestDeleteAccount});
 
   final String? title;
   final String? description;
+  final Function() onRequestDeleteAccount;
 
   @override
   Widget build(BuildContext context) {
@@ -517,19 +548,7 @@ class DetailProfileHeader extends StatelessWidget {
           onCancel: () {
             Navigator.of(context).pop();
           },
-          onConfirm: () async {
-            await removeLoginState();
-            await removeContactModel();
-            if (context.mounted) {
-              Navigator.of(context).pop();
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(
-                  builder: (ctx) => const AuthScreen(),
-                ),
-                (Route<dynamic> route) => false,
-              );
-            }
-          },
+          onConfirm: onRequestDeleteAccount,
         );
       },
     );
