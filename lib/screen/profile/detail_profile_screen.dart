@@ -111,6 +111,7 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
       idContact: _userData?.idContact,
       onError: (e) {
         if (context.mounted) {
+          Navigator.pop(context);
           showSnackBar(context, e);
         }
       },
