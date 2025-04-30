@@ -1,15 +1,20 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:topmortarseller/model/claimed_model.dart';
 import 'package:topmortarseller/model/contact_model.dart';
 import 'package:topmortarseller/model/customer_bank_model.dart';
+import 'package:topmortarseller/screen/auth_screen.dart';
+import 'package:topmortarseller/services/auth_api.dart';
 import 'package:topmortarseller/services/claim_api.dart';
 import 'package:topmortarseller/services/customer_bank_api.dart';
+import 'package:topmortarseller/util/auth_settings.dart';
 import 'package:topmortarseller/util/enum.dart';
 import 'package:topmortarseller/screen/profile/new_rekening_screen.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/util/loading_item.dart';
 import 'package:topmortarseller/widget/card/card_rekening.dart';
 import 'package:topmortarseller/widget/form/button/elevated_button.dart';
+import 'package:topmortarseller/widget/modal/info_modal.dart';
 import 'package:topmortarseller/widget/modal/loading_modal.dart';
 import 'package:topmortarseller/widget/snackbar/show_snackbar.dart';
 
@@ -99,6 +104,34 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
     setState(() {
       myRedeems = data;
     });
+  }
+
+  deleteAccount() async {
+    await AuthApiService().requestDeleteAccount(
+      idContact: _userData?.idContact,
+      onError: (e) {
+        if (context.mounted) {
+          showSnackBar(context, e);
+        }
+      },
+      onSuccess: (e) async {
+        await removeLoginState();
+        await removeContactModel();
+        _clearAllScreenToAuth();
+      },
+    );
+  }
+
+  void _clearAllScreenToAuth() {
+    if (context.mounted) {
+      Navigator.pop(context);
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (ctx) => const AuthScreen(),
+        ),
+        (Route<dynamic> route) => false,
+      );
+    }
   }
 
   String _monthName(int month) {
@@ -277,6 +310,7 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
           DetailProfileHeader(
             title: title,
             description: description,
+            onRequestDeleteAccount: deleteAccount,
           ),
           Expanded(
             child: Stack(
@@ -370,14 +404,15 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
 }
 
 class DetailProfileHeader extends StatelessWidget {
-  const DetailProfileHeader({
-    super.key,
-    required this.title,
-    required this.description,
-  });
+  const DetailProfileHeader(
+      {super.key,
+      required this.title,
+      required this.description,
+      required this.onRequestDeleteAccount});
 
   final String? title;
   final String? description;
+  final Function() onRequestDeleteAccount;
 
   @override
   Widget build(BuildContext context) {
@@ -420,11 +455,32 @@ class DetailProfileHeader extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
-              Text(
-                'Profil Saya',
-                style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                      color: cWhite,
+              Expanded(
+                child: Text(
+                  'Profil Saya',
+                  style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                        color: cWhite,
+                      ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              PopupMenuButton<String>(
+                icon: const Icon(
+                  Icons.settings,
+                  color: cWhite,
+                ),
+                itemBuilder: (ctx) {
+                  return [
+                    PopupMenuItem<String>(
+                      onTap: () {
+                        _onRequestDeleteAccount(context);
+                      },
+                      child: const Row(
+                        children: [SizedBox(width: 12), Text('Hapus Akun')],
+                      ),
                     ),
+                  ];
+                },
               ),
             ],
           ),
@@ -474,6 +530,27 @@ class DetailProfileHeader extends StatelessWidget {
           )
         ],
       ),
+    );
+  }
+
+  void _onRequestDeleteAccount(BuildContext context) {
+    showCupertinoDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return MInfoModal(
+          contentName: 'Apakah anda yakin ingin menghapus akun?',
+          contentDescription:
+              'Dengan menghapus akun, data anda akan kami hapus permanen dalam 7 hari.',
+          contentIcon: Icons.warning_rounded,
+          contentIconColor: cPrimary100,
+          cancelText: 'Batal',
+          confirmText: 'Hapus',
+          onCancel: () {
+            Navigator.of(context).pop();
+          },
+          onConfirm: onRequestDeleteAccount,
+        );
+      },
     );
   }
 }

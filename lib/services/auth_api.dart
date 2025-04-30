@@ -76,4 +76,51 @@ class AuthApiService {
 
     return response;
   }
+
+  Future<void> requestDeleteAccount({
+    String? idContact,
+    Function(String e)? onError,
+    Function(String e)? onSuccess,
+    Function()? onCompleted,
+  }) async {
+    try {
+      final url = Uri.https(baseUrl, 'api/contact/delete');
+      final response = await http.post(url,
+          headers: headerSetup,
+          body: jsonEncode({
+            'id_contact': idContact ?? '',
+          }));
+
+      if (response.statusCode == 200) {
+        final responseBody = json.decode(response.body);
+        final apiResponse = ApiResponse.fromJson(responseBody);
+
+        if (apiResponse.code == 200) {
+          if (onSuccess != null) {
+            onSuccess(apiResponse.msg);
+          }
+          return;
+        }
+
+        if (onError != null) {
+          onError(apiResponse.msg);
+        }
+        return;
+      } else {
+        if (onError != null) {
+          onError('$failedRequestText. Status Code: ${response.statusCode}');
+        }
+        return;
+      }
+    } catch (e) {
+      if (onError != null) {
+        onError('$failedRequestText. Exception: $e');
+      }
+      return;
+    } finally {
+      if (onCompleted != null) {
+        onCompleted();
+      }
+    }
+  }
 }
