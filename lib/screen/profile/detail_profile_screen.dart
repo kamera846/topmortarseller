@@ -174,7 +174,11 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
     Widget emptyRedeemList = Container();
 
     // final quotaPriority = _userData!.quotaPriority;
-    var availableQuota = 0;
+    var availableQuota = totalQuota;
+
+    if (myRedeems != null && myRedeems!.isNotEmpty) {
+      availableQuota = totalQuota - myRedeems!.length;
+    }
 
     if (myBanks != null && myBanks!.isNotEmpty) {
       cardBank = CardRekening(
@@ -202,7 +206,6 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
       );
 
       if (myRedeems != null && myRedeems!.isNotEmpty) {
-        availableQuota = totalQuota - myRedeems!.length;
         redeemList = Expanded(
           child: ListView.builder(
             padding: const EdgeInsets.all(0),
