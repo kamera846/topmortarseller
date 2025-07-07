@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:topmortarseller/model/contact_model.dart';
 import 'package:topmortarseller/screen/auth_screen.dart';
+import 'package:topmortarseller/screen/products/catalog_screen.dart';
+import 'package:topmortarseller/screen/products/order_screen.dart';
 // import 'package:topmortarseller/screen/products/catalog_screen.dart';
 // import 'package:topmortarseller/screen/products/order_screen.dart';
 import 'package:topmortarseller/screen/profile/detail_profile_screen.dart';
@@ -10,10 +12,7 @@ import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/widget/modal/info_modal.dart';
 
 class MainDrawerItems extends StatelessWidget {
-  const MainDrawerItems({
-    super.key,
-    this.userData,
-  });
+  const MainDrawerItems({super.key, this.userData});
 
   final ContactModel? userData;
 
@@ -37,9 +36,7 @@ class MainDrawerItems extends StatelessWidget {
             if (context.mounted) {
               Navigator.of(context).pop();
               Navigator.of(context).pushReplacement(
-                MaterialPageRoute(
-                  builder: (ctx) => const AuthScreen(),
-                ),
+                MaterialPageRoute(builder: (ctx) => const AuthScreen()),
               );
             }
           },
@@ -69,111 +66,43 @@ class MainDrawerItems extends StatelessWidget {
             );
           },
         ),
-        // // Katalog Product
-        // DrawerItem(
-        //   title: 'Katalog Produk',
-        //   description: 'Dapatkan produk terbaik kami',
-        //   icon: const Icon(
-        //     Icons.trolley,
-        //     size: 26,
-        //     color: cDark100,
-        //   ),
-        //   onTap: () {
-        //     Navigator.of(context).push(
-        //       MaterialPageRoute(
-        //         builder: (ctx) => CatalogScreen(userData: userData),
-        //       ),
-        //     );
-        //   },
-        // ),
-        // // User Order
-        // DrawerItem(
-        //   title: 'Pesananan Saya',
-        //   description: 'Pantau status pesanan anda',
-        //   icon: const Icon(
-        //     CupertinoIcons.square_favorites_fill,
-        //     size: 26,
-        //     color: cDark100,
-        //   ),
-        //   onTap: () {
-        //     Navigator.of(context).push(
-        //       MaterialPageRoute(
-        //         builder: (ctx) => OrderScreen(userData: userData),
-        //       ),
-        //     );
-        //   },
-        // ),
+        // Katalog Product
+        DrawerItem(
+          title: 'Katalog Produk',
+          description: 'Dapatkan produk terbaik kami',
+          icon: const Icon(Icons.trolley, size: 26, color: cDark100),
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (ctx) => CatalogScreen(userData: userData),
+              ),
+            );
+          },
+        ),
+        // User Order
+        DrawerItem(
+          title: 'Pesananan Saya',
+          description: 'Pantau status pesanan anda',
+          icon: const Icon(
+            CupertinoIcons.square_favorites_fill,
+            size: 26,
+            color: cDark100,
+          ),
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (ctx) => OrderScreen(userData: userData),
+              ),
+            );
+          },
+        ),
         // User Logout
         DrawerItem(
           title: 'Logout',
           description: 'Anda akan keluar dari akun saat ini',
-          icon: const Icon(
-            CupertinoIcons.power,
-            size: 26,
-            color: cDark100,
-          ),
+          icon: const Icon(CupertinoIcons.power, size: 26, color: cDark100),
           onTap: () => _showConfirmlogout(context),
-        )
-        // ListTile(
-        //   leading: const Icon(
-        //     CupertinoIcons.person_crop_circle_badge_plus,
-        //     size: 26,
-        //     color: cDark100,
-        //   ),
-        //   title: Text(
-        //     'Input Tukang',
-        //     style: Theme.of(context)
-        //         .textTheme
-        //         .titleSmall!
-        //         .copyWith(color: cDark100, fontWeight: FontWeight.bold),
-        //   ),
-        //   subtitle: Text(
-        //     'Daftarkan data tukang',
-        //     style: Theme.of(context).textTheme.bodySmall!.copyWith(
-        //           color: cDark200,
-        //         ),
-        //   ),
-        //   onTap: () {
-        //     Navigator.of(context).push(
-        //       MaterialPageRoute(
-        //         builder: (ctx) => NewTukangScreen(
-        //           userData: userData,
-        //           onSuccess: (state) {},
-        //         ),
-        //       ),
-        //     );
-        //   },
-        // ),
-        // const Padding(
-        //   padding: EdgeInsets.symmetric(horizontal: 32),
-        //   child: Divider(
-        //     height: 1,
-        //     color: cDark500,
-        //   ),
-        // ),
-        // ListTile(
-        //   leading: const Icon(
-        //     CupertinoIcons.power,
-        //     size: 26,
-        //     color: cDark100,
-        //   ),
-        //   title: Text(
-        //     'Keluar',
-        //     style: Theme.of(context)
-        //         .textTheme
-        //         .titleSmall!
-        //         .copyWith(color: cDark100, fontWeight: FontWeight.bold),
-        //   ),
-        //   subtitle: Text(
-        //     'Anda akan keluar dari akun saat ini',
-        //     style: Theme.of(context).textTheme.bodySmall!.copyWith(
-        //           color: cDark200,
-        //         ),
-        //   ),
-        //   onTap: () {
-        //     _showConfirmlogout(context);
-        //   },
-        // ),
+        ),
       ],
     );
   }
@@ -201,25 +130,22 @@ class DrawerItem extends StatelessWidget {
           leading: icon,
           title: Text(
             title,
-            style: Theme.of(context)
-                .textTheme
-                .titleSmall!
-                .copyWith(color: cDark100, fontWeight: FontWeight.bold),
+            style: Theme.of(context).textTheme.titleSmall!.copyWith(
+              color: cDark100,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           subtitle: Text(
             description,
-            style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                  color: cDark200,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall!.copyWith(color: cDark200),
           ),
           onTap: onTap,
         ),
         const Padding(
           padding: EdgeInsets.symmetric(horizontal: 32),
-          child: Divider(
-            height: 1,
-            color: cDark500,
-          ),
+          child: Divider(height: 1, color: cDark500),
         ),
       ],
     );

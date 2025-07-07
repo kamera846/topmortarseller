@@ -9,11 +9,7 @@ import 'package:topmortarseller/widget/form/button/elevated_button.dart';
 import 'package:topmortarseller/widget/modal/loading_modal.dart';
 
 class InvoiceScreen extends StatefulWidget {
-  const InvoiceScreen({
-    super.key,
-    required this.orderItem,
-    this.userData,
-  });
+  const InvoiceScreen({super.key, required this.orderItem, this.userData});
 
   final OrderModel orderItem;
   final ContactModel? userData;
@@ -46,38 +42,38 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
         backgroundColor: cWhite,
         foregroundColor: cDark100,
       ),
-      body: _isLoading
-          ? const LoadingModal()
-          : Column(
-              children: [
-                Card(
-                  margin: const EdgeInsets.all(12),
-                  color: cWhite,
-                  elevation: 0,
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // Section Header
-                        _sectionHeader(),
-                        // Section Detail Invoice
-                        _sectionDetailInvoice(),
-                        // Section List Product
-                        _sectionProducts(),
-                      ],
+      body: SafeArea(
+        child: _isLoading
+            ? const LoadingModal()
+            : Column(
+                children: [
+                  Card(
+                    margin: const EdgeInsets.all(12),
+                    color: cWhite,
+                    elevation: 0,
+                    child: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Section Header
+                          _sectionHeader(),
+                          // Section Detail Invoice
+                          _sectionDetailInvoice(),
+                          // Section List Product
+                          _sectionProducts(),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                const Expanded(
-                  child: SizedBox(height: 12),
-                ),
-                // Section Button Payment
-                if (widget.orderItem.orderStatus == StatusOrder.invoice.name)
-                  _sectionButtonPayment(),
-              ],
-            ),
+                  const Expanded(child: SizedBox(height: 12)),
+                  // Section Button Payment
+                  if (widget.orderItem.orderStatus == StatusOrder.invoice.name)
+                    _sectionButtonPayment(),
+                ],
+              ),
+      ),
     );
   }
 
@@ -88,10 +84,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
       decoration: const BoxDecoration(
         color: Colors.white,
         border: Border.symmetric(
-          horizontal: BorderSide(
-            color: cDark600,
-            width: 1,
-          ),
+          horizontal: BorderSide(color: cDark600, width: 1),
         ),
       ),
       child: MElevatedButton(
@@ -112,52 +105,48 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
         ),
         Container(
           margin: const EdgeInsets.symmetric(vertical: 12),
-          child: const Divider(
-            height: 1,
-            color: cDark500,
-          ),
+          child: const Divider(height: 1, color: cDark500),
         ),
         ListView.separated(
-            shrinkWrap: true,
-            separatorBuilder: (context, index) => const SizedBox(height: 6),
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: widget.orderItem.orderItems.length,
-            padding: const EdgeInsets.all(0),
-            itemBuilder: (ctx, idx) {
-              var item = widget.orderItem.orderItems[idx];
-              var totalPrice = double.parse(item.checkoutCount ?? '0.0') *
-                  double.parse(item.hargaProduk ?? '0.0');
-              return Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(item.namaProduk ?? '-'),
-                      Text(
-                        'x${item.checkoutCount ?? '-'}',
-                        style: const TextStyle(
-                          color: cDark200,
-                        ),
-                      ),
-                    ],
+          shrinkWrap: true,
+          separatorBuilder: (context, index) => const SizedBox(height: 6),
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: widget.orderItem.orderItems.length,
+          padding: const EdgeInsets.all(0),
+          itemBuilder: (ctx, idx) {
+            var item = widget.orderItem.orderItems[idx];
+            var totalPrice =
+                double.parse(item.checkoutCount ?? '0.0') *
+                double.parse(item.hargaProduk ?? '0.0');
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(item.namaProduk ?? '-'),
+                    Text(
+                      'x${item.checkoutCount ?? '-'}',
+                      style: const TextStyle(color: cDark200),
+                    ),
+                  ],
+                ),
+                Text(
+                  CurrencyFormat().format(
+                    amount: totalPrice,
+                    fractionDigits: 2,
                   ),
-                  Text(
-                    CurrencyFormat()
-                        .format(amount: totalPrice, fractionDigits: 2),
-                  ),
-                ],
-              );
-            }),
+                ),
+              ],
+            );
+          },
+        ),
         const SizedBox(height: 24),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
-              'Total',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
+            const Text('Total', style: TextStyle(fontWeight: FontWeight.bold)),
             Text(
               _countSubTotalItems(widget.orderItem.orderItems),
               style: const TextStyle(fontWeight: FontWeight.bold),
@@ -180,10 +169,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
           ),
           Container(
             margin: const EdgeInsets.symmetric(vertical: 12),
-            child: const Divider(
-              height: 1,
-              color: cDark500,
-            ),
+            child: const Divider(height: 1, color: cDark500),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -197,18 +183,13 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text('Total bayar'),
-              Text(
-                _countSubTotalItems(widget.orderItem.orderItems),
-              ),
+              Text(_countSubTotalItems(widget.orderItem.orderItems)),
             ],
           ),
           const SizedBox(height: 6),
           const Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('Tanggal bayar'),
-              Text('-'),
-            ],
+            children: [Text('Tanggal bayar'), Text('-')],
           ),
         ],
       ),
@@ -254,11 +235,13 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                         horizontal: 8,
                         vertical: 4,
                       ),
-                      label: Text(widget.orderItem.orderStatus ==
-                              StatusOrder.selesai.name
-                          ? 'Lunas'
-                          : 'Belum Lunas'),
-                      backgroundColor: widget.orderItem.orderStatus ==
+                      label: Text(
+                        widget.orderItem.orderStatus == StatusOrder.selesai.name
+                            ? 'Lunas'
+                            : 'Belum Lunas',
+                      ),
+                      backgroundColor:
+                          widget.orderItem.orderStatus ==
                               StatusOrder.selesai.name
                           ? Colors.green[700]!
                           : Colors.orange[700]!,
@@ -270,9 +253,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                     ),
                   ],
                 ),
-                const Text(
-                  'Invoices #70',
-                ),
+                const Text('Invoices #70'),
               ],
             ),
           ),
@@ -284,7 +265,8 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   String _countSubTotalItems(List<ProductModel> items) {
     var subTotalPrices = 0.0;
     for (var product in items) {
-      subTotalPrices += double.parse(product.checkoutCount ?? '0.0') *
+      subTotalPrices +=
+          double.parse(product.checkoutCount ?? '0.0') *
           double.parse(product.hargaProduk ?? '0.0');
     }
     return CurrencyFormat().format(amount: subTotalPrices, fractionDigits: 2);
