@@ -273,7 +273,6 @@ class _ListOrderState extends State<ListOrder> {
       imageProduk:
           'https://topmortar.com/wp-content/uploads/2021/10/TOP-THINBED-2.png',
       checkoutCount: '2',
-      stok: 500,
     );
     var product2 = const ProductModel(
       idProduk: '2',
@@ -283,7 +282,6 @@ class _ListOrderState extends State<ListOrder> {
       imageProduk:
           'https://topmortar.com/wp-content/uploads/2021/10/MOCKUP-TA-1000-x-1000.png',
       checkoutCount: '1',
-      stok: 200,
     );
     _getItemTimer = Timer(const Duration(seconds: 1), () {
       setState(() {

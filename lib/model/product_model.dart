@@ -8,7 +8,6 @@ class ProductModel {
     this.hargaProduk,
     this.nameSatuan,
     this.imageProduk,
-    this.stok,
     this.checkoutCount,
     this.createdAt,
     this.updatedAt,
@@ -22,7 +21,6 @@ class ProductModel {
   final String? hargaProduk;
   final String? nameSatuan;
   final String? imageProduk;
-  final int? stok;
   final String? checkoutCount;
   final String? createdAt;
   final String? updatedAt;
@@ -50,7 +48,6 @@ class ProductModel {
       hargaProduk: hargaProduk ?? this.hargaProduk,
       nameSatuan: nameSatuan ?? this.nameSatuan,
       imageProduk: imageProduk ?? this.imageProduk,
-      stok: stok ?? this.stok,
       checkoutCount: checkoutCount ?? this.checkoutCount,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -66,7 +63,6 @@ class ProductModel {
     'harga_produk': hargaProduk ?? '',
     'name_satuan': nameSatuan ?? '',
     'image_produk': imageProduk ?? '',
-    'stok': stok ?? 0,
     'created_at': createdAt ?? '',
     'updated_at': updatedAt ?? '',
   };
@@ -81,7 +77,6 @@ class ProductModel {
       hargaProduk: json['harga_produk'] ?? '',
       nameSatuan: json['name_satuan'] ?? '',
       imageProduk: json['image_produk'] ?? '',
-      stok: json['stok'] ?? 0,
       createdAt: json['created_at'] ?? '',
       updatedAt: json['updated_at'] ?? '',
     );
