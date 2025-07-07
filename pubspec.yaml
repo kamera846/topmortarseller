@@ -4,14 +4,14 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.2.1+21
 
 environment:
-  sdk: '>=3.0.5 <4.0.0'
+  sdk: '3.8.1'
 
 dependencies:
   flutter:
     sdk: flutter
 
   cupertino_icons: ^1.0.2
-  flutter_launcher_icons: ^0.13.1
+  flutter_launcher_icons: ^0.14.4
   # qr_code_scanner: ^1.0.1
   qr_code_scanner_plus: ^2.0.10+1
   # qr_code_scanner:
@@ -30,7 +30,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  flutter_lints: ^2.0.0
+  flutter_lints: ^6.0.0
 
 flutter_icons:
   android: false
