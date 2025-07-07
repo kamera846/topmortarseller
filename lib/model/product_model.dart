@@ -1,5 +1,8 @@
 class ProductModel {
   const ProductModel({
+    this.idCartDetail,
+    this.idCart,
+    this.qtyCartDetail,
     this.idProduk,
     this.idMasterProduk,
     this.namaProduk,
@@ -13,6 +16,9 @@ class ProductModel {
     this.updatedAt,
   });
 
+  final String? idCartDetail;
+  final String? idCart;
+  final String? qtyCartDetail;
   final String? idProduk;
   final String? idMasterProduk;
   final String? namaProduk;
@@ -26,6 +32,9 @@ class ProductModel {
   final String? updatedAt;
 
   ProductModel copyWith({
+    String? idCartDetail,
+    String? idCart,
+    String? qtyCartDetail,
     String? idProduk,
     String? idMasterProduk,
     String? namaProduk,
@@ -40,6 +49,9 @@ class ProductModel {
     String? updatedAt,
   }) {
     return ProductModel(
+      idCartDetail: idCartDetail ?? this.idCartDetail,
+      idCart: idCart ?? this.idCart,
+      qtyCartDetail: qtyCartDetail ?? this.qtyCartDetail,
       idProduk: idProduk ?? this.idProduk,
       idMasterProduk: idMasterProduk ?? this.idMasterProduk,
       namaProduk: namaProduk ?? this.namaProduk,
@@ -55,6 +67,9 @@ class ProductModel {
   }
 
   Map<String, dynamic> toJson() => {
+    'id_cart_detail': idCartDetail ?? '',
+    'id_cart': idCart ?? '',
+    'qty_cart_detail': qtyCartDetail ?? '',
     'id_produk': idProduk ?? '',
     'id_master_produk': idMasterProduk ?? '',
     'nama_produk': namaProduk ?? '',
@@ -69,6 +84,9 @@ class ProductModel {
 
   factory ProductModel.fromJson(Map<String, dynamic> json) {
     return ProductModel(
+      idCartDetail: json['id_cart_detail'] ?? '',
+      idCart: json['id_cart'] ?? '',
+      qtyCartDetail: json['qty_cart_detail'] ?? '',
       idProduk: json['id_produk'] ?? '',
       idMasterProduk: json['id_master_produk'] ?? '',
       namaProduk: json['nama_produk'] ?? '',
