@@ -116,7 +116,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
           itemBuilder: (ctx, idx) {
             var item = widget.orderItem.orderItems[idx];
             var totalPrice =
-                double.parse(item.checkoutCount ?? '0.0') *
+                double.parse(item.qtyCartDetail ?? '0.0') *
                 double.parse(item.hargaProduk ?? '0.0');
             return Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -127,7 +127,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                   children: [
                     Text(item.namaProduk ?? '-'),
                     Text(
-                      'x${item.checkoutCount ?? '-'}',
+                      'x${item.qtyCartDetail ?? '-'}',
                       style: const TextStyle(color: cDark200),
                     ),
                   ],
@@ -266,7 +266,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
     var subTotalPrices = 0.0;
     for (var product in items) {
       subTotalPrices +=
-          double.parse(product.checkoutCount ?? '0.0') *
+          double.parse(product.qtyCartDetail ?? '0.0') *
           double.parse(product.hargaProduk ?? '0.0');
     }
     return CurrencyFormat().format(amount: subTotalPrices, fractionDigits: 2);

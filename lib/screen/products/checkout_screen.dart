@@ -151,10 +151,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                                 ),
                                                 Expanded(
                                                   child: Text(
-                                                    '${CurrencyFormat().format(amount: double.parse(item.hargaProduk ?? '0'))} / satuan',
+                                                    '${CurrencyFormat().format(amount: double.parse(item.hargaProduk ?? '0'))} / ${item.nameSatuan}',
                                                   ),
                                                 ),
-                                                Text('x ${item.checkoutCount}'),
+                                                Text('x ${item.qtyCartDetail}'),
                                               ],
                                             ),
                                           ),
@@ -167,7 +167,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                                                   '0',
                                                             ) *
                                                             int.parse(
-                                                              item.checkoutCount ??
+                                                              item.qtyCartDetail ??
                                                                   '0',
                                                             ))
                                                         .toDouble(),
@@ -328,15 +328,15 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     setState(() {
       items = widget.items;
       diskons.add(
-        const ProductDiskonModel(title: 'Diskon aplikasi', diskon: -10000),
+        const ProductDiskonModel(title: 'Diskon aplikasi', diskon: -1),
       );
       diskons.add(
-        const ProductDiskonModel(title: 'Diskon toko priority', diskon: -15000),
+        const ProductDiskonModel(title: 'Diskon toko priority', diskon: -1),
       );
       diskons.add(
-        const ProductDiskonModel(title: 'Voucher 10.000', diskon: -10000),
+        const ProductDiskonModel(title: 'Voucher 10.000', diskon: -1),
       );
-      diskons.add(const ProductDiskonModel(title: 'Biaya admin', diskon: 1000));
+      diskons.add(const ProductDiskonModel(title: 'Biaya admin', diskon: 5));
       _isLoading = false;
     });
   }
@@ -346,7 +346,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     for (var item in items) {
       double totalPriceProduct =
           double.parse(item.hargaProduk ?? '0') *
-          double.parse(item.checkoutCount ?? '0');
+          double.parse(item.qtyCartDetail ?? '0');
       setState(() {
         totalPrice += totalPriceProduct;
       });
@@ -360,7 +360,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     for (var item in items) {
       double totalPriceProduct =
           double.parse(item.hargaProduk ?? '0') *
-          double.parse(item.checkoutCount ?? '0');
+          double.parse(item.qtyCartDetail ?? '0');
       setState(() {
         totalPrice += totalPriceProduct;
       });

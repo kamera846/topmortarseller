@@ -11,7 +11,6 @@ class ProductModel {
     this.hargaProduk,
     this.nameSatuan,
     this.imageProduk,
-    this.checkoutCount,
     this.createdAt,
     this.updatedAt,
   });
@@ -27,7 +26,6 @@ class ProductModel {
   final String? hargaProduk;
   final String? nameSatuan;
   final String? imageProduk;
-  final String? checkoutCount;
   final String? createdAt;
   final String? updatedAt;
 
@@ -44,7 +42,6 @@ class ProductModel {
     String? nameSatuan,
     String? imageProduk,
     int? stok,
-    String? checkoutCount,
     String? createdAt,
     String? updatedAt,
   }) {
@@ -60,7 +57,6 @@ class ProductModel {
       hargaProduk: hargaProduk ?? this.hargaProduk,
       nameSatuan: nameSatuan ?? this.nameSatuan,
       imageProduk: imageProduk ?? this.imageProduk,
-      checkoutCount: checkoutCount ?? this.checkoutCount,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );

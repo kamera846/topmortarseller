@@ -272,7 +272,7 @@ class _ListOrderState extends State<ListOrder> {
       hargaProduk: '78000',
       imageProduk:
           'https://topmortar.com/wp-content/uploads/2021/10/TOP-THINBED-2.png',
-      checkoutCount: '2',
+      qtyCartDetail: '2',
     );
     var product2 = const ProductModel(
       idProduk: '2',
@@ -281,7 +281,7 @@ class _ListOrderState extends State<ListOrder> {
       hargaProduk: '69000',
       imageProduk:
           'https://topmortar.com/wp-content/uploads/2021/10/MOCKUP-TA-1000-x-1000.png',
-      checkoutCount: '1',
+      qtyCartDetail: '1',
     );
     _getItemTimer = Timer(const Duration(seconds: 1), () {
       setState(() {
@@ -383,7 +383,7 @@ class CardOrder extends StatelessWidget {
     for (var product in products) {
       totalPrices +=
           double.parse(product.hargaProduk ?? '0') *
-          double.parse(product.checkoutCount ?? '0');
+          double.parse(product.qtyCartDetail ?? '0');
     }
     return CurrencyFormat().format(amount: totalPrices);
   }
@@ -477,7 +477,7 @@ class CardOrder extends StatelessWidget {
                           Row(
                             children: [
                               Text(
-                                '${CurrencyFormat().format(amount: double.parse(product.hargaProduk ?? '0'))} (${product.checkoutCount}x)',
+                                '${CurrencyFormat().format(amount: double.parse(product.hargaProduk ?? '0'))} (${product.qtyCartDetail}x)',
                                 style: const TextStyle(
                                   fontSize: 12,
                                   color: cPrimary100,
