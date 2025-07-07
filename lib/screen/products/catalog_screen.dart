@@ -32,6 +32,8 @@ class _CatalogScreenState extends State<CatalogScreen> {
   bool _isLoading = true;
   bool _isCartLoading = true;
   ProductModel? _selectedItem;
+  String dummyImageUrl =
+      'https://topmortar.com/wp-content/uploads/2021/10/TOP-THINBED-2.png';
 
   @override
   void initState() {
@@ -40,12 +42,22 @@ class _CatalogScreenState extends State<CatalogScreen> {
   }
 
   void _getUserData() async {
-    // final data = widget.userData ?? await getContactModel();
     final data = await getContactModel();
     setState(() {
       _userData = data;
     });
 
+    _onRefresh();
+  }
+
+  Future<void> _onRefresh() async {
+    setState(() {
+      _isLoading = true;
+      items = [];
+      checkoutedItems = [];
+      _showOverlay = false;
+      _selectedItem = null;
+    });
     _getList();
   }
 
@@ -58,11 +70,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
       onCompleted: (data) {
         items = [];
         for (var item in data) {
-          var dummyObject = item.copyWith(
-            checkoutCount: '',
-            imageProduk:
-                'https://topmortar.com/wp-content/uploads/2021/10/TOP-THINBED-2.png',
-          );
+          var dummyObject = item.copyWith(imageProduk: dummyImageUrl);
           items.add(dummyObject);
         }
         _getCart();
@@ -81,37 +89,85 @@ class _CatalogScreenState extends State<CatalogScreen> {
       },
       onCompleted: (data) {
         if (data != null && data.details != null) {
-          data.details?.forEach((product) {
+          checkoutedItems = [];
+          for (var product in data.details!) {
+            var dummyObject = product.copyWith(imageProduk: dummyImageUrl);
+            checkoutedItems.add(dummyObject);
+
             int foundIndex = items.indexWhere(
-              (item) => item.idProduk == product.idProduk,
+              (item) => item.idProduk == dummyObject.idProduk,
             );
+
             if (foundIndex >= 0) {
               setState(() {
-                items[foundIndex] = items[foundIndex].copyWith(
-                  checkoutCount: product.qtyCartDetail,
-                );
+                items[foundIndex] = dummyObject;
               });
             }
-          });
+          }
         }
         setState(() {
           cartItem = data;
-          checkoutedItems = data?.details ?? [];
           _isCartLoading = false;
         });
       },
     );
   }
 
-  Future<void> _onRefresh() async {
+  void _insertCart(String idCart, String idProduct, String qty) async {
     setState(() {
-      _isLoading = true;
-      items = [];
-      checkoutedItems = [];
-      _showOverlay = false;
-      _selectedItem = null;
+      _isCartLoading = true;
     });
-    _getList();
+    await CartApiService().insert(
+      idCart: idCart,
+      idProduct: idProduct,
+      qty: qty,
+      onError: (e) {
+        showSnackBar(context, e);
+      },
+      onCompleted: () {
+        _getCart();
+        setState(() {
+          _selectedItem = null;
+          _showOverlay = false;
+        });
+      },
+    );
+  }
+
+  void _deleteCart(String idCartDetail) async {
+    setState(() {
+      _isCartLoading = true;
+    });
+    await CartApiService().delete(
+      idCartDetail: idCartDetail,
+      onError: (e) {
+        showSnackBar(context, e);
+      },
+      onCompleted: () {
+        if (_selectedItem != null) {
+          int foundIndex = items.indexWhere(
+            (item) => item.idProduk == _selectedItem!.idProduk,
+          );
+          if (foundIndex >= 0) {
+            setState(() {
+              items[foundIndex] = _selectedItem!.copyWith(
+                idCartDetail: '',
+                idCart: '',
+                qtyCartDetail: '',
+                imageProduk: dummyImageUrl,
+              );
+            });
+          }
+        }
+
+        setState(() {
+          _selectedItem = null;
+          _showOverlay = false;
+        });
+
+        _getCart();
+      },
+    );
   }
 
   @override
@@ -228,9 +284,9 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                                       ),
                                                     ),
                                                     if (item
-                                                            .checkoutCount!
+                                                            .qtyCartDetail!
                                                             .isNotEmpty &&
-                                                        item.checkoutCount !=
+                                                        item.qtyCartDetail !=
                                                             '0') ...[
                                                       const Icon(Icons.trolley),
                                                       Container(
@@ -245,7 +301,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                                         ),
                                                         child: Center(
                                                           child: Text(
-                                                            item.checkoutCount ??
+                                                            item.qtyCartDetail ??
                                                                 '',
                                                             style:
                                                                 const TextStyle(
@@ -301,8 +357,12 @@ class _CatalogScreenState extends State<CatalogScreen> {
         if (_showOverlay && _selectedItem != null && !_isLoading)
           OverlayItem(
             selectedItem: _selectedItem!,
-            onClear: () {},
-            onSubmit: (checkoutCount) {},
+            onClear: () => _deleteCart(_selectedItem?.idCartDetail ?? '0'),
+            onSubmit: (checkoutCount) => _insertCart(
+              cartItem?.idCart ?? '0',
+              _selectedItem?.idProduk ?? '0',
+              checkoutCount,
+            ),
             onClose: () {
               setState(() {
                 _selectedItem = null;
@@ -391,9 +451,9 @@ class _OverlayItemState extends State<OverlayItem> {
 
   @override
   void initState() {
-    if (widget.selectedItem.checkoutCount != null &&
-        widget.selectedItem.checkoutCount!.isNotEmpty) {
-      _itemCountController.text = widget.selectedItem.checkoutCount!;
+    if (widget.selectedItem.qtyCartDetail != null &&
+        widget.selectedItem.qtyCartDetail!.isNotEmpty) {
+      _itemCountController.text = widget.selectedItem.qtyCartDetail!;
     } else {
       _itemCountController.text = "0";
     }
@@ -551,8 +611,8 @@ class _OverlayItemState extends State<OverlayItem> {
                     const SizedBox(height: 12),
                     Row(
                       children: [
-                        if (widget.selectedItem.checkoutCount != null &&
-                            widget.selectedItem.checkoutCount!.isNotEmpty) ...[
+                        if (widget.selectedItem.qtyCartDetail != null &&
+                            widget.selectedItem.qtyCartDetail!.isNotEmpty) ...[
                           IconButton(
                             onPressed: widget.onClear,
                             style: IconButton.styleFrom(

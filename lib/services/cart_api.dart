@@ -50,4 +50,100 @@ class CartApiService {
       onCompleted(data);
     }
   }
+
+  Future<void> insert({
+    required String idCart,
+    required String idProduct,
+    required String qty,
+    Function(String e)? onError,
+    Function(String e)? onSuccess,
+    required Function() onCompleted,
+  }) async {
+    try {
+      final url = Uri.https(baseUrl, 'api/cart/insert');
+      final response = await http.post(
+        url,
+        headers: headerSetup,
+        body: json.encode({
+          'id_cart': idCart,
+          'id_produk': idProduct,
+          'qty_cart_detail': qty,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final responseBody = json.decode(response.body);
+        final apiResponse = ApiResponse.fromJson(responseBody);
+
+        if (apiResponse.code == 200) {
+          if (onSuccess != null) {
+            onSuccess(apiResponse.msg);
+          }
+          return;
+        }
+
+        if (onError != null) {
+          onError(apiResponse.msg);
+        }
+        return;
+      } else {
+        if (onError != null) {
+          onError('$failedRequestText. Status Code: ${response.statusCode}');
+        }
+        return;
+      }
+    } catch (e) {
+      if (onError != null) {
+        onError('$failedRequestText. Exception: $e');
+      }
+      return;
+    } finally {
+      onCompleted();
+    }
+  }
+
+  Future<void> delete({
+    required String idCartDetail,
+    Function(String e)? onError,
+    Function(String e)? onSuccess,
+    required Function() onCompleted,
+  }) async {
+    try {
+      final url = Uri.https(baseUrl, 'api/cart/delete');
+      final response = await http.post(
+        url,
+        headers: headerSetup,
+        body: json.encode({'id_cart_detail': idCartDetail}),
+      );
+
+      if (response.statusCode == 200) {
+        final responseBody = json.decode(response.body);
+        final apiResponse = ApiResponse.fromJson(responseBody);
+
+        if (apiResponse.code == 200) {
+          if (onSuccess != null) {
+            onSuccess(apiResponse.msg);
+          }
+          return;
+        }
+
+        if (onError != null) {
+          onError(apiResponse.msg);
+        }
+        return;
+      } else {
+        if (onError != null) {
+          onError('$failedRequestText. Status Code: ${response.statusCode}');
+        }
+        return;
+      }
+    } catch (e) {
+      if (onError != null) {
+        onError('$failedRequestText. Exception: $e');
+      }
+      return;
+    } finally {
+      onCompleted();
+    }
+  }
 }
