@@ -13,10 +13,7 @@ import 'package:topmortarseller/util/enum.dart';
 import 'package:topmortarseller/widget/modal/loading_modal.dart';
 
 class OrderScreen extends StatefulWidget {
-  const OrderScreen({
-    super.key,
-    this.userData,
-  });
+  const OrderScreen({super.key, this.userData});
 
   final ContactModel? userData;
 
@@ -43,19 +40,14 @@ class _OrderScreenState extends State<OrderScreen>
         centerTitle: false,
         backgroundColor: cDark600,
         foregroundColor: cDark100,
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: getTabsData(),
-        ),
+        bottom: TabBar(controller: _tabController, tabs: getTabsData()),
       ),
       backgroundColor: cDark600,
       body: TabBarView(
         controller: _tabController,
-        children: _tabsData.map(
-          (item) {
-            return item.body;
-          },
-        ).toList(),
+        children: _tabsData.map((item) {
+          return item.body;
+        }).toList(),
       ),
     );
   }
@@ -102,7 +94,8 @@ class _OrderScreenState extends State<OrderScreen>
             setState(() {
               _tabsBadge[1] = items
                   .where(
-                      (item) => item.orderStatus == StatusOrder.diproses.name)
+                    (item) => item.orderStatus == StatusOrder.diproses.name,
+                  )
                   .length
                   .toString();
               _tabsBadge[2] = items
@@ -194,11 +187,9 @@ class _OrderScreenState extends State<OrderScreen>
         body: ListOrder(status: StatusOrder.selesai.name),
       ),
     );
-    return _tabsData.map(
-      (item) {
-        return item.header;
-      },
-    ).toList();
+    return _tabsData.map((item) {
+      return item.header;
+    }).toList();
   }
 }
 
@@ -244,8 +235,8 @@ class _ListOrderState extends State<ListOrder> {
                           padding: idx == 0
                               ? const EdgeInsets.only(top: 12)
                               : idx == _items.length - 1
-                                  ? const EdgeInsets.only(bottom: 12)
-                                  : const EdgeInsets.all(0),
+                              ? const EdgeInsets.only(bottom: 12)
+                              : const EdgeInsets.all(0),
                           child: CardOrder(item: orderItem),
                         );
                       },
@@ -275,23 +266,25 @@ class _ListOrderState extends State<ListOrder> {
 
   void _getList() {
     var product1 = const ProductModel(
-        idProduk: '1',
-        idCity: '1',
-        namaProduk: 'Thinbed',
-        hargaProduk: '78000',
-        imageProduk:
-            'https://topmortar.com/wp-content/uploads/2021/10/TOP-THINBED-2.png',
-        checkoutCount: '2',
-        stok: 500);
+      idProduk: '1',
+      idCity: '1',
+      namaProduk: 'Thinbed',
+      hargaProduk: '78000',
+      imageProduk:
+          'https://topmortar.com/wp-content/uploads/2021/10/TOP-THINBED-2.png',
+      checkoutCount: '2',
+      stok: 500,
+    );
     var product2 = const ProductModel(
-        idProduk: '2',
-        idCity: '1',
-        namaProduk: 'Plaster',
-        hargaProduk: '69000',
-        imageProduk:
-            'https://topmortar.com/wp-content/uploads/2021/10/MOCKUP-TA-1000-x-1000.png',
-        checkoutCount: '1',
-        stok: 200);
+      idProduk: '2',
+      idCity: '1',
+      namaProduk: 'Plaster',
+      hargaProduk: '69000',
+      imageProduk:
+          'https://topmortar.com/wp-content/uploads/2021/10/MOCKUP-TA-1000-x-1000.png',
+      checkoutCount: '1',
+      stok: 200,
+    );
     _getItemTimer = Timer(const Duration(seconds: 1), () {
       setState(() {
         if (widget.status == null ||
@@ -301,14 +294,14 @@ class _ListOrderState extends State<ListOrder> {
               idOrder: '1',
               orderDate: '09 Februari 2025',
               orderStatus: StatusOrder.diproses.name,
-              orderStatusColors:
-                  List.of({Colors.grey[400]!, Colors.grey[800]!}),
-              orderItems: List.of(
-                {
-                  product1.copyWith(idProduk: '1'),
-                  product2.copyWith(idProduk: '2')
-                },
-              ),
+              orderStatusColors: List.of({
+                Colors.grey[400]!,
+                Colors.grey[800]!,
+              }),
+              orderItems: List.of({
+                product1.copyWith(idProduk: '1'),
+                product2.copyWith(idProduk: '2'),
+              }),
             ),
           );
         }
@@ -319,11 +312,11 @@ class _ListOrderState extends State<ListOrder> {
               idOrder: '2',
               orderDate: '08 Februari 2025',
               orderStatus: StatusOrder.dikirim.name,
-              orderStatusColors:
-                  List.of({Colors.blue[100]!, Colors.blue[800]!}),
-              orderItems: List.of(
-                {product1.copyWith(idProduk: '3')},
-              ),
+              orderStatusColors: List.of({
+                Colors.blue[100]!,
+                Colors.blue[800]!,
+              }),
+              orderItems: List.of({product1.copyWith(idProduk: '3')}),
             ),
           );
           _items.add(
@@ -331,11 +324,11 @@ class _ListOrderState extends State<ListOrder> {
               idOrder: '3',
               orderDate: '07 Februari 2025',
               orderStatus: StatusOrder.dikirim.name,
-              orderStatusColors:
-                  List.of({Colors.blue[100]!, Colors.blue[800]!}),
-              orderItems: List.of(
-                {product2.copyWith(idProduk: '4')},
-              ),
+              orderStatusColors: List.of({
+                Colors.blue[100]!,
+                Colors.blue[800]!,
+              }),
+              orderItems: List.of({product2.copyWith(idProduk: '4')}),
             ),
           );
         }
@@ -346,14 +339,14 @@ class _ListOrderState extends State<ListOrder> {
               idOrder: '4',
               orderDate: '06 Februari 2025',
               orderStatus: StatusOrder.invoice.name,
-              orderStatusColors:
-                  List.of({Colors.orange[100]!, Colors.orange[800]!}),
-              orderItems: List.of(
-                {
-                  product1.copyWith(idProduk: '5'),
-                  product2.copyWith(idProduk: '6')
-                },
-              ),
+              orderStatusColors: List.of({
+                Colors.orange[100]!,
+                Colors.orange[800]!,
+              }),
+              orderItems: List.of({
+                product1.copyWith(idProduk: '5'),
+                product2.copyWith(idProduk: '6'),
+              }),
             ),
           );
         }
@@ -364,11 +357,11 @@ class _ListOrderState extends State<ListOrder> {
               idOrder: '5',
               orderDate: '05 Februari 2025',
               orderStatus: StatusOrder.selesai.name,
-              orderStatusColors:
-                  List.of({Colors.green[100]!, Colors.green[800]!}),
-              orderItems: List.of(
-                {product1.copyWith(idProduk: '7')},
-              ),
+              orderStatusColors: List.of({
+                Colors.green[100]!,
+                Colors.green[800]!,
+              }),
+              orderItems: List.of({product1.copyWith(idProduk: '7')}),
             ),
           );
         }
@@ -390,7 +383,8 @@ class CardOrder extends StatelessWidget {
   String _countPrice(List<ProductModel> products) {
     var totalPrices = 0.0;
     for (var product in products) {
-      totalPrices += double.parse(product.hargaProduk ?? '0') *
+      totalPrices +=
+          double.parse(product.hargaProduk ?? '0') *
           double.parse(product.checkoutCount ?? '0');
     }
     return CurrencyFormat().format(amount: totalPrices);
@@ -413,10 +407,7 @@ class CardOrder extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    const Icon(
-                      Icons.calendar_month_rounded,
-                      color: cDark200,
-                    ),
+                    const Icon(Icons.calendar_month_rounded, color: cDark200),
                     const SizedBox(width: 8),
                     Text(
                       item.orderDate,
@@ -425,10 +416,12 @@ class CardOrder extends StatelessWidget {
                   ],
                 ),
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
-                    color: item.orderStatusColors[0].withOpacity(0.4),
+                    color: item.orderStatusColors[0].withValues(alpha: 0.4),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
@@ -444,10 +437,7 @@ class CardOrder extends StatelessWidget {
             ),
             Container(
               margin: const EdgeInsets.symmetric(vertical: 12),
-              child: const Divider(
-                height: 1,
-                color: cDark500,
-              ),
+              child: const Divider(height: 1, color: cDark500),
             ),
             ListView.builder(
               shrinkWrap: true,
@@ -491,7 +481,9 @@ class CardOrder extends StatelessWidget {
                               Text(
                                 '${CurrencyFormat().format(amount: double.parse(product.hargaProduk ?? '0'))} (${product.checkoutCount}x)',
                                 style: const TextStyle(
-                                    fontSize: 12, color: cPrimary100),
+                                  fontSize: 12,
+                                  color: cPrimary100,
+                                ),
                               ),
                               const SizedBox(width: 8),
                               const Text(
@@ -502,9 +494,9 @@ class CardOrder extends StatelessWidget {
                                 ),
                               ),
                             ],
-                          )
+                          ),
                         ],
-                      )
+                      ),
                     ],
                   ),
                 );
@@ -518,13 +510,13 @@ class CardOrder extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Total ${item.orderItems.length} produk',
-                      ),
+                      Text('Total ${item.orderItems.length} produk'),
                       Text(
                         _countPrice(item.orderItems),
                         style: const TextStyle(
-                            color: cPrimary100, fontWeight: FontWeight.bold),
+                          color: cPrimary100,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ],
                   ),
@@ -536,15 +528,15 @@ class CardOrder extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (ctx) => InvoiceScreen(
-                            orderItem: item,
-                          ),
+                          builder: (ctx) => InvoiceScreen(orderItem: item),
                         ),
                       );
                     },
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 6),
+                        horizontal: 8,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.transparent,
                         borderRadius: BorderRadius.circular(6),
@@ -580,8 +572,10 @@ class CardOrder extends StatelessWidget {
                     );
                   },
                   child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       color: cPrimary100,
                       borderRadius: BorderRadius.circular(6),
@@ -597,7 +591,7 @@ class CardOrder extends StatelessWidget {
                   ),
                 ),
               ],
-            )
+            ),
           ],
         ),
       ),

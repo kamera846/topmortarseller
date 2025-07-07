@@ -19,10 +19,7 @@ import 'package:url_launcher/url_launcher_string.dart';
 import 'package:http/http.dart' as http;
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({
-    super.key,
-    this.userData,
-  });
+  const HomeScreen({super.key, this.userData});
 
   final ContactModel? userData;
 
@@ -40,12 +37,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
-    loadUiTimer = Timer(
-      const Duration(seconds: 1),
-      () {
-        _getUserData();
-      },
-    );
+    loadUiTimer = Timer(const Duration(seconds: 1), () {
+      _getUserData();
+    });
     super.initState();
   }
 
@@ -71,8 +65,9 @@ class _HomeScreenState extends State<HomeScreen> {
     final data = await getContactModel();
     setState(() => _userData = data);
     final prefs = await SharedPreferences.getInstance();
-    final isSkipCreateBank =
-        prefs.getBool('${_userData!.idContact!}-${GlobalEnum.skipCreateBank}');
+    final isSkipCreateBank = prefs.getBool(
+      '${_userData!.idContact!}-${GlobalEnum.skipCreateBank}',
+    );
     if (isSkipCreateBank == null || isSkipCreateBank == false) {
       final userBanks = await CustomerBankApiService().banks(
         idContact: _userData!.idContact!,
@@ -84,11 +79,15 @@ class _HomeScreenState extends State<HomeScreen> {
         _goToNewRekeningScreen();
       } else {
         prefs.setBool(
-            '${_userData!.idContact!}-${GlobalEnum.skipCreateBank}', true);
+          '${_userData!.idContact!}-${GlobalEnum.skipCreateBank}',
+          true,
+        );
       }
     } else {
       prefs.setBool(
-          '${_userData!.idContact!}-${GlobalEnum.skipCreateBank}', true);
+        '${_userData!.idContact!}-${GlobalEnum.skipCreateBank}',
+        true,
+      );
     }
     setState(() => isLoading = false);
     loadFeed();
@@ -97,10 +96,8 @@ class _HomeScreenState extends State<HomeScreen> {
   void _goToNewRekeningScreen() {
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
-        builder: (ctx) => NewRekeningScreen(
-          userData: _userData,
-          onSuccess: (bool? state) {},
-        ),
+        builder: (ctx) =>
+            NewRekeningScreen(userData: _userData, onSuccess: (bool? state) {}),
       ),
     );
   }
@@ -109,10 +106,7 @@ class _HomeScreenState extends State<HomeScreen> {
     List<FeedModel>? data;
     try {
       final url = Uri.https(baseUrl, 'api/konten');
-      final response = await http.get(
-        url,
-        headers: headerSetup,
-      );
+      final response = await http.get(url, headers: headerSetup);
 
       if (response.statusCode == 200) {
         final responseBody = jsonDecode(response.body);
@@ -133,8 +127,10 @@ class _HomeScreenState extends State<HomeScreen> {
         }
       } else {
         if (mounted) {
-          showSnackBar(context,
-              '$failedRequestText. Status Code: ${response.statusCode}');
+          showSnackBar(
+            context,
+            '$failedRequestText. Status Code: ${response.statusCode}',
+          );
         }
       }
     } catch (e) {
@@ -158,21 +154,22 @@ class _HomeScreenState extends State<HomeScreen> {
     if (!isFeedLoading) {
       if (listFeed != null && listFeed!.isNotEmpty) {
         listFeedContent = ListView.builder(
-            itemCount: listFeed!.length,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemBuilder: (conxtext, i) {
-              final item = listFeed![i];
-              return CardFeed(feed: item, mediaLink: mediaLink);
-            });
+          itemCount: listFeed!.length,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemBuilder: (conxtext, i) {
+            final item = listFeed![i];
+            return CardFeed(feed: item, mediaLink: mediaLink);
+          },
+        );
       } else {
         listFeedContent = Padding(
           padding: const EdgeInsets.all(12),
           child: Text(
             'Belum ada konten',
-            style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                  color: cDark200,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium!.copyWith(color: cDark200),
           ),
         );
       }
@@ -181,9 +178,9 @@ class _HomeScreenState extends State<HomeScreen> {
         padding: const EdgeInsets.all(12),
         child: Text(
           'Sedang memuat konten...',
-          style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                color: cDark200,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium!.copyWith(color: cDark200),
         ),
       );
     }
@@ -234,21 +231,21 @@ class _HomeScreenState extends State<HomeScreen> {
                         padding: const EdgeInsets.all(12),
                         child: Text(
                           'Informasi menarik untuk anda',
-                          style:
-                              Theme.of(context).textTheme.titleSmall!.copyWith(
-                                    color: cDark100,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                          style: Theme.of(context).textTheme.titleSmall!
+                              .copyWith(
+                                color: cDark100,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                       ),
-                      listFeedContent
+                      listFeedContent,
                     ],
                   ),
                 ),
               ),
             ),
           ),
-          if (isLoading) const LoadingModal()
+          if (isLoading) const LoadingModal(),
         ],
       ),
     );
@@ -261,7 +258,7 @@ class CardFeed extends StatelessWidget {
   final FeedModel? feed;
   final String? mediaLink;
 
-  void _launchNavigation(context, String url) async {
+  void _launchNavigation(BuildContext context, String url) async {
     try {
       launchUrlString(url);
     } catch (e) {
@@ -276,16 +273,11 @@ class CardFeed extends StatelessWidget {
     final cardFeedHeight = screenWidth * (2 / 3);
 
     return InkWell(
-      onTap: () => _launchNavigation(
-        context,
-        feed!.linkKonten!,
-      ),
+      onTap: () => _launchNavigation(context, feed!.linkKonten!),
       child: Card(
         elevation: 2,
         margin: const EdgeInsets.only(left: 12, top: 0, right: 12, bottom: 12),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: Container(
           width: double.maxFinite,
           height: cardFeedHeight,
@@ -293,10 +285,9 @@ class CardFeed extends StatelessWidget {
             color: cDark400,
             borderRadius: BorderRadius.circular(16),
             image: DecorationImage(
-                image: NetworkImage(
-                  '${mediaLink ?? ''}${feed!.imgKonten!}',
-                ),
-                fit: BoxFit.cover),
+              image: NetworkImage('${mediaLink ?? ''}${feed!.imgKonten!}'),
+              fit: BoxFit.cover,
+            ),
           ),
         ),
       ),
@@ -322,13 +313,13 @@ class FeedModel {
   final String? linkKonten;
 
   Map<String, dynamic> toJson() => {
-        'id_konten': idKonten ?? '',
-        'title_konten': titleKonten ?? '',
-        'img_konten': imgKonten ?? '',
-        'created_at': createdAt ?? '',
-        'udpated_at': udpatedAt ?? '',
-        'link_konten': linkKonten ?? '',
-      };
+    'id_konten': idKonten ?? '',
+    'title_konten': titleKonten ?? '',
+    'img_konten': imgKonten ?? '',
+    'created_at': createdAt ?? '',
+    'udpated_at': udpatedAt ?? '',
+    'link_konten': linkKonten ?? '',
+  };
 
   factory FeedModel.fromJson(Map<String, dynamic> json) {
     return FeedModel(

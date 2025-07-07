@@ -5,11 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 
 class LoadingModal extends StatelessWidget {
-  const LoadingModal({
-    super.key,
-    this.message,
-    this.androidBgColor,
-  });
+  const LoadingModal({super.key, this.message, this.androidBgColor});
 
   final String? message;
   final Color? androidBgColor;
@@ -25,17 +21,11 @@ class LoadingModal extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
-            const CupertinoActivityIndicator(
-              color: cPrimary100,
-              radius: 20.0,
-            ),
+            const CupertinoActivityIndicator(color: cPrimary100, radius: 20.0),
             if (message != null) ...[
               const SizedBox(height: 12),
-              Text(
-                message!,
-                style: const TextStyle(color: cDark100),
-              ),
-            ]
+              Text(message!, style: const TextStyle(color: cDark100)),
+            ],
           ],
         ),
       ),
@@ -43,7 +33,7 @@ class LoadingModal extends StatelessWidget {
     Widget androidContent = Container(
       width: double.infinity,
       height: double.infinity,
-      color: androidBgColor ?? cDark100.withOpacity(0.5),
+      color: androidBgColor ?? cDark100.withValues(alpha: 0.5),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
@@ -53,10 +43,7 @@ class LoadingModal extends StatelessWidget {
             backgroundColor: cWhite,
           ),
           if (message != null)
-            Text(
-              message!,
-              style: const TextStyle(color: cWhite),
-            ),
+            Text(message!, style: const TextStyle(color: cWhite)),
         ],
       ),
     );

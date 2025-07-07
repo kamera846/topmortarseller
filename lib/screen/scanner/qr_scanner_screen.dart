@@ -14,10 +14,7 @@ import 'package:topmortarseller/widget/modal/info_modal.dart';
 import 'package:topmortarseller/widget/modal/loading_modal.dart';
 
 class QRScannerScreen extends StatefulWidget {
-  const QRScannerScreen({
-    super.key,
-    this.userData,
-  });
+  const QRScannerScreen({super.key, this.userData});
 
   final ContactModel? userData;
 
@@ -136,7 +133,7 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
     qrController!.pauseCamera();
     CustomerBankModel? selectedBank;
     await showModalBottomSheet(
-      barrierColor: cDark100.withOpacity(0.7),
+      barrierColor: cDark100.withValues(alpha: 0.7),
       context: context,
       builder: (ctx) => ScannerResultScreen(
         userData: _userData,
@@ -158,7 +155,7 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
 
   @override
   void dispose() {
-    qrController?.dispose();
+    // qrController?.dispose();
     super.dispose();
   }
 
@@ -189,17 +186,13 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  icon: const Icon(
-                    Icons.arrow_back_ios_rounded,
-                    color: cWhite,
-                  ),
+                  icon: const Icon(Icons.arrow_back_ios_rounded, color: cWhite),
                 ),
                 Text(
                   'Top Mortar Scanner',
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleMedium!
-                      .copyWith(color: cWhite),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleMedium!.copyWith(color: cWhite),
                 ),
                 Hero(
                   tag: TagHero.faviconAuth,
@@ -210,11 +203,11 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
                       width: 32,
                     ),
                   ),
-                )
+                ),
               ],
             ),
           ),
-          if (isLoading) const LoadingModal()
+          if (isLoading) const LoadingModal(),
         ],
       ),
     );

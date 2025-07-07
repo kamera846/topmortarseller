@@ -13,10 +13,7 @@ import 'package:topmortarseller/widget/modal/loading_modal.dart';
 import 'package:topmortarseller/widget/snackbar/show_snackbar.dart';
 
 class CatalogScreen extends StatefulWidget {
-  const CatalogScreen({
-    super.key,
-    this.userData,
-  });
+  const CatalogScreen({super.key, this.userData});
 
   final ContactModel? userData;
 
@@ -113,11 +110,11 @@ class _CatalogScreenState extends State<CatalogScreen> {
                           padding: const EdgeInsets.all(12),
                           gridDelegate:
                               const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            childAspectRatio: 1 / 1.5,
-                            crossAxisSpacing: 6,
-                            mainAxisSpacing: 6,
-                          ),
+                                crossAxisCount: 2,
+                                childAspectRatio: 1 / 1.5,
+                                crossAxisSpacing: 6,
+                                mainAxisSpacing: 6,
+                              ),
                           children: [
                             for (final item in items)
                               Card(
@@ -159,8 +156,9 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                               flex: 2,
                                               child: Container(
                                                 color: Colors.white,
-                                                padding:
-                                                    const EdgeInsets.all(12),
+                                                padding: const EdgeInsets.all(
+                                                  12,
+                                                ),
                                                 width: double.infinity,
                                                 child: Column(
                                                   mainAxisAlignment:
@@ -181,18 +179,19 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                                               .ellipsis,
                                                         ),
                                                         Text(
-                                                          CurrencyFormat()
-                                                              .format(
-                                                            amount: double
-                                                                .parse(item
-                                                                    .hargaProduk!),
+                                                          CurrencyFormat().format(
+                                                            amount: double.parse(
+                                                              item.hargaProduk!,
+                                                            ),
                                                           ),
                                                           style:
                                                               const TextStyle(
-                                                            color: cPrimary400,
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                          ),
+                                                                color:
+                                                                    cPrimary400,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              ),
                                                         ),
                                                       ],
                                                     ),
@@ -203,34 +202,35 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                                             'Stok ${item.stok != null && item.stok! != 0 ? 'tersedia' : 'habis'}',
                                                             style:
                                                                 const TextStyle(
-                                                              color: cDark200,
-                                                            ),
+                                                                  color:
+                                                                      cDark200,
+                                                                ),
                                                           ),
                                                         ),
-                                                        if (item.checkoutCount!
+                                                        if (item
+                                                                .checkoutCount!
                                                                 .isNotEmpty &&
                                                             item.checkoutCount !=
                                                                 '0') ...[
                                                           const Icon(
-                                                              Icons.trolley),
+                                                            Icons.trolley,
+                                                          ),
                                                           Container(
                                                             width: 20,
                                                             height: 20,
-                                                            decoration:
-                                                                BoxDecoration(
+                                                            decoration: BoxDecoration(
                                                               color:
                                                                   cPrimary100,
                                                               borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          100),
+                                                                  BorderRadius.circular(
+                                                                    100,
+                                                                  ),
                                                             ),
                                                             child: Center(
                                                               child: Text(
                                                                 item.checkoutCount ??
                                                                     '',
-                                                                style:
-                                                                    const TextStyle(
+                                                                style: const TextStyle(
                                                                   color: cWhite,
                                                                   fontSize: 10,
                                                                   fontWeight:
@@ -239,10 +239,10 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                                                 ),
                                                               ),
                                                             ),
-                                                          )
-                                                        ]
+                                                          ),
+                                                        ],
                                                       ],
-                                                    )
+                                                    ),
                                                   ],
                                                 ),
                                               ),
@@ -253,9 +253,13 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                             item.stok! == 0)
                                           BackdropFilter(
                                             filter: ImageFilter.blur(
-                                                sigmaX: 1.5, sigmaY: 1.5),
+                                              sigmaX: 1.5,
+                                              sigmaY: 1.5,
+                                            ),
                                             child: Container(
-                                              color: cDark200.withOpacity(0.7),
+                                              color: cDark200.withValues(
+                                                alpha: 0.7,
+                                              ),
                                               width: double.infinity,
                                               height: double.infinity,
                                               child: const Center(
@@ -272,7 +276,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                     ),
                                   ),
                                 ),
-                              )
+                              ),
                           ],
                         ),
                       ),
@@ -285,13 +289,12 @@ class _CatalogScreenState extends State<CatalogScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (ctx) => CheckoutScreen(
-                                  items: checkoutedItems,
-                                ),
+                                builder: (ctx) =>
+                                    CheckoutScreen(items: checkoutedItems),
                               ),
                             );
                           },
-                        )
+                        ),
                     ],
                   ),
           ),
@@ -302,20 +305,24 @@ class _CatalogScreenState extends State<CatalogScreen> {
             onClear: () {
               setState(() {
                 var indexOfItems = items.indexWhere(
-                    (data) => data.idProduk == _selectedItem?.idProduk);
-                items[indexOfItems] =
-                    items[indexOfItems].copyWith(checkoutCount: "");
+                  (data) => data.idProduk == _selectedItem?.idProduk,
+                );
+                items[indexOfItems] = items[indexOfItems].copyWith(
+                  checkoutCount: "",
+                );
 
                 var indexOfCheckoutItems = checkoutedItems.indexWhere(
-                    (data) => data.idProduk == _selectedItem?.idProduk);
+                  (data) => data.idProduk == _selectedItem?.idProduk,
+                );
                 if (indexOfCheckoutItems == -1) {
                   checkoutedItems.add(
                     _selectedItem!.copyWith(checkoutCount: ""),
                   );
                 } else {
                   checkoutedItems[indexOfCheckoutItems] =
-                      checkoutedItems[indexOfCheckoutItems]
-                          .copyWith(checkoutCount: "");
+                      checkoutedItems[indexOfCheckoutItems].copyWith(
+                        checkoutCount: "",
+                      );
                 }
 
                 totalPrice = 0;
@@ -323,7 +330,8 @@ class _CatalogScreenState extends State<CatalogScreen> {
 
                 for (var item in checkoutedItems) {
                   if (item.checkoutCount!.isNotEmpty) {
-                    totalPrice += int.parse(item.hargaProduk!) *
+                    totalPrice +=
+                        int.parse(item.hargaProduk!) *
                         int.parse(item.checkoutCount!);
                     totalItems += int.parse(item.checkoutCount!);
                   }
@@ -340,27 +348,32 @@ class _CatalogScreenState extends State<CatalogScreen> {
             onSubmit: (checkoutCount) {
               setState(() {
                 var indexOfItems = items.indexWhere(
-                    (data) => data.idProduk == _selectedItem?.idProduk);
-                items[indexOfItems] =
-                    items[indexOfItems].copyWith(checkoutCount: checkoutCount);
+                  (data) => data.idProduk == _selectedItem?.idProduk,
+                );
+                items[indexOfItems] = items[indexOfItems].copyWith(
+                  checkoutCount: checkoutCount,
+                );
 
                 var indexOfCheckoutItems = checkoutedItems.indexWhere(
-                    (data) => data.idProduk == _selectedItem?.idProduk);
+                  (data) => data.idProduk == _selectedItem?.idProduk,
+                );
                 if (indexOfCheckoutItems == -1) {
                   checkoutedItems.add(
                     _selectedItem!.copyWith(checkoutCount: checkoutCount),
                   );
                 } else {
                   checkoutedItems[indexOfCheckoutItems] =
-                      checkoutedItems[indexOfCheckoutItems]
-                          .copyWith(checkoutCount: checkoutCount);
+                      checkoutedItems[indexOfCheckoutItems].copyWith(
+                        checkoutCount: checkoutCount,
+                      );
                 }
 
                 totalPrice = 0;
                 totalItems = 0;
 
                 for (var item in checkoutedItems) {
-                  totalPrice += int.parse(item.hargaProduk!) *
+                  totalPrice +=
+                      int.parse(item.hargaProduk!) *
                       int.parse(item.checkoutCount!);
                   totalItems += int.parse(item.checkoutCount!);
                 }
@@ -375,7 +388,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                 _showOverlay = false;
               });
             },
-          )
+          ),
       ],
     );
   }
@@ -403,10 +416,7 @@ class CheckoutedItems extends StatelessWidget {
       decoration: const BoxDecoration(
         color: Colors.white,
         border: Border.symmetric(
-          horizontal: BorderSide(
-            color: cDark600,
-            width: 1,
-          ),
+          horizontal: BorderSide(color: cDark600, width: 1),
         ),
       ),
       child: Row(
@@ -416,9 +426,7 @@ class CheckoutedItems extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  CurrencyFormat().format(
-                    amount: double.parse('$totalPrice'),
-                  ),
+                  CurrencyFormat().format(amount: double.parse('$totalPrice')),
                   style: const TextStyle(
                     color: cPrimary100,
                     fontWeight: FontWeight.bold,
@@ -509,8 +517,9 @@ class _OverlayItemState extends State<OverlayItem> {
     if (value.isNotEmpty && int.tryParse(value) != null) {
       if (int.parse(value) > widget.selectedItem.stok!) {
         setState(() {
-          _itemCountController.text =
-              widget.selectedItem.stok!.toStringAsFixed(0);
+          _itemCountController.text = widget.selectedItem.stok!.toStringAsFixed(
+            0,
+          );
         });
       } else if (int.parse(value) <= 0) {
         setState(() {
@@ -536,7 +545,7 @@ class _OverlayItemState extends State<OverlayItem> {
         filter: ImageFilter.blur(sigmaX: 7.0, sigmaY: 7.0),
         child: Container(
           padding: const EdgeInsets.all(24),
-          color: cDark100.withOpacity(0.7),
+          color: cDark100.withValues(alpha: 0.7),
           child: Center(
             child: Material(
               color: Colors.transparent,
@@ -563,9 +572,10 @@ class _OverlayItemState extends State<OverlayItem> {
                         amount: double.parse(widget.selectedItem.hargaProduk!),
                       ),
                       style: const TextStyle(
-                          color: cPrimary400,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold),
+                        color: cPrimary400,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     Text(
                       widget.selectedItem.namaProduk ?? '',
@@ -605,11 +615,12 @@ class _OverlayItemState extends State<OverlayItem> {
                               decoration: InputDecoration(
                                 contentPadding: const EdgeInsets.all(0),
                                 border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(100),
-                                    borderSide: const BorderSide(
-                                      color: cDark100,
-                                      width: 1,
-                                    )),
+                                  borderRadius: BorderRadius.circular(100),
+                                  borderSide: const BorderSide(
+                                    color: cDark100,
+                                    width: 1,
+                                  ),
+                                ),
                               ),
                               onChanged: _itemCountControllerChanged,
                             ),
@@ -629,7 +640,9 @@ class _OverlayItemState extends State<OverlayItem> {
                         children: [
                           if (widget.selectedItem.checkoutCount != null &&
                               widget
-                                  .selectedItem.checkoutCount!.isNotEmpty) ...[
+                                  .selectedItem
+                                  .checkoutCount!
+                                  .isNotEmpty) ...[
                             IconButton(
                               onPressed: widget.onClear,
                               style: IconButton.styleFrom(
@@ -638,15 +651,15 @@ class _OverlayItemState extends State<OverlayItem> {
                               ),
                               icon: const Icon(CupertinoIcons.trash),
                             ),
-                            const SizedBox(width: 6)
+                            const SizedBox(width: 6),
                           ],
                           Expanded(
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
                                 backgroundColor:
                                     _itemCountController.text == "0"
-                                        ? cPrimary600
-                                        : cPrimary200,
+                                    ? cPrimary600
+                                    : cPrimary200,
                                 foregroundColor: cWhite,
                                 iconColor: cWhite,
                                 overlayColor: cWhite,
@@ -655,8 +668,9 @@ class _OverlayItemState extends State<OverlayItem> {
                               onPressed: _itemCountController.text == "0"
                                   ? null
                                   : () {
-                                      widget
-                                          .onSubmit(_itemCountController.text);
+                                      widget.onSubmit(
+                                        _itemCountController.text,
+                                      );
                                     },
                               // onPressed: () => print('Hello there..'),
                               child: const Text(

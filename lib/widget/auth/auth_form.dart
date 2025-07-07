@@ -64,9 +64,7 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (ctx) => const AuthScreen(
-          authType: AuthType.forgot,
-        ),
+        builder: (ctx) => const AuthScreen(authType: AuthType.forgot),
       ),
     );
   }
@@ -83,9 +81,7 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (ctx) => const AuthScreen(
-          authType: AuthType.register,
-        ),
+        builder: (ctx) => const AuthScreen(authType: AuthType.register),
       ),
     );
   }
@@ -155,9 +151,7 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (ctx) => HomeScreen(
-                  userData: userData,
-                ),
+                builder: (ctx) => HomeScreen(userData: userData),
               ),
             );
             showSnackBar(context, apiResponse.msg);
@@ -169,7 +163,9 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
         }
       } else {
         showSnackBar(
-            context, '$failedRequestText. Status Code: ${response.statusCode}');
+          context,
+          '$failedRequestText. Status Code: ${response.statusCode}',
+        );
       }
     } catch (e) {
       showSnackBar(context, '$failedRequestText. Exception: $e');
@@ -199,8 +195,9 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
     setState(() => widget.isLoading!(true));
 
     try {
-      final response =
-          await AuthApiService().fetchRegister(phoneNumber: phoneNumber);
+      final response = await AuthApiService().fetchRegister(
+        phoneNumber: phoneNumber,
+      );
 
       if (response.statusCode == 200) {
         final responseBody = json.decode(response.body);
@@ -239,7 +236,9 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
         }
       } else {
         showSnackBar(
-            context, '$failedRequestText. Status Code: ${response.statusCode}');
+          context,
+          '$failedRequestText. Status Code: ${response.statusCode}',
+        );
       }
     } catch (e) {
       showSnackBar(context, '$failedRequestText. Exception: $e');
@@ -264,10 +263,8 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
         if (apiResponse.code == 200) {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
-              builder: ((context) => AuthScreen(
-                    authType: AuthType.otp,
-                    userData: _userData!,
-                  )),
+              builder: ((context) =>
+                  AuthScreen(authType: AuthType.otp, userData: _userData!)),
             ),
           );
         }
@@ -275,7 +272,9 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
         showSnackBar(context, apiResponse.msg);
       } else {
         showSnackBar(
-            context, '$failedRequestText. Status Code: ${response.statusCode}');
+          context,
+          '$failedRequestText. Status Code: ${response.statusCode}',
+        );
       }
     } catch (e) {
       showSnackBar(context, '$failedRequestText. Exception: $e');
@@ -285,10 +284,7 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
   }
 
   void verifyOtp() async {
-    final String? otpValidator = Validator.otpAuth(
-      _otpController,
-      _otpLength,
-    );
+    final String? otpValidator = Validator.otpAuth(_otpController, _otpLength);
 
     setState(() {
       _otpError = otpValidator;
@@ -323,7 +319,9 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
         showSnackBar(context, apiResponse.msg);
       } else {
         showSnackBar(
-            context, '$failedRequestText. Status Code: ${response.statusCode}');
+          context,
+          '$failedRequestText. Status Code: ${response.statusCode}',
+        );
       }
     } catch (e) {
       showSnackBar(context, '$failedRequestText. Exception: $e');
@@ -333,12 +331,16 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
   }
 
   void resetPasswordHandler() async {
-    final String? passwordValidator =
-        Validator.passwordAuth(_passwordController.text);
-    final String? confirmPasswordValidator =
-        Validator.passwordAuth(_confirmPasswordController.text);
+    final String? passwordValidator = Validator.passwordAuth(
+      _passwordController.text,
+    );
+    final String? confirmPasswordValidator = Validator.passwordAuth(
+      _confirmPasswordController.text,
+    );
     final String? passwordMatchesValidator = Validator.passwordMatches(
-        _passwordController.text, _confirmPasswordController.text);
+      _passwordController.text,
+      _confirmPasswordController.text,
+    );
 
     setState(() {
       _passwordError = passwordValidator;
@@ -348,7 +350,9 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
 
     if (passwordValidator != null ||
         confirmPasswordValidator != null ||
-        passwordMatchesValidator != null) return;
+        passwordMatchesValidator != null) {
+      return;
+    }
 
     setState(() => widget.isLoading!(true));
 
@@ -384,7 +388,9 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
         }
       } else {
         showSnackBar(
-            context, '$failedRequestText. Status Code: ${response.statusCode}');
+          context,
+          '$failedRequestText. Status Code: ${response.statusCode}',
+        );
       }
     } catch (e) {
       showSnackBar(context, '$failedRequestText. Exception: $e');
@@ -402,7 +408,8 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
     List<Widget> formList = [];
     final authType = widget.authType;
     bool isBackButtonShow = authType != AuthType.login;
-    bool isPhoneFieldShow = authType == AuthType.login ||
+    bool isPhoneFieldShow =
+        authType == AuthType.login ||
         authType == AuthType.forgot ||
         authType == AuthType.register;
     bool isPasswordFieldShow =
@@ -412,27 +419,29 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
     bool isForgotButtonShow = authType == AuthType.login;
 
     if (isBackButtonShow) {
-      formList.add(Hero(
-        tag: TagHero.backButtonAuth,
-        child: Container(
-          margin: const EdgeInsets.only(bottom: 8),
-          child: Row(
-            children: [
-              MTextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                title: 'Kembali',
-                icon: Icons.arrow_circle_left_rounded,
-                titleStyle: TextButton.styleFrom(
-                  foregroundColor: cDark100,
-                  padding: const EdgeInsets.all(0),
+      formList.add(
+        Hero(
+          tag: TagHero.backButtonAuth,
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 8),
+            child: Row(
+              children: [
+                MTextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  title: 'Kembali',
+                  icon: Icons.arrow_circle_left_rounded,
+                  titleStyle: TextButton.styleFrom(
+                    foregroundColor: cDark100,
+                    padding: const EdgeInsets.all(0),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
-      ));
+      );
     }
 
     if (isPhoneFieldShow) {
@@ -477,9 +486,9 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
             },
             child: Text(
               _isPasswordHidden ? 'Tampilkan' : 'Sembunyikan',
-              style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                    color: cDark300,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall!.copyWith(color: cDark300),
             ),
           ),
         ),
@@ -508,9 +517,9 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
             },
             child: Text(
               _isConfirmPasswordHidden ? 'Tampilkan' : 'Sembunyikan',
-              style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                    color: cDark300,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall!.copyWith(color: cDark300),
             ),
           ),
         ),
@@ -592,8 +601,6 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
       ),
     );
 
-    return Column(
-      children: formList,
-    );
+    return Column(children: formList);
   }
 }

@@ -19,10 +19,7 @@ import 'package:topmortarseller/widget/modal/loading_modal.dart';
 import 'package:topmortarseller/widget/snackbar/show_snackbar.dart';
 
 class DetailProfileScreen extends StatefulWidget {
-  const DetailProfileScreen({
-    super.key,
-    this.userData,
-  });
+  const DetailProfileScreen({super.key, this.userData});
 
   final ContactModel? userData;
 
@@ -106,7 +103,7 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
     });
   }
 
-  deleteAccount() async {
+  void deleteAccount() async {
     await AuthApiService().requestDeleteAccount(
       idContact: _userData?.idContact,
       onError: (e) {
@@ -127,9 +124,7 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
     if (context.mounted) {
       Navigator.pop(context);
       Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(
-          builder: (ctx) => const AuthScreen(),
-        ),
+        MaterialPageRoute(builder: (ctx) => const AuthScreen()),
         (Route<dynamic> route) => false,
       );
     }
@@ -149,20 +144,24 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
       "September",
       "Oktober",
       "November",
-      "Desember"
+      "Desember",
     ];
     return months[month - 1];
   }
 
-  String _formattedDate(dateString) {
-    DateTime dateTime = DateTime.parse(dateString);
-    String day = dateTime.day.toString().padLeft(2, '0');
-    String month = _monthName(dateTime.month);
-    String year = dateTime.year.toString();
-    String hour = dateTime.hour.toString().padLeft(2, '0');
-    String minute = dateTime.minute.toString().padLeft(2, '0');
+  String _formattedDate(String dateString) {
+    try {
+      DateTime dateTime = DateTime.parse(dateString);
+      String day = dateTime.day.toString().padLeft(2, '0');
+      String month = _monthName(dateTime.month);
+      String year = dateTime.year.toString();
+      String hour = dateTime.hour.toString().padLeft(2, '0');
+      String minute = dateTime.minute.toString().padLeft(2, '0');
 
-    return "$day $month $year, $hour:$minute";
+      return "$day $month $year, $hour:$minute";
+    } catch (e) {
+      return dateString;
+    }
   }
 
   @override
@@ -228,22 +227,19 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
                           style: Theme.of(context).textTheme.bodyLarge,
                         ),
                         Text(
-                          _formattedDate(redeemItem.claimDate!),
+                          _formattedDate(redeemItem.claimDate ?? '-'),
                           softWrap: true,
                           overflow: TextOverflow.visible,
-                          style:
-                              Theme.of(context).textTheme.bodyMedium!.copyWith(
-                                    fontStyle: FontStyle.italic,
-                                    color: cDark200,
-                                  ),
+                          style: Theme.of(context).textTheme.bodyMedium!
+                              .copyWith(
+                                fontStyle: FontStyle.italic,
+                                color: cDark200,
+                              ),
                         ),
                       ],
                     ),
                   ),
-                  const Divider(
-                    height: 1,
-                    color: cDark500,
-                  ),
+                  const Divider(height: 1, color: cDark500),
                 ],
               );
             },
@@ -257,10 +253,9 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
         padding: const EdgeInsets.all(12),
         child: Text(
           'Informasi Penukaran ($availableQuota kuota tersisa)',
-          style: Theme.of(context)
-              .textTheme
-              .titleSmall!
-              .copyWith(fontWeight: FontWeight.bold),
+          style: Theme.of(
+            context,
+          ).textTheme.titleSmall!.copyWith(fontWeight: FontWeight.bold),
         ),
       );
     }
@@ -324,15 +319,17 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
                   children: [
                     Padding(
                       padding: const EdgeInsets.only(
-                          top: 24, right: 24, left: 24, bottom: 12),
+                        top: 24,
+                        right: 24,
+                        left: 24,
+                        bottom: 12,
+                      ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             'Daftar Rekening',
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleSmall!
+                            style: Theme.of(context).textTheme.titleSmall!
                                 .copyWith(fontWeight: FontWeight.bold),
                           ),
                           Text(
@@ -343,7 +340,7 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
                           ),
                           const SizedBox(height: 12),
                           cardBank,
-                          emptyCardBank
+                          emptyCardBank,
                         ],
                       ),
                     ),
@@ -383,7 +380,7 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
                     // ),
                   ],
                 ),
-                if (isLoading) const LoadingModal()
+                if (isLoading) const LoadingModal(),
               ],
             ),
           ),
@@ -408,11 +405,12 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
 }
 
 class DetailProfileHeader extends StatelessWidget {
-  const DetailProfileHeader(
-      {super.key,
-      required this.title,
-      required this.description,
-      required this.onRequestDeleteAccount});
+  const DetailProfileHeader({
+    super.key,
+    required this.title,
+    required this.description,
+    required this.onRequestDeleteAccount,
+  });
 
   final String? title;
   final String? description;
@@ -450,29 +448,21 @@ class DetailProfileHeader extends StatelessWidget {
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                style: IconButton.styleFrom(
-                  padding: const EdgeInsets.all(0),
-                ),
-                icon: const Icon(
-                  Icons.arrow_back,
-                  color: cWhite,
-                ),
+                style: IconButton.styleFrom(padding: const EdgeInsets.all(0)),
+                icon: const Icon(Icons.arrow_back, color: cWhite),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
                   'Profil Saya',
-                  style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                        color: cWhite,
-                      ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge!.copyWith(color: cWhite),
                 ),
               ),
               const SizedBox(width: 12),
               PopupMenuButton<String>(
-                icon: const Icon(
-                  Icons.settings,
-                  color: cWhite,
-                ),
+                icon: const Icon(Icons.settings, color: cWhite),
                 itemBuilder: (ctx) {
                   return [
                     PopupMenuItem<String>(
@@ -494,24 +484,16 @@ class DetailProfileHeader extends StatelessWidget {
               const SizedBox(width: 24),
               const Hero(
                 tag: TagHero.mainDrawerHeader,
-                child: Icon(
-                  Icons.storefront,
-                  size: 24,
-                  color: cWhite,
-                ),
+                child: Icon(Icons.storefront, size: 24, color: cWhite),
               ),
               const SizedBox(width: 12),
               title == null
-                  ? const Expanded(
-                      child: LoadingItem(
-                        isPrimaryTheme: true,
-                      ),
-                    )
+                  ? const Expanded(child: LoadingItem(isPrimaryTheme: true))
                   : Text(
                       title!,
-                      style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                            color: cWhite,
-                          ),
+                      style: Theme.of(
+                        context,
+                      ).textTheme.titleMedium!.copyWith(color: cWhite),
                     ),
               const SizedBox(width: 24),
             ],
@@ -520,18 +502,16 @@ class DetailProfileHeader extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: description == null
-                ? const LoadingItem(
-                    isPrimaryTheme: true,
-                  )
+                ? const LoadingItem(isPrimaryTheme: true)
                 : Text(
                     description!,
                     softWrap: true,
                     overflow: TextOverflow.visible,
-                    style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                          color: cPrimary600,
-                        ),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodySmall!.copyWith(color: cPrimary600),
                   ),
-          )
+          ),
         ],
       ),
     );
