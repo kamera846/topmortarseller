@@ -185,6 +185,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
             centerTitle: false,
             actions: [
               PopupMenuButton(
+                enabled: !_isCartLoading && checkoutedItems.isNotEmpty,
                 position: PopupMenuPosition.under,
                 color: Colors.white,
                 icon: Badge(
@@ -289,12 +290,9 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                             color: cDark600,
                                             width: double.infinity,
                                             height: double.infinity,
-                                            child: Hero(
-                                              tag: 'product-${item.idProduk}',
-                                              child: Image.network(
-                                                item.imageProduk ?? '',
-                                                fit: BoxFit.cover,
-                                              ),
+                                            child: Image.network(
+                                              item.imageProduk ?? '',
+                                              fit: BoxFit.cover,
                                             ),
                                           ),
                                         ),

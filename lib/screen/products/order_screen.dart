@@ -455,7 +455,6 @@ class CardOrder extends StatelessWidget {
                           color: cDark600,
                           width: 50,
                           height: 50,
-                          margin: const EdgeInsets.only(right: 12),
                           child: Hero(
                             tag: 'product-${product.idProduk}-${item.idOrder}',
                             child: Image.network(
@@ -465,6 +464,7 @@ class CardOrder extends StatelessWidget {
                           ),
                         ),
                       ),
+                      const SizedBox(width: 12),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
