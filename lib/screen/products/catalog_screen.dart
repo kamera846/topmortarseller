@@ -183,6 +183,68 @@ class _CatalogScreenState extends State<CatalogScreen> {
             ),
             title: const Text('Katalog Produk'),
             centerTitle: false,
+            actions: [
+              PopupMenuButton(
+                position: PopupMenuPosition.under,
+                color: Colors.white,
+                icon: Badge(
+                  label: Text(checkoutedItems.length.toString()),
+                  isLabelVisible: !_isCartLoading && checkoutedItems.isNotEmpty,
+                  alignment: Alignment(1.2, -1),
+                  child: Icon(Icons.trolley),
+                ),
+                itemBuilder: (context) {
+                  return checkoutedItems.map((item) {
+                    return PopupMenuItem(
+                      onTap: () {
+                        setState(() {
+                          _selectedItem = item;
+                          _showOverlay = true;
+                        });
+                      },
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadiusGeometry.circular(4),
+                            child: Container(
+                              color: cDark600,
+                              width: 40,
+                              height: 40,
+                              child: Image.network(
+                                item.imageProduk ?? '',
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  item.namaProduk ?? '',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: Theme.of(context).textTheme.titleSmall,
+                                ),
+                                Text(
+                                  '${item.qtyCartDetail} ${item.nameSatuan}',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: Theme.of(context).textTheme.bodySmall
+                                      ?.copyWith(color: cDark200),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }).toList();
+                },
+              ),
+            ],
             backgroundColor: cWhite,
             foregroundColor: cDark100,
           ),
@@ -288,7 +350,9 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                                             .isNotEmpty &&
                                                         item.qtyCartDetail !=
                                                             '0') ...[
-                                                      const Icon(Icons.trolley),
+                                                      const Icon(
+                                                        Icons.shopping_bag,
+                                                      ),
                                                       Container(
                                                         width: 20,
                                                         height: 20,
