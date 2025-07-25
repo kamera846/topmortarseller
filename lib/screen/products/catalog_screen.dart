@@ -249,169 +249,161 @@ class _CatalogScreenState extends State<CatalogScreen> {
             backgroundColor: cWhite,
             foregroundColor: cDark100,
           ),
+          bottomNavigationBar: checkoutedItems.isNotEmpty
+              ? CheckoutedItems(
+                  items: checkoutedItems,
+                  totalItems: checkoutedItems.length,
+                  totalPrice: int.parse(cartItem?.subtotalPrice ?? '0'),
+                  onCheckout: _isCartLoading
+                      ? null
+                      : () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (ctx) => CheckoutScreen(
+                                items: checkoutedItems,
+                                cartItem: cartItem,
+                              ),
+                            ),
+                          ).then((value) {
+                            if (value != null &&
+                                value is String &&
+                                value == 'isCheckouted') {
+                              _onRefresh();
+                            }
+                          });
+                        },
+                )
+              : null,
           body: SafeArea(
             child: RefreshIndicator(
               onRefresh: () => _onRefresh(),
               child: _isLoading
                   ? const LoadingModal()
-                  : Column(
-                      children: [
-                        Expanded(
-                          child: GridView.builder(
-                            padding: const EdgeInsets.all(12),
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 2,
-                                  childAspectRatio: 1 / 1.5,
-                                  crossAxisSpacing: 6,
-                                  mainAxisSpacing: 6,
-                                ),
-                            itemCount: items.length,
-                            itemBuilder: (context, index) {
-                              final item = items[index];
-                              return Card(
-                                color: cWhite,
-                                clipBehavior: Clip.antiAliasWithSaveLayer,
-                                child: InkWell(
-                                  onTap: () {
-                                    setState(() {
-                                      _selectedItem = item;
-                                      _showOverlay = true;
-                                    });
-                                  },
-                                  child: SizedBox(
-                                    width: double.infinity,
-                                    height: double.infinity,
-                                    child: Column(
-                                      children: [
-                                        Expanded(
-                                          flex: 3,
-                                          child: Container(
-                                            color: cDark600,
-                                            width: double.infinity,
-                                            height: double.infinity,
-                                            child: Image.network(
-                                              item.imageProduk ?? '',
-                                              fit: BoxFit.cover,
-                                            ),
+                  : GridView.builder(
+                      padding: const EdgeInsets.all(12),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            childAspectRatio: 1 / 1.5,
+                            crossAxisSpacing: 6,
+                            mainAxisSpacing: 6,
+                          ),
+                      itemCount: items.length,
+                      itemBuilder: (context, index) {
+                        final item = items[index];
+                        return Card(
+                          color: cWhite,
+                          clipBehavior: Clip.antiAliasWithSaveLayer,
+                          child: InkWell(
+                            onTap: () {
+                              setState(() {
+                                _selectedItem = item;
+                                _showOverlay = true;
+                              });
+                            },
+                            child: SizedBox(
+                              width: double.infinity,
+                              height: double.infinity,
+                              child: Column(
+                                children: [
+                                  Expanded(
+                                    flex: 3,
+                                    child: Container(
+                                      color: cDark600,
+                                      width: double.infinity,
+                                      height: double.infinity,
+                                      child: Image.network(
+                                        item.imageProduk ?? '',
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 2,
+                                    child: Container(
+                                      color: Colors.white,
+                                      padding: const EdgeInsets.all(12),
+                                      width: double.infinity,
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                item.namaProduk ?? '',
+                                                maxLines: 2,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                              Text(
+                                                CurrencyFormat().format(
+                                                  amount: double.parse(
+                                                    item.hargaProduk!,
+                                                  ),
+                                                ),
+                                                style: const TextStyle(
+                                                  color: cPrimary400,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ],
                                           ),
-                                        ),
-                                        Expanded(
-                                          flex: 2,
-                                          child: Container(
-                                            color: Colors.white,
-                                            padding: const EdgeInsets.all(12),
-                                            width: double.infinity,
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text(
-                                                      item.namaProduk ?? '',
-                                                      maxLines: 2,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                    ),
-                                                    Text(
-                                                      CurrencyFormat().format(
-                                                        amount: double.parse(
-                                                          item.hargaProduk!,
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: Text(
+                                                  'Stok tersedia',
+                                                  style: const TextStyle(
+                                                    color: cDark200,
+                                                  ),
+                                                ),
+                                              ),
+                                              if (item
+                                                      .qtyCartDetail!
+                                                      .isNotEmpty &&
+                                                  item.qtyCartDetail !=
+                                                      '0') ...[
+                                                const Icon(Icons.shopping_bag),
+                                                Container(
+                                                  width: 20,
+                                                  height: 20,
+                                                  decoration: BoxDecoration(
+                                                    color: cPrimary100,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          100,
                                                         ),
-                                                      ),
+                                                  ),
+                                                  child: Center(
+                                                    child: Text(
+                                                      item.qtyCartDetail ?? '',
                                                       style: const TextStyle(
-                                                        color: cPrimary400,
+                                                        color: cWhite,
+                                                        fontSize: 10,
                                                         fontWeight:
                                                             FontWeight.bold,
                                                       ),
                                                     ),
-                                                  ],
-                                                ),
-                                                Row(
-                                                  children: [
-                                                    Expanded(
-                                                      child: Text(
-                                                        'Stok tersedia',
-                                                        style: const TextStyle(
-                                                          color: cDark200,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    if (item
-                                                            .qtyCartDetail!
-                                                            .isNotEmpty &&
-                                                        item.qtyCartDetail !=
-                                                            '0') ...[
-                                                      const Icon(
-                                                        Icons.shopping_bag,
-                                                      ),
-                                                      Container(
-                                                        width: 20,
-                                                        height: 20,
-                                                        decoration: BoxDecoration(
-                                                          color: cPrimary100,
-                                                          borderRadius:
-                                                              BorderRadius.circular(
-                                                                100,
-                                                              ),
-                                                        ),
-                                                        child: Center(
-                                                          child: Text(
-                                                            item.qtyCartDetail ??
-                                                                '',
-                                                            style:
-                                                                const TextStyle(
-                                                                  color: cWhite,
-                                                                  fontSize: 10,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ],
+                                                  ),
                                                 ),
                                               ],
-                                            ),
+                                            ],
                                           ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                        if (checkoutedItems.isNotEmpty)
-                          CheckoutedItems(
-                            items: checkoutedItems,
-                            totalItems: checkoutedItems.length,
-                            totalPrice: int.parse(
-                              cartItem?.subtotalPrice ?? '0',
+                                ],
+                              ),
                             ),
-                            onCheckout: _isCartLoading
-                                ? null
-                                : () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (ctx) => CheckoutScreen(
-                                          items: checkoutedItems,
-                                        ),
-                                      ),
-                                    );
-                                  },
                           ),
-                      ],
+                        );
+                      },
                     ),
             ),
           ),
@@ -462,29 +454,34 @@ class CheckoutedItems extends StatelessWidget {
           horizontal: BorderSide(color: cDark600, width: 1),
         ),
       ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  CurrencyFormat().format(amount: double.parse('$totalPrice')),
-                  style: const TextStyle(
-                    color: cPrimary100,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
+      child: SafeArea(
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    CurrencyFormat().format(
+                      amount: double.parse('$totalPrice'),
+                    ),
+                    style: const TextStyle(
+                      color: cPrimary100,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
                   ),
-                ),
-                Text('Total ${items.length} produk'),
-                // Text('${items.length} produk $totalItems item'),
-              ],
+                  Text('Total ${items.length} produk'),
+                  // Text('${items.length} produk $totalItems item'),
+                ],
+              ),
             ),
-          ),
-          onCheckout != null
-              ? MElevatedButton(onPressed: onCheckout!, title: 'Checkout')
-              : CircularProgressIndicator.adaptive(),
-        ],
+            onCheckout != null
+                ? MElevatedButton(onPressed: onCheckout!, title: 'Checkout')
+                : CircularProgressIndicator.adaptive(),
+          ],
+        ),
       ),
     );
   }

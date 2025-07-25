@@ -14,9 +14,10 @@ class LoadingModal extends StatelessWidget {
   Widget build(BuildContext context) {
     Widget iosContent = CupertinoPopupSurface(
       isSurfacePainted: false,
-      child: SizedBox(
+      child: Container(
         width: double.infinity,
         height: double.infinity,
+        color: cDark600,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,

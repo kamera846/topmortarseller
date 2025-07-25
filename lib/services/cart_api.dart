@@ -146,4 +146,52 @@ class CartApiService {
       onCompleted();
     }
   }
+
+  Future<void> checkout({
+    required String idContact,
+    required String idCart,
+    Function(String e)? onError,
+    Function(String e)? onSuccess,
+    required Function(bool status) onCompleted,
+  }) async {
+    bool status = false;
+    try {
+      final url = Uri.https(baseUrl, 'api/cart/checkout');
+      final response = await http.post(
+        url,
+        headers: headerSetup,
+        body: json.encode({'id_contact': idContact, 'id_cart': idCart}),
+      );
+
+      if (response.statusCode == 200) {
+        final responseBody = json.decode(response.body);
+        final apiResponse = ApiResponse.fromJson(responseBody);
+
+        if (apiResponse.code == 200) {
+          status = true;
+          if (onSuccess != null) {
+            onSuccess(apiResponse.msg);
+          }
+          return;
+        }
+
+        if (onError != null) {
+          onError(apiResponse.msg);
+        }
+        return;
+      } else {
+        if (onError != null) {
+          onError('$failedRequestText. Status Code: ${response.statusCode}');
+        }
+        return;
+      }
+    } catch (e) {
+      if (onError != null) {
+        onError('$failedRequestText. Exception: $e');
+      }
+      return;
+    } finally {
+      onCompleted(status);
+    }
+  }
 }

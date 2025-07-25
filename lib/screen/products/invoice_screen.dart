@@ -42,36 +42,32 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
         backgroundColor: cWhite,
         foregroundColor: cDark100,
       ),
+      bottomNavigationBar:
+          widget.orderItem.orderStatus == StatusOrder.invoice.name
+          ? _sectionButtonPayment()
+          : null,
       body: SafeArea(
         child: _isLoading
             ? const LoadingModal()
-            : Column(
-                children: [
-                  Card(
-                    margin: const EdgeInsets.all(12),
-                    color: cWhite,
-                    elevation: 0,
-                    child: Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          // Section Header
-                          _sectionHeader(),
-                          // Section Detail Invoice
-                          _sectionDetailInvoice(),
-                          // Section List Product
-                          _sectionProducts(),
-                        ],
-                      ),
-                    ),
+            : Card(
+                margin: const EdgeInsets.all(12),
+                color: cWhite,
+                elevation: 0,
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Section Header
+                      _sectionHeader(),
+                      // Section Detail Invoice
+                      _sectionDetailInvoice(),
+                      // Section List Product
+                      _sectionProducts(),
+                    ],
                   ),
-                  const Expanded(child: SizedBox(height: 12)),
-                  // Section Button Payment
-                  if (widget.orderItem.orderStatus == StatusOrder.invoice.name)
-                    _sectionButtonPayment(),
-                ],
+                ),
               ),
       ),
     );
@@ -87,10 +83,12 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
           horizontal: BorderSide(color: cDark600, width: 1),
         ),
       ),
-      child: MElevatedButton(
-        onPressed: () {},
-        title: 'Bayar Sekarang',
-        isFullWidth: true,
+      child: SafeArea(
+        child: MElevatedButton(
+          onPressed: () {},
+          title: 'Bayar Sekarang',
+          isFullWidth: true,
+        ),
       ),
     );
   }
