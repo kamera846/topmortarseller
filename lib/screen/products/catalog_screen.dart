@@ -58,27 +58,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
       _showOverlay = false;
       _selectedItem = null;
     });
-    _getList();
-  }
-
-  void _getList() async {
-    await ProductApiService().list(
-      idContact: _userData != null ? _userData?.idContact ?? '-1' : 'null',
-      onError: (e) {
-        showSnackBar(context, e);
-      },
-      onCompleted: (data) {
-        items = [];
-        for (var item in data) {
-          var dummyObject = item.copyWith(imageProduk: dummyImageUrl);
-          items.add(dummyObject);
-        }
-        _getCart();
-        setState(() {
-          _isLoading = false;
-        });
-      },
-    );
+    _getCart();
   }
 
   void _getCart() async {
@@ -87,7 +67,11 @@ class _CatalogScreenState extends State<CatalogScreen> {
       onError: (e) {
         showSnackBar(context, e);
       },
-      onCompleted: (data) {
+      onCompleted: (data) async {
+        if (items.isEmpty) {
+          await _getList();
+        }
+
         if (data != null && data.details != null) {
           checkoutedItems = [];
           for (var product in data.details!) {
@@ -105,12 +89,33 @@ class _CatalogScreenState extends State<CatalogScreen> {
             }
           }
         }
+
         setState(() {
           cartItem = data;
           _isCartLoading = false;
         });
       },
     );
+  }
+
+  Future<void> _getList() async {
+    await ProductApiService().list(
+      idContact: _userData != null ? _userData?.idContact ?? '-1' : 'null',
+      onError: (e) {
+        showSnackBar(context, e);
+      },
+      onCompleted: (data) {
+        items = [];
+        for (var item in data) {
+          var dummyObject = item.copyWith(imageProduk: dummyImageUrl);
+          items.add(dummyObject);
+        }
+        setState(() {
+          _isLoading = false;
+        });
+      },
+    );
+    return;
   }
 
   void _insertCart(String idCart, String idProduct, String qty) async {
@@ -215,6 +220,13 @@ class _CatalogScreenState extends State<CatalogScreen> {
                               child: Image.network(
                                 item.imageProduk ?? '',
                                 fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return const Icon(
+                                    Icons.broken_image,
+                                    size: 25,
+                                    color: Colors.grey,
+                                  );
+                                },
                               ),
                             ),
                           ),
@@ -316,6 +328,14 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                       child: Image.network(
                                         item.imageProduk ?? '',
                                         fit: BoxFit.cover,
+                                        errorBuilder:
+                                            (context, error, stackTrace) {
+                                              return const Icon(
+                                                Icons.broken_image,
+                                                size: 80,
+                                                color: Colors.grey,
+                                              );
+                                            },
                                       ),
                                     ),
                                   ),
@@ -594,6 +614,13 @@ class _OverlayItemState extends State<OverlayItem> {
                       child: Image.network(
                         widget.selectedItem.imageProduk ?? '',
                         fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Icon(
+                            Icons.broken_image,
+                            size: 80,
+                            color: Colors.grey,
+                          );
+                        },
                       ),
                     ),
                     const SizedBox(height: 12),

@@ -460,6 +460,13 @@ class CardOrder extends StatelessWidget {
                             child: Image.network(
                               product.imageProduk ?? '',
                               fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return const Icon(
+                                  Icons.broken_image,
+                                  size: 25,
+                                  color: Colors.grey,
+                                );
+                              },
                             ),
                           ),
                         ),

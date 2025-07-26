@@ -104,7 +104,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 Navigator.pop(context);
                 _submitCheckout();
               },
-              child: const Text('Oke'),
+              child: const Text('Ya'),
             ),
           ],
         );
@@ -278,6 +278,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                           child: Image.network(
                                             item.imageProduk ?? '',
                                             fit: BoxFit.cover,
+                                            errorBuilder:
+                                                (context, error, stackTrace) {
+                                                  return const Icon(
+                                                    Icons.broken_image,
+                                                    size: 40,
+                                                    color: Colors.grey,
+                                                  );
+                                                },
                                           ),
                                         ),
                                       ),

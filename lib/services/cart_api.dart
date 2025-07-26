@@ -168,27 +168,30 @@ class CartApiService {
         final apiResponse = ApiResponse.fromJson(responseBody);
 
         if (apiResponse.code == 200) {
-          status = true;
           if (onSuccess != null) {
             onSuccess(apiResponse.msg);
           }
+          status = true;
           return;
         }
 
         if (onError != null) {
           onError(apiResponse.msg);
         }
+        status = false;
         return;
       } else {
         if (onError != null) {
           onError('$failedRequestText. Status Code: ${response.statusCode}');
         }
+        status = false;
         return;
       }
     } catch (e) {
       if (onError != null) {
         onError('$failedRequestText. Exception: $e');
       }
+      status = false;
       return;
     } finally {
       onCompleted(status);
