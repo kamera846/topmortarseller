@@ -157,6 +157,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final statusOrder = widget.orderItem?.statusAppOrder.toLowerCase();
     return Scaffold(
       backgroundColor: cDark600,
       appBar: AppBar(
@@ -172,7 +173,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       bottomNavigationBar:
           widget.orderItem == null ||
               (widget.orderItem != null &&
-                  widget.orderItem!.orderStatus == StatusOrder.invoice.name)
+                  statusOrder == StatusOrder.invoice.name)
           ? Container(
               width: double.infinity,
               padding: const EdgeInsets.all(24),
@@ -186,8 +187,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 child: MElevatedButton(
                   onPressed: () {
                     if (widget.orderItem != null &&
-                        widget.orderItem!.orderStatus ==
-                            StatusOrder.invoice.name) {
+                        statusOrder == StatusOrder.invoice.name) {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -201,8 +201,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   },
                   title:
                       widget.orderItem != null &&
-                          widget.orderItem!.orderStatus ==
-                              StatusOrder.invoice.name
+                          statusOrder == StatusOrder.invoice.name
                       ? 'Bayar Sekarang'
                       : 'Checkout Sekarang',
                   isFullWidth: true,
@@ -273,7 +272,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                         height: 90,
                                         child: Hero(
                                           tag: widget.orderItem != null
-                                              ? 'product-${item.idProduk}-${widget.orderItem!.idOrder}'
+                                              ? 'product-${item.idProduk}-${widget.orderItem!.idAppOrder}'
                                               : 'product-${item.idProduk}',
                                           child: Image.network(
                                             item.imageProduk ?? '',
@@ -466,14 +465,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   Color getReminderBackgroundColor() {
     if (widget.orderItem != null) {
-      var orderStatus = widget.orderItem?.orderStatus;
-      if (orderStatus == 'diproses') {
+      var statusAppOrder = widget.orderItem?.statusAppOrder.toLowerCase();
+      if (statusAppOrder == 'diproses') {
         return Colors.grey[400]!;
-      } else if (orderStatus == 'dikirim') {
+      } else if (statusAppOrder == 'dikirim') {
         return Colors.blue[100]!;
-      } else if (orderStatus == 'invoice') {
+      } else if (statusAppOrder == 'invoice') {
         return Colors.orange[100]!;
-      } else if (orderStatus == 'selesai') {
+      } else if (statusAppOrder == 'selesai') {
         return Colors.green[100]!;
       } else {
         return Colors.yellow[700]!.withAlpha(180);
@@ -485,14 +484,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   Widget getReminderIcon() {
     if (widget.orderItem != null) {
-      var orderStatus = widget.orderItem?.orderStatus;
-      if (orderStatus == 'diproses') {
+      var statusAppOrder = widget.orderItem?.statusAppOrder.toLowerCase();
+      if (statusAppOrder == 'diproses') {
         return const Icon(Icons.inventory_2_outlined);
-      } else if (orderStatus == 'dikirim') {
+      } else if (statusAppOrder == 'dikirim') {
         return const Icon(Icons.fire_truck_rounded);
-      } else if (orderStatus == 'invoice') {
+      } else if (statusAppOrder == 'invoice') {
         return const Icon(Icons.payment_rounded);
-      } else if (orderStatus == 'selesai') {
+      } else if (statusAppOrder == 'selesai') {
         return const Icon(Icons.check_circle_sharp);
       } else {
         return const Icon(Icons.info_outline);
@@ -506,17 +505,17 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     var title = 'Periksa produk sebelum checkout';
     var description = 'Pastikan setiap detail sudah sesuai';
     if (widget.orderItem != null) {
-      var orderStatus = widget.orderItem?.orderStatus;
-      if (orderStatus == 'diproses') {
+      var statusAppOrder = widget.orderItem?.statusAppOrder.toLowerCase();
+      if (statusAppOrder == 'diproses') {
         title = 'Status pesanan sedang diproses';
         description = 'Sabarr ngab :))';
-      } else if (orderStatus == 'dikirim') {
+      } else if (statusAppOrder == 'dikirim') {
         title = 'Status pesanan sedang dikirim';
         description = 'Otewe niih :)';
-      } else if (orderStatus == 'invoice') {
+      } else if (statusAppOrder == 'invoice') {
         title = 'Status pesanan sudah diterima';
         description = 'Bayarr woyy';
-      } else if (orderStatus == 'selesai') {
+      } else if (statusAppOrder == 'selesai') {
         title = 'Status pesanan sudah selesai';
         description = 'Terimakasih bos, cair nih caiirr ..';
       } else {

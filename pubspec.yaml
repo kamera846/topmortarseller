@@ -1,10 +1,10 @@
 name: topmortarseller
 description: Aplikasi untuk toko atau penjual produk Top Mortar.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 version: 1.2.1+21
 
 environment:
-  sdk: '3.8.1'
+  sdk: "3.8.1"
 
 dependencies:
   flutter:
@@ -25,6 +25,7 @@ dependencies:
   upgrader: ^11.2.0
   url_launcher: ^6.3.1
   money_formatter: ^0.0.6
+  intl: ^0.19.0
 
 dev_dependencies:
   flutter_test:

@@ -1,19 +1,25 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:topmortarseller/screen/splash_screen.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:upgrader/upgrader.dart';
 
-final mColorScheme =
-    ColorScheme.fromSeed(seedColor: cPrimary100, brightness: Brightness.light);
-final mDarkColorScheme =
-    ColorScheme.fromSeed(seedColor: cDark100, brightness: Brightness.dark);
+final mColorScheme = ColorScheme.fromSeed(
+  seedColor: cPrimary100,
+  brightness: Brightness.light,
+);
+final mDarkColorScheme = ColorScheme.fromSeed(
+  seedColor: cDark100,
+  brightness: Brightness.dark,
+);
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Upgrader.clearSavedSettings();
+  await initializeDateFormatting('id_ID', null);
   HttpOverrides.global = MyHttpOverrides();
   runApp(const MyApp());
 }

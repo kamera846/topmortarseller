@@ -1,18 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:topmortarseller/screen/products/order_screen.dart';
 
 class OrderTabsModel {
-  final Widget header;
-  final Widget body;
+  final Tab header;
+  final ListOrder body;
 
-  OrderTabsModel({
-    required this.header,
-    required this.body,
-  });
+  OrderTabsModel({required this.header, required this.body});
 
-  OrderTabsModel copyWith({
-    Widget? header,
-    Widget? body,
-  }) {
+  OrderTabsModel copyWith({Tab? header, ListOrder? body}) {
     return OrderTabsModel(
       header: header ?? this.header,
       body: body ?? this.body,

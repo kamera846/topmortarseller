@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:topmortarseller/model/contact_model.dart';
 import 'package:topmortarseller/model/order_model.dart';
-import 'package:topmortarseller/model/product_model.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/util/currency_format.dart';
+import 'package:topmortarseller/util/date_format.dart';
 import 'package:topmortarseller/util/enum.dart';
 import 'package:topmortarseller/widget/form/button/elevated_button.dart';
 import 'package:topmortarseller/widget/modal/loading_modal.dart';
@@ -30,6 +30,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final orderStatus = widget.orderItem.statusAppOrder.toLowerCase();
     return Scaffold(
       backgroundColor: cDark600,
       appBar: AppBar(
@@ -42,8 +43,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
         backgroundColor: cWhite,
         foregroundColor: cDark100,
       ),
-      bottomNavigationBar:
-          widget.orderItem.orderStatus == StatusOrder.invoice.name
+      bottomNavigationBar: orderStatus == StatusOrder.invoice.name
           ? _sectionButtonPayment()
           : null,
       body: SafeArea(
@@ -109,13 +109,13 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
           shrinkWrap: true,
           separatorBuilder: (context, index) => const SizedBox(height: 6),
           physics: const NeverScrollableScrollPhysics(),
-          itemCount: widget.orderItem.orderItems.length,
+          itemCount: widget.orderItem.items.length,
           padding: const EdgeInsets.all(0),
           itemBuilder: (ctx, idx) {
-            var item = widget.orderItem.orderItems[idx];
+            var item = widget.orderItem.items[idx];
             var totalPrice =
-                double.parse(item.qtyCartDetail ?? '0.0') *
-                double.parse(item.hargaProduk ?? '0.0');
+                double.parse(item.qtyAppOrderDetail) *
+                double.parse(item.priceProduk);
             return Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -123,9 +123,9 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(item.namaProduk ?? '-'),
+                    Text(item.nameProduk),
                     Text(
-                      'x${item.qtyCartDetail ?? '-'}',
+                      'x${item.qtyAppOrderDetail}',
                       style: const TextStyle(color: cDark200),
                     ),
                   ],
@@ -146,7 +146,10 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
           children: [
             const Text('Total', style: TextStyle(fontWeight: FontWeight.bold)),
             Text(
-              _countSubTotalItems(widget.orderItem.orderItems),
+              CurrencyFormat().format(
+                amount: double.parse(widget.orderItem.totalAppOrder),
+                fractionDigits: 2,
+              ),
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ],
@@ -162,7 +165,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Diterbitkan pada ${widget.orderItem.orderDate}',
+            'Diterbitkan pada ${MyDateFormat.formatDateTime(widget.orderItem.createdAt)}',
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           Container(
@@ -181,7 +184,12 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text('Total bayar'),
-              Text(_countSubTotalItems(widget.orderItem.orderItems)),
+              Text(
+                CurrencyFormat().format(
+                  amount: double.parse(widget.orderItem.totalAppOrder),
+                  fractionDigits: 2,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 6),
@@ -195,6 +203,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
   }
 
   Container _sectionHeader() {
+    final orderStatus = widget.orderItem.statusAppOrder.toLowerCase();
     return Container(
       margin: const EdgeInsets.only(bottom: 24),
       child: Row(
@@ -234,13 +243,11 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                         vertical: 4,
                       ),
                       label: Text(
-                        widget.orderItem.orderStatus == StatusOrder.selesai.name
+                        orderStatus == StatusOrder.selesai.name
                             ? 'Lunas'
                             : 'Belum Lunas',
                       ),
-                      backgroundColor:
-                          widget.orderItem.orderStatus ==
-                              StatusOrder.selesai.name
+                      backgroundColor: orderStatus == StatusOrder.selesai.name
                           ? Colors.green[700]!
                           : Colors.orange[700]!,
                       textColor: cWhite,
@@ -258,16 +265,6 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
         ],
       ),
     );
-  }
-
-  String _countSubTotalItems(List<ProductModel> items) {
-    var subTotalPrices = 0.0;
-    for (var product in items) {
-      subTotalPrices +=
-          double.parse(product.qtyCartDetail ?? '0.0') *
-          double.parse(product.hargaProduk ?? '0.0');
-    }
-    return CurrencyFormat().format(amount: subTotalPrices, fractionDigits: 2);
   }
 
   void _getList() async {

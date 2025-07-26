@@ -21,17 +21,6 @@ enum GlobalEnum {
   skipCreateBank,
 }
 
-enum AuthType {
-  login,
-  register,
-  forgot,
-  otp,
-  resetPassword,
-}
+enum AuthType { login, register, forgot, otp, resetPassword }
 
-enum StatusOrder {
-  diproses,
-  dikirim,
-  invoice,
-  selesai,
-}
+enum StatusOrder { all, diproses, dikirim, invoice, selesai }

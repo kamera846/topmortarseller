@@ -4,13 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:topmortarseller/model/contact_model.dart';
 import 'package:topmortarseller/model/order_model.dart';
 import 'package:topmortarseller/model/order_tabs_model.dart';
-import 'package:topmortarseller/model/product_model.dart';
 import 'package:topmortarseller/screen/products/checkout_screen.dart';
-import 'package:topmortarseller/screen/products/invoice_screen.dart';
+import 'package:topmortarseller/services/app_order_api.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/util/currency_format.dart';
+import 'package:topmortarseller/util/date_format.dart';
 import 'package:topmortarseller/util/enum.dart';
 import 'package:topmortarseller/widget/modal/loading_modal.dart';
+import 'package:topmortarseller/widget/snackbar/show_snackbar.dart';
 
 class OrderScreen extends StatefulWidget {
   const OrderScreen({super.key, this.userData});
@@ -24,9 +25,14 @@ class OrderScreen extends StatefulWidget {
 class _OrderScreenState extends State<OrderScreen>
     with TickerProviderStateMixin {
   late final TabController _tabController;
-  final List<String> _tabsBadge = ['0', '0', '0', '0', '0'];
+  final List<String> _tabsBadge = ['0', '0', '0', '0'];
+  final List<String> _tabsTitle = [
+    'Pesanan Saya',
+    'Pesanan Diproses',
+    'Pesanan Dikirim',
+    'Pesanan Selesai',
+  ];
   List<OrderTabsModel> _tabsData = [];
-  // ContactModel? _userData;
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +42,7 @@ class _OrderScreenState extends State<OrderScreen>
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: const Text('Pesanan Saya'),
+        title: Text(_tabsTitle[_tabController.index]),
         centerTitle: false,
         backgroundColor: cDark600,
         foregroundColor: cDark100,
@@ -54,8 +60,7 @@ class _OrderScreenState extends State<OrderScreen>
 
   @override
   void initState() {
-    _tabController = TabController(length: 5, vsync: this);
-    _getUserData();
+    _tabController = TabController(length: 4, vsync: this);
     super.initState();
   }
 
@@ -63,14 +68,6 @@ class _OrderScreenState extends State<OrderScreen>
   void dispose() {
     _tabController.dispose();
     super.dispose();
-  }
-
-  void _getUserData() async {
-    // // final data = widget.userData ?? await getContactModel();
-    // final data = await getContactModel();
-    setState(() {
-      // _userData = data;
-    });
   }
 
   List<Widget> getTabsData() {
@@ -92,18 +89,29 @@ class _OrderScreenState extends State<OrderScreen>
         body: ListOrder(
           items: (items) {
             setState(() {
+              _tabsBadge[0] = items.length.toString();
               _tabsBadge[1] = items
                   .where(
-                    (item) => item.orderStatus == StatusOrder.diproses.name,
+                    (item) =>
+                        item.statusAppOrder.toUpperCase() ==
+                        StatusOrder.diproses.name,
                   )
                   .length
                   .toString();
               _tabsBadge[2] = items
-                  .where((item) => item.orderStatus == StatusOrder.dikirim.name)
+                  .where(
+                    (item) =>
+                        item.statusAppOrder.toUpperCase() ==
+                        StatusOrder.dikirim.name,
+                  )
                   .length
                   .toString();
               _tabsBadge[3] = items
-                  .where((item) => item.orderStatus == StatusOrder.invoice.name)
+                  .where(
+                    (item) =>
+                        item.statusAppOrder.toUpperCase() ==
+                        StatusOrder.selesai.name,
+                  )
                   .length
                   .toString();
             });
@@ -160,31 +168,16 @@ class _OrderScreenState extends State<OrderScreen>
                   label: Text(_tabsBadge[3]),
                   textColor: cWhite,
                   backgroundColor: cPrimary100,
-                  child: const Icon(Icons.payment_rounded),
-                )
-              : const Icon(Icons.payment_rounded),
-        ),
-        body: ListOrder(
-          status: StatusOrder.invoice.name,
-          items: (items) => setState(() {
-            _tabsBadge[3] = '${items.length}';
-          }),
-        ),
-      ),
-    );
-    _tabsData.add(
-      OrderTabsModel(
-        header: Tab(
-          icon: _tabsBadge[4] != '0'
-              ? Badge(
-                  label: Text(_tabsBadge[4]),
-                  textColor: cWhite,
-                  backgroundColor: cPrimary100,
                   child: const Icon(Icons.check_circle_sharp),
                 )
               : const Icon(Icons.check_circle_sharp),
         ),
-        body: ListOrder(status: StatusOrder.selesai.name),
+        body: ListOrder(
+          status: StatusOrder.selesai.name,
+          items: (items) => setState(() {
+            _tabsBadge[3] = '${items.length}';
+          }),
+        ),
       ),
     );
     return _tabsData.map((item) {
@@ -205,9 +198,54 @@ class ListOrder extends StatefulWidget {
 }
 
 class _ListOrderState extends State<ListOrder> {
-  final List<OrderModel> _items = [];
+  List<OrderModel> _items = [];
   bool _isLoading = true;
-  late Timer _getItemTimer;
+  ContactModel? _userData;
+
+  @override
+  void initState() {
+    _getUserData();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  Future<void> _onRefresh() async {
+    setState(() {
+      _isLoading = true;
+    });
+    _getUserData();
+  }
+
+  void _getUserData() async {
+    final data = await getContactModel();
+    setState(() {
+      _userData = data;
+    });
+    _getList();
+  }
+
+  void _getList() async {
+    await AppOrderApi().get(
+      idContact: _userData?.idContact ?? '-1',
+      statusOrder: widget.status?.toUpperCase() ?? 'ALL',
+      onError: (e) {
+        showSnackBar(context, e);
+      },
+      onCompleted: (data) {
+        _items = data ?? [];
+        if (widget.items != null) {
+          widget.items!(_items);
+        }
+        setState(() {
+          _isLoading = false;
+        });
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -244,132 +282,6 @@ class _ListOrderState extends State<ListOrder> {
             ),
     );
   }
-
-  @override
-  void initState() {
-    _getList();
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _getItemTimer.cancel();
-    super.dispose();
-  }
-
-  Future<void> _onRefresh() async {
-    setState(() {
-      _isLoading = true;
-    });
-    _getList();
-  }
-
-  void _getList() {
-    var product1 = const ProductModel(
-      idProduk: '1',
-      idCity: '1',
-      namaProduk: 'Thinbed',
-      hargaProduk: '78000',
-      imageProduk:
-          'https://topmortar.com/wp-content/uploads/2021/10/TOP-THINBED-2.png',
-      qtyCartDetail: '2',
-    );
-    var product2 = const ProductModel(
-      idProduk: '2',
-      idCity: '1',
-      namaProduk: 'Plaster',
-      hargaProduk: '69000',
-      imageProduk:
-          'https://topmortar.com/wp-content/uploads/2021/10/MOCKUP-TA-1000-x-1000.png',
-      qtyCartDetail: '1',
-    );
-    _getItemTimer = Timer(const Duration(seconds: 1), () {
-      setState(() {
-        if (widget.status == null ||
-            widget.status == StatusOrder.diproses.name) {
-          _items.add(
-            OrderModel(
-              idOrder: '1',
-              orderDate: '09 Februari 2025',
-              orderStatus: StatusOrder.diproses.name,
-              orderStatusColors: List.of({
-                Colors.grey[400]!,
-                Colors.grey[800]!,
-              }),
-              orderItems: List.of({
-                product1.copyWith(idProduk: '1'),
-                product2.copyWith(idProduk: '2'),
-              }),
-            ),
-          );
-        }
-        if (widget.status == null ||
-            widget.status == StatusOrder.dikirim.name) {
-          _items.add(
-            OrderModel(
-              idOrder: '2',
-              orderDate: '08 Februari 2025',
-              orderStatus: StatusOrder.dikirim.name,
-              orderStatusColors: List.of({
-                Colors.blue[100]!,
-                Colors.blue[800]!,
-              }),
-              orderItems: List.of({product1.copyWith(idProduk: '3')}),
-            ),
-          );
-          _items.add(
-            OrderModel(
-              idOrder: '3',
-              orderDate: '07 Februari 2025',
-              orderStatus: StatusOrder.dikirim.name,
-              orderStatusColors: List.of({
-                Colors.blue[100]!,
-                Colors.blue[800]!,
-              }),
-              orderItems: List.of({product2.copyWith(idProduk: '4')}),
-            ),
-          );
-        }
-        if (widget.status == null ||
-            widget.status == StatusOrder.invoice.name) {
-          _items.add(
-            OrderModel(
-              idOrder: '4',
-              orderDate: '06 Februari 2025',
-              orderStatus: StatusOrder.invoice.name,
-              orderStatusColors: List.of({
-                Colors.orange[100]!,
-                Colors.orange[800]!,
-              }),
-              orderItems: List.of({
-                product1.copyWith(idProduk: '5'),
-                product2.copyWith(idProduk: '6'),
-              }),
-            ),
-          );
-        }
-        if (widget.status == null ||
-            widget.status == StatusOrder.selesai.name) {
-          _items.add(
-            OrderModel(
-              idOrder: '5',
-              orderDate: '05 Februari 2025',
-              orderStatus: StatusOrder.selesai.name,
-              orderStatusColors: List.of({
-                Colors.green[100]!,
-                Colors.green[800]!,
-              }),
-              orderItems: List.of({product1.copyWith(idProduk: '7')}),
-            ),
-          );
-        }
-        if (widget.items != null) {
-          widget.items!(_items);
-        }
-        _isLoading = false;
-      });
-    });
-  }
 }
 
 // Card Order Widget
@@ -377,16 +289,6 @@ class CardOrder extends StatelessWidget {
   const CardOrder({super.key, required this.item});
 
   final OrderModel item;
-
-  String _countPrice(List<ProductModel> products) {
-    var totalPrices = 0.0;
-    for (var product in products) {
-      totalPrices +=
-          double.parse(product.hargaProduk ?? '0') *
-          double.parse(product.qtyCartDetail ?? '0');
-    }
-    return CurrencyFormat().format(amount: totalPrices);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -408,29 +310,12 @@ class CardOrder extends StatelessWidget {
                     const Icon(Icons.calendar_month_rounded, color: cDark200),
                     const SizedBox(width: 8),
                     Text(
-                      item.orderDate,
+                      MyDateFormat.formatDate(item.createdAt),
                       style: const TextStyle(color: cDark200),
                     ),
                   ],
                 ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: item.orderStatusColors[0].withValues(alpha: 0.4),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Text(
-                    item.orderStatus.toUpperCase(),
-                    style: TextStyle(
-                      color: item.orderStatusColors[1],
-                      fontWeight: FontWeight.bold,
-                      fontSize: 10,
-                    ),
-                  ),
-                ),
+                _generateStatusBadge(),
               ],
             ),
             Container(
@@ -439,10 +324,10 @@ class CardOrder extends StatelessWidget {
             ),
             ListView.builder(
               shrinkWrap: true,
-              itemCount: item.orderItems.length,
+              itemCount: item.items.length,
               physics: const NeverScrollableScrollPhysics(),
               itemBuilder: (context, index) {
-                final product = item.orderItems[index];
+                final product = item.items[index];
                 return Container(
                   width: double.infinity,
                   height: 50,
@@ -456,9 +341,10 @@ class CardOrder extends StatelessWidget {
                           width: 50,
                           height: 50,
                           child: Hero(
-                            tag: 'product-${product.idProduk}-${item.idOrder}',
+                            tag:
+                                'product-${product.idProduk}-${item.idAppOrder}',
                             child: Image.network(
-                              product.imageProduk ?? '',
+                              product.imgProduk,
                               fit: BoxFit.cover,
                               errorBuilder: (context, error, stackTrace) {
                                 return const Icon(
@@ -476,7 +362,7 @@ class CardOrder extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            product.namaProduk ?? '',
+                            product.nameProduk,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(fontWeight: FontWeight.bold),
@@ -484,18 +370,10 @@ class CardOrder extends StatelessWidget {
                           Row(
                             children: [
                               Text(
-                                '${CurrencyFormat().format(amount: double.parse(product.hargaProduk ?? '0'))} (${product.qtyCartDetail}x)',
+                                '${CurrencyFormat().format(amount: double.parse(product.priceProduk))} (${product.qtyAppOrderDetail}x)',
                                 style: const TextStyle(
                                   fontSize: 12,
                                   color: cPrimary100,
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              const Text(
-                                'Rp 100.000',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  decoration: TextDecoration.lineThrough,
                                 ),
                               ),
                             ],
@@ -514,65 +392,45 @@ class CardOrder extends StatelessWidget {
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text('Total ${item.orderItems.length} produk'),
-                      Text(
-                        _countPrice(item.orderItems),
-                        style: const TextStyle(
-                          color: cPrimary100,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      Text('Total ${item.items.length} produk'),
+                      Row(
+                        children: [
+                          Text(
+                            // _countPrice(item.items),
+                            CurrencyFormat().format(
+                              amount: double.parse(item.totalAppOrder),
+                            ),
+                            style: const TextStyle(
+                              color: cPrimary100,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          if (item.discountAppOrder.isNotEmpty)
+                            Text(
+                              CurrencyFormat().format(
+                                amount: double.parse(item.subTotalAppOrder),
+                              ),
+                              style: TextStyle(
+                                fontSize: 12,
+                                decoration: TextDecoration.lineThrough,
+                              ),
+                            ),
+                        ],
                       ),
                     ],
                   ),
                 ),
-                if (item.orderStatus == StatusOrder.invoice.name ||
-                    item.orderStatus == StatusOrder.selesai.name) ...[
-                  InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (ctx) => InvoiceScreen(orderItem: item),
-                        ),
-                      );
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.transparent,
-                        borderRadius: BorderRadius.circular(6),
-                        border: Border.all(
-                          color: cPrimary100.withAlpha(200),
-                          width: 1,
-                        ),
-                      ),
-                      child: Text(
-                        item.orderStatus == StatusOrder.invoice.name
-                            ? 'Bayar'
-                            : 'Lihat Invoice',
-                        style: const TextStyle(
-                          color: cPrimary100,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 12,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                ],
+                const SizedBox(width: 8),
                 InkWell(
                   onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (ctx) => CheckoutScreen(
-                          items: item.orderItems,
-                          orderItem: item,
-                        ),
+                        builder: (ctx) =>
+                            CheckoutScreen(items: [], orderItem: item),
                       ),
                     );
                   },
@@ -598,6 +456,31 @@ class CardOrder extends StatelessWidget {
               ],
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Container _generateStatusBadge() {
+    final status = item.statusAppOrder.toLowerCase();
+    List<Color> badgeColor = List.of({Colors.grey[400]!, Colors.grey[800]!});
+    if (status == StatusOrder.dikirim.name) {
+      badgeColor = List.of({Colors.blue[100]!, Colors.blue[800]!});
+    } else if (status == StatusOrder.selesai.name) {
+      badgeColor = List.of({Colors.green[100]!, Colors.green[800]!});
+    }
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: badgeColor[0].withValues(alpha: 0.4),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Text(
+        item.statusAppOrder,
+        style: TextStyle(
+          color: badgeColor[1],
+          fontWeight: FontWeight.bold,
+          fontSize: 10,
         ),
       ),
     );
