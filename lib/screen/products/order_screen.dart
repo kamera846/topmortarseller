@@ -74,18 +74,10 @@ class _OrderScreenState extends State<OrderScreen>
     setState(() {
       _tabsData = [];
     });
+    // Tab ALL
     _tabsData.add(
       OrderTabsModel(
-        header: Tab(
-          icon: _tabsBadge[0] != '0'
-              ? Badge(
-                  label: Text(_tabsBadge[0]),
-                  textColor: cWhite,
-                  backgroundColor: cPrimary100,
-                  child: const Icon(Icons.border_all_rounded),
-                )
-              : const Icon(Icons.border_all_rounded),
-        ),
+        header: Tab(icon: Icon(Icons.border_all_rounded)),
         body: ListOrder(
           items: (items) {
             setState(() {
@@ -93,7 +85,7 @@ class _OrderScreenState extends State<OrderScreen>
               _tabsBadge[1] = items
                   .where(
                     (item) =>
-                        item.statusAppOrder.toUpperCase() ==
+                        item.statusAppOrder.toLowerCase() ==
                         StatusOrder.diproses.name,
                   )
                   .length
@@ -101,7 +93,7 @@ class _OrderScreenState extends State<OrderScreen>
               _tabsBadge[2] = items
                   .where(
                     (item) =>
-                        item.statusAppOrder.toUpperCase() ==
+                        item.statusAppOrder.toLowerCase() ==
                         StatusOrder.dikirim.name,
                   )
                   .length
@@ -109,7 +101,7 @@ class _OrderScreenState extends State<OrderScreen>
               _tabsBadge[3] = items
                   .where(
                     (item) =>
-                        item.statusAppOrder.toUpperCase() ==
+                        item.statusAppOrder.toLowerCase() ==
                         StatusOrder.selesai.name,
                   )
                   .length
@@ -120,6 +112,7 @@ class _OrderScreenState extends State<OrderScreen>
         ),
       ),
     );
+    // Tab DIPROSES
     _tabsData.add(
       OrderTabsModel(
         header: Tab(
@@ -128,9 +121,17 @@ class _OrderScreenState extends State<OrderScreen>
                   label: Text(_tabsBadge[1]),
                   textColor: cWhite,
                   backgroundColor: cPrimary100,
-                  child: const Icon(Icons.inventory_2_outlined),
+                  child: Icon(
+                    _tabController.index == 1
+                        ? Icons.inventory
+                        : Icons.inventory_2_outlined,
+                  ),
                 )
-              : const Icon(Icons.inventory_2_outlined),
+              : Icon(
+                  _tabController.index == 1
+                      ? Icons.inventory
+                      : Icons.inventory_2_outlined,
+                ),
         ),
         body: ListOrder(
           status: StatusOrder.diproses.name,
@@ -140,6 +141,7 @@ class _OrderScreenState extends State<OrderScreen>
         ),
       ),
     );
+    // Tab DIKIRIM
     _tabsData.add(
       OrderTabsModel(
         header: Tab(
@@ -148,9 +150,17 @@ class _OrderScreenState extends State<OrderScreen>
                   label: Text(_tabsBadge[2]),
                   textColor: cWhite,
                   backgroundColor: cPrimary100,
-                  child: const Icon(Icons.fire_truck_rounded),
+                  child: Icon(
+                    _tabController.index == 2
+                        ? Icons.fire_truck
+                        : Icons.fire_truck_outlined,
+                  ),
                 )
-              : const Icon(Icons.fire_truck_rounded),
+              : Icon(
+                  _tabController.index == 2
+                      ? Icons.fire_truck
+                      : Icons.fire_truck_outlined,
+                ),
         ),
         body: ListOrder(
           status: StatusOrder.dikirim.name,
@@ -160,17 +170,15 @@ class _OrderScreenState extends State<OrderScreen>
         ),
       ),
     );
+    // Tab SELESAI
     _tabsData.add(
       OrderTabsModel(
         header: Tab(
-          icon: _tabsBadge[3] != '0'
-              ? Badge(
-                  label: Text(_tabsBadge[3]),
-                  textColor: cWhite,
-                  backgroundColor: cPrimary100,
-                  child: const Icon(Icons.check_circle_sharp),
-                )
-              : const Icon(Icons.check_circle_sharp),
+          icon: Icon(
+            _tabController.index == 3
+                ? Icons.check_circle
+                : Icons.check_circle_outline,
+          ),
         ),
         body: ListOrder(
           status: StatusOrder.selesai.name,
@@ -310,7 +318,10 @@ class CardOrder extends StatelessWidget {
                     const Icon(Icons.calendar_month_rounded, color: cDark200),
                     const SizedBox(width: 8),
                     Text(
-                      MyDateFormat.formatDate(item.createdAt),
+                      MyDateFormat.formatDate(
+                        item.createdAt,
+                        outputFormat: 'dd MMMM yyyy, HH:mm',
+                      ),
                       style: const TextStyle(color: cDark200),
                     ),
                   ],
