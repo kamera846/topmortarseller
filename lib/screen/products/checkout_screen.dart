@@ -406,7 +406,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                           Column(
                             children: [
                               Text(
-                                getTotalAfterDiskon(),
+                                widget.orderItem == null
+                                    ? getTotalAfterDiskon()
+                                    : CurrencyFormat().format(
+                                        amount: double.parse(
+                                          widget.orderItem!.totalAppOrder,
+                                        ),
+                                      ),
                                 style: const TextStyle(
                                   color: cPrimary200,
                                   fontSize: 16,
@@ -414,7 +420,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                 ),
                               ),
                               Text(
-                                getTotalPrices(),
+                                widget.orderItem == null
+                                    ? getTotalPrices()
+                                    : CurrencyFormat().format(
+                                        amount: double.parse(
+                                          widget.orderItem!.subTotalAppOrder,
+                                        ),
+                                      ),
                                 style: const TextStyle(
                                   color: cPrimary200,
                                   decoration: TextDecoration.lineThrough,

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:topmortarseller/model/contact_model.dart';
 import 'package:topmortarseller/model/order_model.dart';
 import 'package:topmortarseller/model/order_tabs_model.dart';
+import 'package:topmortarseller/model/product_model.dart';
 import 'package:topmortarseller/screen/products/checkout_screen.dart';
 import 'package:topmortarseller/services/app_order_api.dart';
 import 'package:topmortarseller/util/colors/color.dart';
@@ -298,6 +299,38 @@ class CardOrder extends StatelessWidget {
 
   final OrderModel item;
 
+  void _navigateToDetail(BuildContext context) {
+    OrderModel orderItem = item;
+    List<ProductModel> listItems = [];
+    // convert order item modal to cart item
+    for (var element in orderItem.items) {
+      listItems.add(
+        ProductModel(
+          idCartDetail: '-',
+          idCart: '-',
+          qtyCartDetail: element.qtyAppOrderDetail,
+          idProduk: element.idProduk,
+          idMasterProduk: '-',
+          namaProduk: element.nameProduk,
+          idSatuan: '-',
+          idCity: '-',
+          hargaProduk: element.priceProduk,
+          nameSatuan: '-',
+          imageProduk: element.imgProduk,
+          createdAt: element.createdAt,
+          updatedAt: element.updatedAt,
+        ),
+      );
+    }
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (ctx) =>
+            CheckoutScreen(items: listItems, orderItem: orderItem),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -436,15 +469,7 @@ class CardOrder extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 InkWell(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (ctx) =>
-                            CheckoutScreen(items: [], orderItem: item),
-                      ),
-                    );
-                  },
+                  onTap: () => _navigateToDetail(context),
                   child: Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 8,
