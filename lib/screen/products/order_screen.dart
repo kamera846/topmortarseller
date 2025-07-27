@@ -315,7 +315,7 @@ class CardOrder extends StatelessWidget {
           idSatuan: '-',
           idCity: '-',
           hargaProduk: element.priceProduk,
-          nameSatuan: '-',
+          nameSatuan: element.nameSatuan,
           imageProduk: element.imgProduk,
           createdAt: element.createdAt,
           updatedAt: element.updatedAt,
@@ -341,6 +341,7 @@ class CardOrder extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -366,16 +367,16 @@ class CardOrder extends StatelessWidget {
               margin: const EdgeInsets.symmetric(vertical: 12),
               child: const Divider(height: 1, color: cDark500),
             ),
-            ListView.builder(
+            ListView.separated(
               shrinkWrap: true,
-              itemCount: item.items.length,
+              itemCount: item.items.length > 2 ? 2 : item.items.length,
               physics: const NeverScrollableScrollPhysics(),
+              separatorBuilder: (context, index) => const SizedBox(height: 12),
               itemBuilder: (context, index) {
                 final product = item.items[index];
-                return Container(
+                return SizedBox(
                   width: double.infinity,
                   height: 50,
-                  margin: const EdgeInsets.only(bottom: 12),
                   child: Row(
                     children: [
                       ClipRRect(
@@ -424,6 +425,20 @@ class CardOrder extends StatelessWidget {
                   ),
                 );
               },
+            ),
+            item.items.length > 2
+                ? Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: Text(
+                      '+ ${item.items.length - 2} produk Lainnya',
+                      textAlign: TextAlign.end,
+                      style: TextStyle(color: cDark200),
+                    ),
+                  )
+                : const SizedBox.shrink(),
+            Container(
+              margin: const EdgeInsets.symmetric(vertical: 12),
+              child: const Divider(height: 1, color: cDark500),
             ),
             Row(
               // mainAxisAlignment: MainAxisAlignment.spaceBetween,

@@ -7,6 +7,7 @@ class OrderItemModel {
   final String priceProduk;
   final String qtyAppOrderDetail;
   final String totalAppOrderDetail;
+  final String nameSatuan;
   final String createdAt;
   final String updatedAt;
   final String deletedAt;
@@ -20,6 +21,7 @@ class OrderItemModel {
     required this.priceProduk,
     required this.qtyAppOrderDetail,
     required this.totalAppOrderDetail,
+    required this.nameSatuan,
     required this.createdAt,
     required this.updatedAt,
     required this.deletedAt,
@@ -34,6 +36,7 @@ class OrderItemModel {
     String? priceProduk,
     String? qtyAppOrderDetail,
     String? totalAppOrderDetail,
+    String? nameSatuan,
     String? createdAt,
     String? updatedAt,
     String? deletedAt,
@@ -47,6 +50,7 @@ class OrderItemModel {
       priceProduk: priceProduk ?? this.priceProduk,
       qtyAppOrderDetail: qtyAppOrderDetail ?? this.qtyAppOrderDetail,
       totalAppOrderDetail: totalAppOrderDetail ?? this.totalAppOrderDetail,
+      nameSatuan: nameSatuan ?? this.nameSatuan,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       deletedAt: deletedAt ?? this.deletedAt,
@@ -62,6 +66,7 @@ class OrderItemModel {
     'price_produk': priceProduk,
     'qty_apporder_detail': qtyAppOrderDetail,
     'total_apporder_detail': totalAppOrderDetail,
+    'name_satuan': nameSatuan,
     'created_at': createdAt,
     'updated_at': updatedAt,
     'deleted_at': deletedAt,
@@ -77,6 +82,7 @@ class OrderItemModel {
       priceProduk: json['price_produk'] ?? '',
       qtyAppOrderDetail: json['qty_apporder_detail'] ?? '',
       totalAppOrderDetail: json['total_apporder_detail'] ?? '',
+      nameSatuan: json['name_satuan'] ?? '',
       createdAt: json['created_at'] ?? '',
       updatedAt: json['updated_at'] ?? '',
       deletedAt: json['deleted_at'] ?? '',

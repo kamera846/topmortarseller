@@ -336,20 +336,20 @@ class CardInvoice extends StatelessWidget {
               padding: const EdgeInsets.only(bottom: 16),
               child: Text('# Invoice ${item.noInvoie}'),
             ),
-            ListView.builder(
+            ListView.separated(
               shrinkWrap: true,
               itemCount: item.item.length > 2 ? 2 : item.item.length,
               physics: const NeverScrollableScrollPhysics(),
+              separatorBuilder: (context, index) => const SizedBox(height: 12),
               itemBuilder: (context, index) {
                 final product = item.item[index];
                 double priceProduct = 0.0;
                 if (double.tryParse(product.price) != null) {
                   priceProduct = double.parse(product.price);
                 }
-                return Container(
+                return SizedBox(
                   width: double.infinity,
                   height: 50,
-                  margin: const EdgeInsets.only(bottom: 12),
                   child: Row(
                     children: [
                       ClipRRect(
@@ -400,10 +400,13 @@ class CardInvoice extends StatelessWidget {
               },
             ),
             item.item.length > 2
-                ? Text(
-                    '+ ${item.item.length - 2} produk Lainnya',
-                    textAlign: TextAlign.end,
-                    style: TextStyle(color: cDark200),
+                ? Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: Text(
+                      '+ ${item.item.length - 2} produk Lainnya',
+                      textAlign: TextAlign.end,
+                      style: TextStyle(color: cDark200),
+                    ),
                   )
                 : const SizedBox.shrink(),
             Container(

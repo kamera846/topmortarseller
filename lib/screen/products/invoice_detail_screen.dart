@@ -5,31 +5,16 @@ import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/util/currency_format.dart';
 import 'package:topmortarseller/util/date_format.dart';
 import 'package:topmortarseller/util/enum.dart';
-import 'package:topmortarseller/widget/modal/loading_modal.dart';
+import 'package:topmortarseller/util/phone_format.dart';
 
-class InvoiceDetailScreen extends StatefulWidget {
+class InvoiceDetailScreen extends StatelessWidget {
   const InvoiceDetailScreen({super.key, required this.invoice, this.userData});
 
   final InvoiceModel invoice;
   final ContactModel? userData;
 
   @override
-  State<InvoiceDetailScreen> createState() => _InvoiceDetailScreenState();
-}
-
-class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
-  bool _isLoading = true;
-  ContactModel? _userData;
-
-  @override
-  void initState() {
-    _getUserData();
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    // final orderStatus = widget.invoice.statusInvoice.toLowerCase();
     return Scaffold(
       backgroundColor: cDark600,
       appBar: AppBar(
@@ -42,57 +27,32 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
         backgroundColor: cWhite,
         foregroundColor: cDark100,
       ),
-      // bottomNavigationBar: orderStatus == StatusOrder.waiting.name
-      //     ? _sectionButtonPayment()
-      //     : null,
       body: SafeArea(
-        child: _isLoading
-            ? const LoadingModal()
-            : SingleChildScrollView(
-                child: Card(
-                  margin: const EdgeInsets.all(12),
-                  color: cWhite,
-                  elevation: 0,
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // Section Header
-                        _sectionHeader(),
-                        // Section Detail Invoice
-                        _sectionDetailInvoice(),
-                        // Section List Product
-                        _sectionProducts(),
-                      ],
-                    ),
-                  ),
-                ),
+        child: SingleChildScrollView(
+          child: Card(
+            margin: const EdgeInsets.all(12),
+            color: cWhite,
+            elevation: 0,
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Section Header
+                  _sectionHeader(),
+                  // Section Detail Invoice
+                  _sectionDetailInvoice(),
+                  // Section List Product
+                  _sectionProducts(),
+                ],
               ),
+            ),
+          ),
+        ),
       ),
     );
   }
-
-  // Container _sectionButtonPayment() {
-  //   return Container(
-  //     width: double.infinity,
-  //     padding: const EdgeInsets.all(24),
-  //     decoration: const BoxDecoration(
-  //       color: Colors.white,
-  //       border: Border.symmetric(
-  //         horizontal: BorderSide(color: cDark600, width: 1),
-  //       ),
-  //     ),
-  //     child: SafeArea(
-  //       child: MElevatedButton(
-  //         onPressed: () {},
-  //         title: 'Bayar Sekarang',
-  //         isFullWidth: true,
-  //       ),
-  //     ),
-  //   );
-  // }
 
   Column _sectionProducts() {
     return Column(
@@ -108,12 +68,12 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
         ),
         ListView.separated(
           shrinkWrap: true,
-          separatorBuilder: (context, index) => const SizedBox(height: 8),
+          separatorBuilder: (context, index) => const SizedBox(height: 12),
           physics: const NeverScrollableScrollPhysics(),
-          itemCount: widget.invoice.item.length,
+          itemCount: invoice.item.length,
           padding: EdgeInsets.zero,
           itemBuilder: (ctx, idx) {
-            var item = widget.invoice.item[idx];
+            var item = invoice.item[idx];
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -155,14 +115,17 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
             );
           },
         ),
-        const SizedBox(height: 24),
+        Container(
+          margin: const EdgeInsets.symmetric(vertical: 24),
+          child: const Divider(height: 1, color: cDark500),
+        ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             const Text('Total', style: TextStyle(fontWeight: FontWeight.bold)),
             Text(
               CurrencyFormat().format(
-                amount: double.parse(widget.invoice.totalInvoice),
+                amount: double.parse(invoice.totalInvoice),
                 fractionDigits: 2,
               ),
               style: const TextStyle(fontWeight: FontWeight.bold),
@@ -181,7 +144,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Diterbitkan ${MyDateFormat.formatDateTime(widget.invoice.dateInvoice)}',
+            'Diterbitkan ${MyDateFormat.formatDateTime(invoice.dateInvoice)}',
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           Container(
@@ -191,35 +154,28 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Ditagihkan kepada'),
-              Text(_userData?.nama ?? '-'),
+              const Text('Ditagihkan kepada:'),
+              Text(invoice.billToName),
             ],
           ),
-          const SizedBox(height: 6),
-          // Row(
-          //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          //   children: [
-          //     const Text('Total bayar'),
-          //     Text(
-          //       CurrencyFormat().format(
-          //         amount: double.parse(widget.invoice.totalInvoice),
-          //         fractionDigits: 2,
-          //       ),
-          //     ),
-          //   ],
-          // ),
-          const SizedBox(height: 6),
-          const Row(
+          const SizedBox(height: 8),
+          Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [Text('Tanggal bayar'), Text('-')],
+            children: [
+              const Text('Nomor Telpon:'),
+              Text(MyPhoneFormat.format(invoice.billToPhone)),
+            ],
           ),
+          const SizedBox(height: 8),
+          const Text('Alamat:'),
+          Text(invoice.billToAddress),
         ],
       ),
     );
   }
 
   Container _sectionHeader() {
-    final orderStatus = widget.invoice.statusInvoice.toLowerCase();
+    final orderStatus = invoice.statusInvoice.toLowerCase();
     return Container(
       margin: const EdgeInsets.only(bottom: 24),
       child: Row(
@@ -274,29 +230,12 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                     ),
                   ],
                 ),
-                Text('# Invoices ${widget.invoice.noInvoie}'),
+                Text('# Invoices ${invoice.noInvoie}'),
               ],
             ),
           ),
         ],
       ),
     );
-  }
-
-  void _getList() async {
-    await Future.delayed(const Duration(seconds: 1), () {
-      setState(() {
-        _isLoading = false;
-      });
-    });
-  }
-
-  void _getUserData() async {
-    // final data = widget.userData ?? await getContactModel();
-    final data = await getContactModel();
-    setState(() {
-      _userData = data;
-    });
-    _getList();
   }
 }

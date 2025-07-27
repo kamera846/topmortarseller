@@ -248,17 +248,16 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             ],
                           ),
                           const SizedBox(height: 24),
-                          ListView.builder(
+                          ListView.separated(
                             itemCount: items.length,
                             shrinkWrap: true,
                             physics: const NeverScrollableScrollPhysics(),
                             padding: const EdgeInsets.all(0),
+                            separatorBuilder: (context, index) =>
+                                const SizedBox(height: 24),
                             itemBuilder: (conxtext, i) {
                               final item = items[i];
-                              return Container(
-                                margin: i < items.length - 1
-                                    ? const EdgeInsets.only(bottom: 24)
-                                    : null,
+                              return SizedBox(
                                 height: 90,
                                 child: Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -297,31 +296,34 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                               fontWeight: FontWeight.bold,
                                             ),
                                           ),
-                                          Expanded(
-                                            child: Text(
-                                              '${CurrencyFormat().format(amount: double.parse(item.hargaProduk ?? '0'))} / ${item.nameSatuan}',
-                                            ),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                '${CurrencyFormat().format(amount: double.parse(item.hargaProduk ?? '0'))} / ${item.nameSatuan}',
+                                              ),
+                                              Text(
+                                                CurrencyFormat().format(
+                                                  amount:
+                                                      (int.parse(
+                                                                item.hargaProduk ??
+                                                                    '0',
+                                                              ) *
+                                                              int.parse(
+                                                                item.qtyCartDetail ??
+                                                                    '0',
+                                                              ))
+                                                          .toDouble(),
+                                                ),
+                                                style: const TextStyle(
+                                                  color: cPrimary100,
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                           Text('x ${item.qtyCartDetail}'),
                                         ],
-                                      ),
-                                    ),
-                                    Center(
-                                      child: Text(
-                                        CurrencyFormat().format(
-                                          amount:
-                                              (int.parse(
-                                                        item.hargaProduk ?? '0',
-                                                      ) *
-                                                      int.parse(
-                                                        item.qtyCartDetail ??
-                                                            '0',
-                                                      ))
-                                                  .toDouble(),
-                                        ),
-                                        style: const TextStyle(
-                                          color: cPrimary100,
-                                        ),
                                       ),
                                     ),
                                   ],
