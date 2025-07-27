@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Top Mortar Seller',
+      title: 'MyTop Seller',
       theme: ThemeData().copyWith(
         colorScheme: mColorScheme,
         appBarTheme: const AppBarTheme().copyWith(
