@@ -1,7 +1,7 @@
 class OrderItemModel {
   final String idAppOrderDetail;
   final String idAppOrder;
-  final String idProduk;
+  final String idProduct;
   final String imgProduk;
   final String nameProduk;
   final String priceProduk;
@@ -15,7 +15,7 @@ class OrderItemModel {
   OrderItemModel({
     required this.idAppOrderDetail,
     required this.idAppOrder,
-    required this.idProduk,
+    required this.idProduct,
     required this.imgProduk,
     required this.nameProduk,
     required this.priceProduk,
@@ -30,7 +30,7 @@ class OrderItemModel {
   OrderItemModel copyWith({
     String? idAppOrderDetail,
     String? idAppOrder,
-    String? idProduk,
+    String? idProduct,
     String? imgProduk,
     String? nameProduk,
     String? priceProduk,
@@ -44,7 +44,7 @@ class OrderItemModel {
     return OrderItemModel(
       idAppOrderDetail: idAppOrderDetail ?? this.idAppOrderDetail,
       idAppOrder: idAppOrder ?? this.idAppOrder,
-      idProduk: idProduk ?? this.idProduk,
+      idProduct: idProduct ?? this.idProduct,
       imgProduk: imgProduk ?? this.imgProduk,
       nameProduk: nameProduk ?? this.nameProduk,
       priceProduk: priceProduk ?? this.priceProduk,
@@ -60,7 +60,7 @@ class OrderItemModel {
   Map<String, dynamic> toJson() => {
     'id_apporder_detail': idAppOrderDetail,
     'id_apporder': idAppOrder,
-    'id_produk': idProduk,
+    'id_produk': idProduct,
     'img_produk': imgProduk,
     'name_produk': nameProduk,
     'price_produk': priceProduk,
@@ -76,7 +76,7 @@ class OrderItemModel {
     return OrderItemModel(
       idAppOrderDetail: json['id_apporder'] ?? '',
       idAppOrder: json['id_apporder'] ?? '',
-      idProduk: json['id_produk'] ?? '',
+      idProduct: json['id_produk'] ?? '',
       imgProduk: json['img_produk'] ?? '',
       nameProduk: json['name_produk'] ?? '',
       priceProduk: json['price_produk'] ?? '',

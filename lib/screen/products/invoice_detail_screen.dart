@@ -1,17 +1,56 @@
 import 'package:flutter/material.dart';
-import 'package:topmortarseller/model/contact_model.dart';
 import 'package:topmortarseller/model/invoice_model.dart';
+import 'package:topmortarseller/services/invoice_api.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/util/currency_format.dart';
 import 'package:topmortarseller/util/date_format.dart';
 import 'package:topmortarseller/util/enum.dart';
 import 'package:topmortarseller/util/phone_format.dart';
+import 'package:topmortarseller/widget/modal/loading_modal.dart';
+import 'package:topmortarseller/widget/snackbar/show_snackbar.dart';
 
-class InvoiceDetailScreen extends StatelessWidget {
-  const InvoiceDetailScreen({super.key, required this.invoice, this.userData});
+class InvoiceDetailScreen extends StatefulWidget {
+  const InvoiceDetailScreen({super.key, required this.idInvoice});
 
-  final InvoiceModel invoice;
-  final ContactModel? userData;
+  final String idInvoice;
+
+  @override
+  State<InvoiceDetailScreen> createState() => _InvoiceDetailScreenState();
+}
+
+class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
+  late InvoiceModel invoice;
+  bool isLoading = true;
+  double totalInvoice = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+    _onRefresh();
+  }
+
+  Future<void> _onRefresh() async {
+    setState(() {
+      isLoading = true;
+    });
+    _getList();
+  }
+
+  void _getList() async {
+    await InvoiceApi().detail(
+      idInvoice: widget.idInvoice,
+      onError: (e) => showSnackBar(context, e),
+      onCompleted: (data) {
+        setState(() {
+          invoice = data ?? InvoiceModel();
+          totalInvoice = double.tryParse(invoice.totalInvoice) != null
+              ? double.parse(invoice.totalInvoice)
+              : 0.0;
+          isLoading = false;
+        });
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,28 +67,33 @@ class InvoiceDetailScreen extends StatelessWidget {
         foregroundColor: cDark100,
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Card(
-            margin: const EdgeInsets.all(12),
-            color: cWhite,
-            elevation: 0,
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Section Header
-                  _sectionHeader(),
-                  // Section Detail Invoice
-                  _sectionDetailInvoice(),
-                  // Section List Product
-                  _sectionProducts(),
-                ],
+        child: isLoading
+            ? const LoadingModal()
+            : RefreshIndicator.adaptive(
+                onRefresh: () => _onRefresh(),
+                child: SingleChildScrollView(
+                  child: Card(
+                    margin: const EdgeInsets.all(12),
+                    color: cWhite,
+                    elevation: 0,
+                    child: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Section Header
+                          _sectionHeader(),
+                          // Section Detail Invoice
+                          _sectionDetailInvoice(),
+                          // Section List Product
+                          _sectionProducts(),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
               ),
-            ),
-          ),
-        ),
       ),
     );
   }
@@ -74,6 +118,9 @@ class InvoiceDetailScreen extends StatelessWidget {
           padding: EdgeInsets.zero,
           itemBuilder: (ctx, idx) {
             var item = invoice.item[idx];
+            double price = double.tryParse(item.price) != null
+                ? double.parse(item.price)
+                : 0.0;
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -84,10 +131,7 @@ class InvoiceDetailScreen extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      CurrencyFormat().format(
-                        amount: double.parse(item.price),
-                        fractionDigits: 2,
-                      ),
+                      CurrencyFormat().format(amount: price, fractionDigits: 2),
                       style: TextStyle(
                         color: cDark200,
                         decoration: item.isBonus == '1'
@@ -124,10 +168,7 @@ class InvoiceDetailScreen extends StatelessWidget {
           children: [
             const Text('Total', style: TextStyle(fontWeight: FontWeight.bold)),
             Text(
-              CurrencyFormat().format(
-                amount: double.parse(invoice.totalInvoice),
-                fractionDigits: 2,
-              ),
+              CurrencyFormat().format(amount: totalInvoice, fractionDigits: 2),
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ],
@@ -175,7 +216,6 @@ class InvoiceDetailScreen extends StatelessWidget {
   }
 
   Container _sectionHeader() {
-    final orderStatus = invoice.statusInvoice.toLowerCase();
     return Container(
       margin: const EdgeInsets.only(bottom: 24),
       child: Row(
@@ -209,25 +249,7 @@ class InvoiceDetailScreen extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    Badge(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      label: Text(
-                        orderStatus == StatusOrder.paid.name
-                            ? 'Lunas'
-                            : 'Belum Lunas',
-                      ),
-                      backgroundColor: orderStatus == StatusOrder.paid.name
-                          ? Colors.green[700]!
-                          : Colors.orange[700]!,
-                      textColor: cWhite,
-                      textStyle: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    _generateStatusBadge(),
                   ],
                 ),
                 Text('# Invoices ${invoice.noInvoie}'),
@@ -235,6 +257,36 @@ class InvoiceDetailScreen extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Container _generateStatusBadge() {
+    final status = invoice.statusInvoice.toLowerCase();
+    List<Color> badgeColor = List.of({
+      Colors.grey.shade400,
+      Colors.grey.shade800,
+    });
+    if (status == StatusOrder.waiting.name) {
+      badgeColor = List.of({Colors.orange.shade100, Colors.orange.shade800});
+    } else if (status == StatusOrder.paid.name) {
+      badgeColor = List.of({Colors.green.shade100, Colors.green.shade800});
+    }
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: badgeColor[0].withValues(alpha: 0.4),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Text(
+        invoice.statusInvoice == StatusOrder.paid.name
+            ? 'LUNAS'
+            : 'BELUM LUNAS',
+        style: TextStyle(
+          color: badgeColor[1],
+          fontWeight: FontWeight.bold,
+          fontSize: 10,
+        ),
       ),
     );
   }

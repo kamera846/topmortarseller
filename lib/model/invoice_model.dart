@@ -18,21 +18,21 @@ class InvoiceModel {
   final List<InvoiceItemModel> item;
 
   InvoiceModel({
-    required this.idInvoice,
-    required this.noInvoie,
-    required this.billToName,
-    required this.billToPhone,
-    required this.billToAddress,
-    required this.subTotalInvoice,
-    required this.discountAppOrder,
-    required this.totalInvoice,
-    required this.statusInvoice,
-    required this.dateInvoice,
-    required this.totalQty,
-    required this.createdAt,
-    required this.updatedAt,
-    required this.deletedAt,
-    required this.item,
+    this.idInvoice = '',
+    this.noInvoie = '',
+    this.billToName = '',
+    this.billToPhone = '',
+    this.billToAddress = '',
+    this.subTotalInvoice = '',
+    this.discountAppOrder = '',
+    this.totalInvoice = '',
+    this.statusInvoice = '',
+    this.dateInvoice = '',
+    this.totalQty = '',
+    this.createdAt = '',
+    this.updatedAt = '',
+    this.deletedAt = '',
+    this.item = const [],
   });
 
   InvoiceModel copyWith({

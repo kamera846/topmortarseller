@@ -72,9 +72,9 @@ class _CatalogScreenState extends State<CatalogScreen> {
           await _getList();
         }
 
-        if (data != null && data.details != null) {
+        if (data != null && data.details.isNotEmpty) {
           checkoutedItems = [];
-          for (var product in data.details!) {
+          for (var product in data.details) {
             var dummyObject = product.copyWith(imageProduk: dummyImageUrl);
             checkoutedItems.add(dummyObject);
 
@@ -218,7 +218,8 @@ class _CatalogScreenState extends State<CatalogScreen> {
                               width: 40,
                               height: 40,
                               child: Image.network(
-                                item.imageProduk ?? '',
+                                item.imageProduk ?? 'https://google.com',
+                                key: Key(item.idProduk ?? '-1'),
                                 fit: BoxFit.cover,
                                 errorBuilder: (context, error, stackTrace) {
                                   return const Icon(
@@ -273,8 +274,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                             context,
                             MaterialPageRoute(
                               builder: (ctx) => CheckoutScreen(
-                                items: checkoutedItems,
-                                cartItem: cartItem,
+                                idCart: cartItem?.idCart ?? '-1',
                               ),
                             ),
                           ).then((value) {
@@ -288,7 +288,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                 )
               : null,
           body: SafeArea(
-            child: RefreshIndicator(
+            child: RefreshIndicator.adaptive(
               onRefresh: () => _onRefresh(),
               child: _isLoading
                   ? const LoadingModal()
@@ -326,7 +326,11 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                       width: double.infinity,
                                       height: double.infinity,
                                       child: Image.network(
-                                        item.imageProduk ?? '',
+                                        item.imageProduk ??
+                                            'https://google.com',
+                                        key: Key(
+                                          item.idProduk ?? index.toString(),
+                                        ),
                                         fit: BoxFit.cover,
                                         errorBuilder:
                                             (context, error, stackTrace) {
@@ -640,7 +644,8 @@ class _OverlayItemState extends State<OverlayItem> {
                     ClipRRect(
                       borderRadius: BorderRadius.circular(12),
                       child: Image.network(
-                        widget.selectedItem.imageProduk ?? '',
+                        widget.selectedItem.imageProduk ?? 'https://google.com',
+                        key: Key(widget.selectedItem.idProduk ?? '-1'),
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) {
                           return const Icon(

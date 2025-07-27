@@ -15,18 +15,18 @@ class OrderModel {
   final List<OrderItemModel> items;
 
   OrderModel({
-    required this.idAppOrder,
-    required this.idCart,
-    required this.idContact,
-    required this.subTotalAppOrder,
-    required this.discountAppOrder,
-    required this.totalAppOrder,
-    required this.statusAppOrder,
-    required this.totalQty,
-    required this.createdAt,
-    required this.updatedAt,
-    required this.deletedAt,
-    required this.items,
+    this.idAppOrder = '',
+    this.idCart = '',
+    this.idContact = '',
+    this.subTotalAppOrder = '',
+    this.discountAppOrder = '',
+    this.totalAppOrder = '',
+    this.statusAppOrder = '',
+    this.totalQty = '',
+    this.createdAt = '',
+    this.updatedAt = '',
+    this.deletedAt = '',
+    this.items = const [],
   });
 
   OrderModel copyWith({

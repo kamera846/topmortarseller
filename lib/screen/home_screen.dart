@@ -219,7 +219,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
             drawer: MainDrawer(userData: _userData),
-            body: RefreshIndicator(
+            body: RefreshIndicator.adaptive(
               onRefresh: () => _onRefresh(),
               child: SingleChildScrollView(
                 child: Center(

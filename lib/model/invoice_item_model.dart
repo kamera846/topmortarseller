@@ -1,15 +1,17 @@
 class InvoiceItemModel {
-  final String isBonus; //
-  final String imgProduk; //
-  final String namaProduk; //
-  final String price; //
-  final String qtyProduk; //
-  final String amount; //
-  final String createdAt; //
-  final String updatedAt; //
-  final String deletedAt; //
+  final String idProduct;
+  final String isBonus;
+  final String imgProduk;
+  final String namaProduk;
+  final String price;
+  final String qtyProduk;
+  final String amount;
+  final String createdAt;
+  final String updatedAt;
+  final String deletedAt;
 
   InvoiceItemModel({
+    required this.idProduct,
     required this.isBonus,
     required this.imgProduk,
     required this.namaProduk,
@@ -22,6 +24,7 @@ class InvoiceItemModel {
   });
 
   InvoiceItemModel copyWith({
+    String? idProduct,
     String? isBonus,
     String? imgProduk,
     String? namaProduk,
@@ -33,6 +36,7 @@ class InvoiceItemModel {
     String? deletedAt,
   }) {
     return InvoiceItemModel(
+      idProduct: idProduct ?? this.idProduct,
       isBonus: isBonus ?? this.isBonus,
       imgProduk: imgProduk ?? this.imgProduk,
       namaProduk: namaProduk ?? this.namaProduk,
@@ -46,6 +50,7 @@ class InvoiceItemModel {
   }
 
   Map<String, dynamic> toJson() => {
+    'is_produk': idProduct,
     'is_bonus': isBonus,
     'img_produk': imgProduk,
     'nama_produk': namaProduk,
@@ -59,6 +64,7 @@ class InvoiceItemModel {
 
   factory InvoiceItemModel.fromJson(Map<String, dynamic> json) {
     return InvoiceItemModel(
+      idProduct: json['id_produk'] ?? '',
       isBonus: json['is_bonus'] ?? '',
       imgProduk: json['img_produk'] ?? '',
       namaProduk: json['nama_produk'] ?? '',

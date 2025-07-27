@@ -219,7 +219,7 @@ class _ListInvoiceState extends State<ListInvoice> {
 
   @override
   Widget build(BuildContext context) {
-    return RefreshIndicator(
+    return RefreshIndicator.adaptive(
       onRefresh: () => _onRefresh(),
       child: _isLoading
           ? const LoadingModal()
@@ -258,32 +258,10 @@ class CardInvoice extends StatelessWidget {
   final InvoiceModel item;
 
   void _navigateToDetail(BuildContext context) {
-    InvoiceModel invoiceItem = item;
-    // List<ProductModel> listItems = [];
-    // // convert order item modal to cart item
-    // for (var element in invoiceItem.item) {
-    //   listItems.add(
-    //     ProductModel(
-    //       idCartDetail: '-',
-    //       idCart: '-',
-    //       qtyCartDetail: element.qtyProduk,
-    //       idProduk: '-',
-    //       idMasterProduk: '-',
-    //       namaProduk: element.namaProduk,
-    //       idSatuan: '-',
-    //       idCity: '-',
-    //       hargaProduk: element.price,
-    //       nameSatuan: '-',
-    //       imageProduk: element.imgProduk,
-    //       createdAt: element.createdAt,
-    //       updatedAt: element.updatedAt,
-    //     ),
-    //   );
-    // }
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (ctx) => InvoiceDetailScreen(invoice: invoiceItem),
+        builder: (ctx) => InvoiceDetailScreen(idInvoice: item.idInvoice),
       ),
     );
   }
@@ -364,7 +342,10 @@ class CardInvoice extends StatelessWidget {
                           width: 50,
                           height: 50,
                           child: Image.network(
-                            product.imgProduk,
+                            product.imgProduk.isNotEmpty
+                                ? product.imgProduk
+                                : 'https://google.com',
+                            key: Key(product.idProduct),
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) {
                               return const Icon(
@@ -488,11 +469,14 @@ class CardInvoice extends StatelessWidget {
 
   Container _generateStatusBadge() {
     final status = item.statusInvoice.toLowerCase();
-    List<Color> badgeColor = List.of({Colors.grey[400]!, Colors.grey[800]!});
+    List<Color> badgeColor = List.of({
+      Colors.grey.shade400,
+      Colors.grey.shade800,
+    });
     if (status == StatusOrder.waiting.name) {
-      badgeColor = List.of({Colors.blue[100]!, Colors.blue[800]!});
+      badgeColor = List.of({Colors.orange.shade100, Colors.orange.shade800});
     } else if (status == StatusOrder.paid.name) {
-      badgeColor = List.of({Colors.green[100]!, Colors.green[800]!});
+      badgeColor = List.of({Colors.green.shade100, Colors.green.shade800});
     }
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -501,7 +485,7 @@ class CardInvoice extends StatelessWidget {
         borderRadius: BorderRadius.circular(6),
       ),
       child: Text(
-        item.statusInvoice.toUpperCase(),
+        item.statusInvoice == StatusOrder.paid.name ? 'LUNAS' : 'BELUM LUNAS',
         style: TextStyle(
           color: badgeColor[1],
           fontWeight: FontWeight.bold,

@@ -4,8 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:topmortarseller/model/contact_model.dart';
 import 'package:topmortarseller/model/order_model.dart';
 import 'package:topmortarseller/model/order_tabs_model.dart';
-import 'package:topmortarseller/model/product_model.dart';
-import 'package:topmortarseller/screen/products/checkout_screen.dart';
+import 'package:topmortarseller/screen/products/order_detail_screen.dart';
 import 'package:topmortarseller/services/app_order_api.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/util/currency_format.dart';
@@ -258,7 +257,7 @@ class _ListOrderState extends State<ListOrder> {
 
   @override
   Widget build(BuildContext context) {
-    return RefreshIndicator(
+    return RefreshIndicator.adaptive(
       onRefresh: () => _onRefresh(),
       child: _isLoading
           ? const LoadingModal()
@@ -300,33 +299,10 @@ class CardOrder extends StatelessWidget {
   final OrderModel item;
 
   void _navigateToDetail(BuildContext context) {
-    OrderModel orderItem = item;
-    List<ProductModel> listItems = [];
-    // convert order item modal to cart item
-    for (var element in orderItem.items) {
-      listItems.add(
-        ProductModel(
-          idCartDetail: '-',
-          idCart: '-',
-          qtyCartDetail: element.qtyAppOrderDetail,
-          idProduk: element.idProduk,
-          idMasterProduk: '-',
-          namaProduk: element.nameProduk,
-          idSatuan: '-',
-          idCity: '-',
-          hargaProduk: element.priceProduk,
-          nameSatuan: element.nameSatuan,
-          imageProduk: element.imgProduk,
-          createdAt: element.createdAt,
-          updatedAt: element.updatedAt,
-        ),
-      );
-    }
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (ctx) =>
-            CheckoutScreen(items: listItems, orderItem: orderItem),
+        builder: (ctx) => OrderDetailScreen(idAppOrder: item.idAppOrder),
       ),
     );
   }
@@ -392,7 +368,10 @@ class CardOrder extends StatelessWidget {
                           width: 50,
                           height: 50,
                           child: Image.network(
-                            product.imgProduk,
+                            key: Key(product.idProduct),
+                            product.imgProduk.isNotEmpty
+                                ? product.imgProduk
+                                : 'https://google.com',
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) {
                               return const Icon(

@@ -2,47 +2,30 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:topmortarseller/model/cart_model.dart';
 import 'package:topmortarseller/model/contact_model.dart';
-import 'package:topmortarseller/model/order_model.dart';
-import 'package:topmortarseller/model/product_model.dart';
+import 'package:topmortarseller/model/product_discount_modal.dart';
 import 'package:topmortarseller/services/cart_api.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/util/currency_format.dart';
-import 'package:topmortarseller/util/enum.dart';
 import 'package:topmortarseller/widget/form/button/elevated_button.dart';
 import 'package:topmortarseller/widget/modal/loading_modal.dart';
 import 'package:topmortarseller/widget/snackbar/show_snackbar.dart';
 
-class ProductDiskonModel {
-  const ProductDiskonModel({required this.title, required this.diskon});
-
-  final String title;
-  final double diskon;
-}
-
 class CheckoutScreen extends StatefulWidget {
-  const CheckoutScreen({
-    super.key,
-    required this.items,
-    this.orderItem,
-    this.cartItem,
-  });
+  const CheckoutScreen({super.key, required this.idCart});
 
-  final List<ProductModel> items;
-  final OrderModel? orderItem;
-  final CartModel? cartItem;
+  final String idCart;
 
   @override
   State<CheckoutScreen> createState() => _CheckoutScreenState();
 }
 
 class _CheckoutScreenState extends State<CheckoutScreen> {
-  ContactModel? _userData;
-  List<ProductModel> items = [];
-  List<ProductDiskonModel> diskons = [];
-  bool _isLoading = true;
-  double totalPrice = 0.0;
-  double totalDiskon = 0.0;
-  double totalAfterDiskon = 0.0;
+  late ContactModel userData;
+  late CartModel cart;
+  List<ProductDiscountModel> discounts = [];
+  double subTotalPrice = 0.0;
+  double discountApp = 0.0;
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -53,7 +36,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   void _getUserData() async {
     final data = await getContactModel();
     setState(() {
-      _userData = data;
+      userData = data ?? ContactModel();
     });
 
     _onRefresh();
@@ -61,27 +44,37 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   Future<void> _onRefresh() async {
     setState(() {
-      _isLoading = true;
-      items = [];
+      isLoading = true;
     });
     _getList();
   }
 
   void _getList() async {
-    setState(() {
-      items = widget.items;
-      diskons.add(
-        const ProductDiskonModel(title: 'Diskon aplikasi', diskon: -1),
-      );
-      diskons.add(
-        const ProductDiskonModel(title: 'Diskon toko priority', diskon: -1),
-      );
-      diskons.add(
-        const ProductDiskonModel(title: 'Voucher 10.000', diskon: -1),
-      );
-      diskons.add(const ProductDiskonModel(title: 'Biaya admin', diskon: 5));
-      _isLoading = false;
-    });
+    await CartApiService().get(
+      idContact: userData.idContact ?? '-1',
+      onSuccess: (e) => showSnackBar(context, e),
+      onError: (e) => showSnackBar(context, e),
+      onCompleted: (data) {
+        setState(() {
+          cart = data ?? CartModel();
+          subTotalPrice = double.tryParse(cart.subtotalPrice) == null
+              ? 0.0
+              : double.parse(cart.subtotalPrice);
+          discountApp = double.tryParse(cart.discountApp) == null
+              ? 0.0
+              : double.parse(cart.discountApp);
+          if (discountApp > 0.0) {
+            discounts.add(
+              ProductDiscountModel(
+                title: 'Diskon Aplikasi',
+                discount: discountApp,
+              ),
+            );
+          }
+          isLoading = false;
+        });
+      },
+    );
   }
 
   void _checkoutConfirmation() {
@@ -113,11 +106,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   Future<void> _submitCheckout() async {
     setState(() {
-      _isLoading = true;
+      isLoading = true;
     });
     await CartApiService().checkout(
-      idContact: _userData?.idContact ?? '-1',
-      idCart: widget.cartItem?.idCart ?? '-1',
+      idContact: userData.idContact ?? '-1',
+      idCart: cart.idCart,
       onError: (e) {
         showSnackBar(context, e);
       },
@@ -129,7 +122,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           Navigator.pop(context, 'isCheckouted');
         } else {
           setState(() {
-            _isLoading = false;
+            isLoading = false;
           });
         }
       },
@@ -156,7 +149,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final statusOrder = widget.orderItem?.statusAppOrder.toLowerCase();
     return Scaffold(
       backgroundColor: cDark600,
       appBar: AppBar(
@@ -164,54 +156,33 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: Text(widget.orderItem != null ? 'Pesanan Saya' : 'Checkout'),
+        title: Text('Checkout Pesanan'),
         centerTitle: false,
         backgroundColor: cWhite,
         foregroundColor: cDark100,
       ),
-      bottomNavigationBar:
-          widget.orderItem == null ||
-              (widget.orderItem != null &&
-                  statusOrder == StatusOrder.waiting.name)
-          ? Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(24),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                border: Border.symmetric(
-                  horizontal: BorderSide(color: cDark600, width: 1),
-                ),
-              ),
-              child: SafeArea(
-                child: MElevatedButton(
-                  onPressed: () {
-                    if (widget.orderItem != null &&
-                        statusOrder == StatusOrder.waiting.name) {
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //     builder: (ctx) =>
-                      //         InvoiceDetailScreen(invoice: widget.orderItem!),
-                      //   ),
-                      // );
-                    } else {
-                      _checkoutConfirmation();
-                    }
-                  },
-                  title:
-                      widget.orderItem != null &&
-                          statusOrder == StatusOrder.waiting.name
-                      ? 'Bayar Sekarang'
-                      : 'Checkout Sekarang',
-                  isFullWidth: true,
-                ),
-              ),
-            )
-          : null,
-      body: SafeArea(
-        child: _isLoading
-            ? const LoadingModal()
-            : SingleChildScrollView(
+      bottomNavigationBar: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(24),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          border: Border.symmetric(
+            horizontal: BorderSide(color: cDark600, width: 1),
+          ),
+        ),
+        child: SafeArea(
+          child: MElevatedButton(
+            onPressed: () => _checkoutConfirmation(),
+            title: 'Checkout Sekarang',
+            isFullWidth: true,
+          ),
+        ),
+      ),
+      body: isLoading
+          ? const LoadingModal()
+          : RefreshIndicator.adaptive(
+              onRefresh: () => _onRefresh(),
+              child: SingleChildScrollView(
                 child: Column(
                   children: [
                     Container(
@@ -242,21 +213,21 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                               ),
                               const SizedBox(width: 12),
                               Text(
-                                '${items.length} produk',
+                                '${cart.details.length} produk',
                                 style: const TextStyle(color: cDark200),
                               ),
                             ],
                           ),
                           const SizedBox(height: 24),
                           ListView.separated(
-                            itemCount: items.length,
+                            itemCount: cart.details.length,
                             shrinkWrap: true,
                             physics: const NeverScrollableScrollPhysics(),
                             padding: const EdgeInsets.all(0),
                             separatorBuilder: (context, index) =>
                                 const SizedBox(height: 24),
                             itemBuilder: (conxtext, i) {
-                              final item = items[i];
+                              final product = cart.details[i];
                               return SizedBox(
                                 height: 90,
                                 child: Row(
@@ -269,7 +240,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                         width: 90,
                                         height: 90,
                                         child: Image.network(
-                                          item.imageProduk ?? '',
+                                          product.imageProduk ??
+                                              'https://google.com',
+                                          key: Key(
+                                            product.idProduk ?? i.toString(),
+                                          ),
                                           fit: BoxFit.cover,
                                           errorBuilder:
                                               (context, error, stackTrace) {
@@ -289,7 +264,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            item.namaProduk ?? '',
+                                            product.namaProduk ?? '',
                                             maxLines: 2,
                                             overflow: TextOverflow.ellipsis,
                                             style: const TextStyle(
@@ -301,17 +276,17 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                                 MainAxisAlignment.spaceBetween,
                                             children: [
                                               Text(
-                                                '${CurrencyFormat().format(amount: double.parse(item.hargaProduk ?? '0'))} / ${item.nameSatuan}',
+                                                '${CurrencyFormat().format(amount: double.parse(product.hargaProduk ?? '0'))} / ${product.nameSatuan}',
                                               ),
                                               Text(
                                                 CurrencyFormat().format(
                                                   amount:
                                                       (int.parse(
-                                                                item.hargaProduk ??
+                                                                product.hargaProduk ??
                                                                     '0',
                                                               ) *
                                                               int.parse(
-                                                                item.qtyCartDetail ??
+                                                                product.qtyCartDetail ??
                                                                     '0',
                                                               ))
                                                           .toDouble(),
@@ -322,7 +297,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                               ),
                                             ],
                                           ),
-                                          Text('x ${item.qtyCartDetail}'),
+                                          Text('x ${product.qtyCartDetail}'),
                                         ],
                                       ),
                                     ),
@@ -351,32 +326,31 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                 ),
                               ),
                               Text(
-                                getTotalPrices(),
+                                CurrencyFormat().format(
+                                  amount: subTotalPrice,
+                                  fractionDigits: 2,
+                                ),
                                 style: const TextStyle(color: cPrimary100),
                               ),
                             ],
                           ),
                           const SizedBox(height: 24),
-                          ListView.builder(
-                            itemCount: diskons.length,
+                          ListView.separated(
+                            itemCount: discounts.length,
                             shrinkWrap: true,
                             physics: const NeverScrollableScrollPhysics(),
                             padding: const EdgeInsets.all(0),
+                            separatorBuilder: (context, index) =>
+                                const SizedBox(height: 12),
                             itemBuilder: (ctx, idx) {
-                              var diskonItem = diskons[idx];
-                              return Container(
-                                margin: const EdgeInsets.only(bottom: 12),
-                                child: Row(
-                                  children: [
-                                    Expanded(child: Text(diskonItem.title)),
-                                    Text(
-                                      CurrencyFormat().format(
-                                        amount: diskonItem.diskon,
-                                        fractionDigits: 2,
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                              var discountItem = discounts[idx];
+                              return Row(
+                                children: [
+                                  Expanded(child: Text(discountItem.title)),
+                                  Text(
+                                    '- ${CurrencyFormat().format(amount: discountItem.discount, fractionDigits: 2)}',
+                                  ),
+                                ],
                               );
                             },
                           ),
@@ -400,32 +374,24 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             ),
                           ),
                           Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               Text(
-                                widget.orderItem == null
-                                    ? getTotalAfterDiskon()
-                                    : CurrencyFormat().format(
-                                        amount: double.parse(
-                                          widget.orderItem!.totalAppOrder,
-                                        ),
-                                      ),
+                                CurrencyFormat().format(
+                                  amount: double.parse(cart.subtotalPrice),
+                                  fractionDigits: 2,
+                                ),
+                                style: const TextStyle(
+                                  color: cPrimary200,
+                                  decoration: TextDecoration.lineThrough,
+                                ),
+                              ),
+                              Text(
+                                getTotalAfterDiskon(),
                                 style: const TextStyle(
                                   color: cPrimary200,
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Text(
-                                widget.orderItem == null
-                                    ? getTotalPrices()
-                                    : CurrencyFormat().format(
-                                        amount: double.parse(
-                                          widget.orderItem!.subTotalAppOrder,
-                                        ),
-                                      ),
-                                style: const TextStyle(
-                                  color: cPrimary200,
-                                  decoration: TextDecoration.lineThrough,
                                 ),
                               ),
                             ],
@@ -436,101 +402,26 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   ],
                 ),
               ),
-      ),
+            ),
     );
   }
 
-  String getTotalPrices() {
-    var totalPrice = 0.0;
-    for (var item in items) {
-      double totalPriceProduct =
-          double.parse(item.hargaProduk ?? '0') *
-          double.parse(item.qtyCartDetail ?? '0');
-      setState(() {
-        totalPrice += totalPriceProduct;
-      });
-    }
-    return CurrencyFormat().format(amount: totalPrice, fractionDigits: 2);
-  }
-
   String getTotalAfterDiskon() {
-    var totalPrice = 0.0;
-    var totalDiskon = 0.0;
-    for (var item in items) {
-      double totalPriceProduct =
-          double.parse(item.hargaProduk ?? '0') *
-          double.parse(item.qtyCartDetail ?? '0');
-      setState(() {
-        totalPrice += totalPriceProduct;
-      });
-    }
-    for (var item in diskons) {
-      totalDiskon += item.diskon;
-    }
-    var totalAfterDiskon = totalPrice + totalDiskon;
-    return CurrencyFormat().format(amount: totalAfterDiskon, fractionDigits: 2);
+    var totalAfterDiskon = subTotalPrice - discountApp;
+    return CurrencyFormat().format(amount: totalAfterDiskon);
   }
 
   Color getReminderBackgroundColor() {
-    if (widget.orderItem != null) {
-      var statusAppOrder = widget.orderItem?.statusAppOrder.toLowerCase();
-      if (statusAppOrder == 'diproses') {
-        return Colors.grey[400]!;
-      } else if (statusAppOrder == 'dikirim') {
-        return Colors.blue[100]!;
-      } else if (statusAppOrder == 'invoice') {
-        return Colors.orange[100]!;
-      } else if (statusAppOrder == 'selesai') {
-        return Colors.green[100]!;
-      } else {
-        return Colors.yellow[700]!.withAlpha(180);
-      }
-    } else {
-      return Colors.yellow[700]!.withAlpha(180);
-    }
+    return Colors.yellow[700]!.withAlpha(180);
   }
 
   Widget getReminderIcon() {
-    if (widget.orderItem != null) {
-      var statusAppOrder = widget.orderItem?.statusAppOrder.toLowerCase();
-      if (statusAppOrder == 'diproses') {
-        return const Icon(Icons.inventory_2_outlined);
-      } else if (statusAppOrder == 'dikirim') {
-        return const Icon(Icons.fire_truck_rounded);
-      } else if (statusAppOrder == 'invoice') {
-        return const Icon(Icons.payment_rounded);
-      } else if (statusAppOrder == 'selesai') {
-        return const Icon(Icons.check_circle_sharp);
-      } else {
-        return const Icon(Icons.info_outline);
-      }
-    } else {
-      return const Icon(Icons.info_outline);
-    }
+    return const Icon(Icons.info_outline);
   }
 
   Column getReminderTitleAndDescriptionText() {
-    var title = 'Periksa produk sebelum checkout';
-    var description = 'Pastikan setiap detail sudah sesuai';
-    if (widget.orderItem != null) {
-      var statusAppOrder = widget.orderItem?.statusAppOrder.toLowerCase();
-      if (statusAppOrder == 'diproses') {
-        title = 'Status pesanan sedang diproses';
-        description = 'Sabarr ngab :))';
-      } else if (statusAppOrder == 'dikirim') {
-        title = 'Status pesanan sedang dikirim';
-        description = 'Otewe niih :)';
-      } else if (statusAppOrder == 'invoice') {
-        title = 'Status pesanan sudah diterima';
-        description = 'Bayarr woyy';
-      } else if (statusAppOrder == 'selesai') {
-        title = 'Status pesanan sudah selesai';
-        description = 'Terimakasih bos, cair nih caiirr ..';
-      } else {
-        title = '-';
-        description = '-';
-      }
-    }
+    String title = 'Periksa produk sebelum checkout';
+    String description = 'Pastikan setiap detail sudah sesuai';
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
