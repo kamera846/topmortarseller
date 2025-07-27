@@ -11,6 +11,7 @@ class InvoiceModel {
   final String totalInvoice;
   final String statusInvoice;
   final String dateInvoice;
+  final String totalQty;
   final String createdAt;
   final String updatedAt;
   final String deletedAt;
@@ -27,6 +28,7 @@ class InvoiceModel {
     required this.totalInvoice,
     required this.statusInvoice,
     required this.dateInvoice,
+    required this.totalQty,
     required this.createdAt,
     required this.updatedAt,
     required this.deletedAt,
@@ -61,6 +63,7 @@ class InvoiceModel {
       totalInvoice: totalInvoice ?? this.totalInvoice,
       statusInvoice: statusInvoice ?? this.statusInvoice,
       dateInvoice: dateInvoice ?? this.dateInvoice,
+      totalQty: totalQty ?? this.totalQty,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       deletedAt: deletedAt ?? this.deletedAt,
@@ -79,6 +82,7 @@ class InvoiceModel {
     'total_invoice': totalInvoice,
     'status_invoice': statusInvoice,
     'date_invoice': dateInvoice,
+    'total_qty': totalQty,
     'created_at': createdAt,
     'updated_at': updatedAt,
     'deleted_at': deletedAt,
@@ -97,6 +101,7 @@ class InvoiceModel {
       totalInvoice: json['total_invoice'] ?? '',
       statusInvoice: json['status_invoice'] ?? '',
       dateInvoice: json['date_invoice'] ?? '',
+      totalQty: json['total_qty'] ?? '',
       createdAt: json['created_at'] ?? '',
       updatedAt: json['updated_at'] ?? '',
       deletedAt: json['deleted_at'] ?? '',

@@ -333,6 +333,12 @@ class CardOrder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final totalItems = item.items.length;
+    final totalQty = int.tryParse(item.totalQty) != null
+        ? int.parse(item.totalQty)
+        : item.items.length;
+    final moreItems = totalQty - totalItems;
+
     return Card(
       color: cWhite,
       clipBehavior: Clip.antiAliasWithSaveLayer,
@@ -369,7 +375,7 @@ class CardOrder extends StatelessWidget {
             ),
             ListView.separated(
               shrinkWrap: true,
-              itemCount: item.items.length > 2 ? 2 : item.items.length,
+              itemCount: totalItems,
               physics: const NeverScrollableScrollPhysics(),
               separatorBuilder: (context, index) => const SizedBox(height: 12),
               itemBuilder: (context, index) {
@@ -426,11 +432,11 @@ class CardOrder extends StatelessWidget {
                 );
               },
             ),
-            item.items.length > 2
+            moreItems > 0
                 ? Padding(
                     padding: const EdgeInsets.only(top: 12),
                     child: Text(
-                      '+ ${item.items.length - 2} produk Lainnya',
+                      '+ $moreItems produk Lainnya',
                       textAlign: TextAlign.end,
                       style: TextStyle(color: cDark200),
                     ),
@@ -449,11 +455,10 @@ class CardOrder extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text('Total ${item.items.length} produk'),
+                      Text('Total $totalItems produk'),
                       Row(
                         children: [
                           Text(
-                            // _countPrice(item.items),
                             CurrencyFormat().format(
                               amount: double.parse(item.totalAppOrder),
                             ),

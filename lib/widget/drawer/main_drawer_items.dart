@@ -82,11 +82,7 @@ class MainDrawerItems extends StatelessWidget {
         DrawerItem(
           title: 'Pesananan Saya',
           description: 'Pantau status pesanan anda',
-          icon: const Icon(
-            CupertinoIcons.square_favorites_fill,
-            size: 26,
-            color: cDark100,
-          ),
+          icon: const Icon(CupertinoIcons.cube_box, size: 26, color: cDark100),
           onTap: () {
             Navigator.of(context).push(
               MaterialPageRoute(
@@ -98,8 +94,12 @@ class MainDrawerItems extends StatelessWidget {
         // User Invoices
         DrawerItem(
           title: 'Invoice Saya',
-          description: 'Jaga reputasi dengan pembayaran tepat waktu',
-          icon: const Icon(Icons.receipt_long, size: 26, color: cDark100),
+          description: 'Jaga reputasi toko anda dengan pembayaran tepat waktu',
+          icon: const Icon(
+            Icons.receipt_long_outlined,
+            size: 26,
+            color: cDark100,
+          ),
           onTap: () {
             Navigator.of(context).push(
               MaterialPageRoute(

@@ -298,6 +298,11 @@ class CardInvoice extends StatelessWidget {
     if (double.tryParse(item.subTotalInvoice) != null) {
       subTotalInvoice = double.parse(item.subTotalInvoice);
     }
+    final totalItems = item.item.length;
+    final totalQty = int.tryParse(item.totalQty) != null
+        ? int.parse(item.totalQty)
+        : item.item.length;
+    final moreItems = totalQty - totalItems;
     return Card(
       color: cWhite,
       clipBehavior: Clip.antiAliasWithSaveLayer,
@@ -338,7 +343,7 @@ class CardInvoice extends StatelessWidget {
             ),
             ListView.separated(
               shrinkWrap: true,
-              itemCount: item.item.length > 2 ? 2 : item.item.length,
+              itemCount: totalItems,
               physics: const NeverScrollableScrollPhysics(),
               separatorBuilder: (context, index) => const SizedBox(height: 12),
               itemBuilder: (context, index) {
@@ -399,11 +404,11 @@ class CardInvoice extends StatelessWidget {
                 );
               },
             ),
-            item.item.length > 2
+            moreItems > 0
                 ? Padding(
                     padding: const EdgeInsets.only(top: 12),
                     child: Text(
-                      '+ ${item.item.length - 2} produk Lainnya',
+                      '+ $moreItems produk Lainnya',
                       textAlign: TextAlign.end,
                       style: TextStyle(color: cDark200),
                     ),
@@ -422,7 +427,7 @@ class CardInvoice extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text('Total ${item.item.length} produk'),
+                      Text('Total $totalItems produk'),
                       Row(
                         children: [
                           Text(
