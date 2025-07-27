@@ -23,4 +23,4 @@ enum GlobalEnum {
 
 enum AuthType { login, register, forgot, otp, resetPassword }
 
-enum StatusOrder { all, diproses, dikirim, invoice, selesai }
+enum StatusOrder { all, diproses, dikirim, paid, waiting, selesai }

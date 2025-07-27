@@ -4,7 +4,7 @@ import 'package:topmortarseller/model/cart_model.dart';
 import 'package:topmortarseller/model/contact_model.dart';
 import 'package:topmortarseller/model/order_model.dart';
 import 'package:topmortarseller/model/product_model.dart';
-import 'package:topmortarseller/screen/products/invoice_screen.dart';
+import 'package:topmortarseller/screen/products/invoice_detail_screen.dart';
 import 'package:topmortarseller/services/cart_api.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/util/currency_format.dart';
@@ -173,7 +173,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       bottomNavigationBar:
           widget.orderItem == null ||
               (widget.orderItem != null &&
-                  statusOrder == StatusOrder.invoice.name)
+                  statusOrder == StatusOrder.waiting.name)
           ? Container(
               width: double.infinity,
               padding: const EdgeInsets.all(24),
@@ -187,12 +187,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 child: MElevatedButton(
                   onPressed: () {
                     if (widget.orderItem != null &&
-                        statusOrder == StatusOrder.invoice.name) {
+                        statusOrder == StatusOrder.waiting.name) {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (ctx) =>
-                              InvoiceScreen(orderItem: widget.orderItem!),
+                              InvoiceDetailScreen(orderItem: widget.orderItem!),
                         ),
                       );
                     } else {
@@ -201,7 +201,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   },
                   title:
                       widget.orderItem != null &&
-                          statusOrder == StatusOrder.invoice.name
+                          statusOrder == StatusOrder.waiting.name
                       ? 'Bayar Sekarang'
                       : 'Checkout Sekarang',
                   isFullWidth: true,
