@@ -1,21 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:topmortarseller/model/contact_model.dart';
-import 'package:topmortarseller/model/order_model.dart';
+import 'package:topmortarseller/model/invoice_model.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/util/currency_format.dart';
 import 'package:topmortarseller/util/date_format.dart';
 import 'package:topmortarseller/util/enum.dart';
-import 'package:topmortarseller/widget/form/button/elevated_button.dart';
 import 'package:topmortarseller/widget/modal/loading_modal.dart';
 
 class InvoiceDetailScreen extends StatefulWidget {
-  const InvoiceDetailScreen({
-    super.key,
-    required this.orderItem,
-    this.userData,
-  });
+  const InvoiceDetailScreen({super.key, required this.invoice, this.userData});
 
-  final OrderModel orderItem;
+  final InvoiceModel invoice;
   final ContactModel? userData;
 
   @override
@@ -34,7 +29,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final orderStatus = widget.orderItem.statusAppOrder.toLowerCase();
+    // final orderStatus = widget.invoice.statusInvoice.toLowerCase();
     return Scaffold(
       backgroundColor: cDark600,
       appBar: AppBar(
@@ -47,29 +42,31 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
         backgroundColor: cWhite,
         foregroundColor: cDark100,
       ),
-      bottomNavigationBar: orderStatus == StatusOrder.waiting.name
-          ? _sectionButtonPayment()
-          : null,
+      // bottomNavigationBar: orderStatus == StatusOrder.waiting.name
+      //     ? _sectionButtonPayment()
+      //     : null,
       body: SafeArea(
         child: _isLoading
             ? const LoadingModal()
-            : Card(
-                margin: const EdgeInsets.all(12),
-                color: cWhite,
-                elevation: 0,
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // Section Header
-                      _sectionHeader(),
-                      // Section Detail Invoice
-                      _sectionDetailInvoice(),
-                      // Section List Product
-                      _sectionProducts(),
-                    ],
+            : SingleChildScrollView(
+                child: Card(
+                  margin: const EdgeInsets.all(12),
+                  color: cWhite,
+                  elevation: 0,
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Section Header
+                        _sectionHeader(),
+                        // Section Detail Invoice
+                        _sectionDetailInvoice(),
+                        // Section List Product
+                        _sectionProducts(),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -77,25 +74,25 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
     );
   }
 
-  Container _sectionButtonPayment() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(24),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border.symmetric(
-          horizontal: BorderSide(color: cDark600, width: 1),
-        ),
-      ),
-      child: SafeArea(
-        child: MElevatedButton(
-          onPressed: () {},
-          title: 'Bayar Sekarang',
-          isFullWidth: true,
-        ),
-      ),
-    );
-  }
+  // Container _sectionButtonPayment() {
+  //   return Container(
+  //     width: double.infinity,
+  //     padding: const EdgeInsets.all(24),
+  //     decoration: const BoxDecoration(
+  //       color: Colors.white,
+  //       border: Border.symmetric(
+  //         horizontal: BorderSide(color: cDark600, width: 1),
+  //       ),
+  //     ),
+  //     child: SafeArea(
+  //       child: MElevatedButton(
+  //         onPressed: () {},
+  //         title: 'Bayar Sekarang',
+  //         isFullWidth: true,
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Column _sectionProducts() {
     return Column(
@@ -111,34 +108,48 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
         ),
         ListView.separated(
           shrinkWrap: true,
-          separatorBuilder: (context, index) => const SizedBox(height: 6),
+          separatorBuilder: (context, index) => const SizedBox(height: 8),
           physics: const NeverScrollableScrollPhysics(),
-          itemCount: widget.orderItem.items.length,
-          padding: const EdgeInsets.all(0),
+          itemCount: widget.invoice.item.length,
+          padding: EdgeInsets.zero,
           itemBuilder: (ctx, idx) {
-            var item = widget.orderItem.items[idx];
-            var totalPrice =
-                double.parse(item.qtyAppOrderDetail) *
-                double.parse(item.priceProduk);
-            return Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            var item = widget.invoice.item[idx];
+            return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                Text(
+                  item.namaProduk,
+                  style: TextStyle(fontWeight: FontWeight.w400),
+                ),
+                Row(
                   children: [
-                    Text(item.nameProduk),
                     Text(
-                      'x${item.qtyAppOrderDetail}',
-                      style: const TextStyle(color: cDark200),
+                      CurrencyFormat().format(
+                        amount: double.parse(item.price),
+                        fractionDigits: 2,
+                      ),
+                      style: TextStyle(
+                        color: cDark200,
+                        decoration: item.isBonus == '1'
+                            ? TextDecoration.lineThrough
+                            : TextDecoration.none,
+                      ),
+                    ),
+                    item.isBonus == '1'
+                        ? Padding(
+                            padding: const EdgeInsets.only(left: 8),
+                            child: Text(
+                              '(Free)',
+                              style: TextStyle(color: cDark200),
+                            ),
+                          )
+                        : const SizedBox.shrink(),
+                    const Spacer(),
+                    Text(
+                      'x${item.qtyProduk}',
+                      style: TextStyle(color: cDark200),
                     ),
                   ],
-                ),
-                Text(
-                  CurrencyFormat().format(
-                    amount: totalPrice,
-                    fractionDigits: 2,
-                  ),
                 ),
               ],
             );
@@ -151,13 +162,14 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
             const Text('Total', style: TextStyle(fontWeight: FontWeight.bold)),
             Text(
               CurrencyFormat().format(
-                amount: double.parse(widget.orderItem.totalAppOrder),
+                amount: double.parse(widget.invoice.totalInvoice),
                 fractionDigits: 2,
               ),
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ],
         ),
+        const SizedBox(height: 16),
       ],
     );
   }
@@ -169,7 +181,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Diterbitkan pada ${MyDateFormat.formatDateTime(widget.orderItem.createdAt)}',
+            'Diterbitkan ${MyDateFormat.formatDateTime(widget.invoice.dateInvoice)}',
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           Container(
@@ -184,18 +196,18 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
             ],
           ),
           const SizedBox(height: 6),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text('Total bayar'),
-              Text(
-                CurrencyFormat().format(
-                  amount: double.parse(widget.orderItem.totalAppOrder),
-                  fractionDigits: 2,
-                ),
-              ),
-            ],
-          ),
+          // Row(
+          //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //   children: [
+          //     const Text('Total bayar'),
+          //     Text(
+          //       CurrencyFormat().format(
+          //         amount: double.parse(widget.invoice.totalInvoice),
+          //         fractionDigits: 2,
+          //       ),
+          //     ),
+          //   ],
+          // ),
           const SizedBox(height: 6),
           const Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -207,7 +219,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
   }
 
   Container _sectionHeader() {
-    final orderStatus = widget.orderItem.statusAppOrder.toLowerCase();
+    final orderStatus = widget.invoice.statusInvoice.toLowerCase();
     return Container(
       margin: const EdgeInsets.only(bottom: 24),
       child: Row(
@@ -247,11 +259,11 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                         vertical: 4,
                       ),
                       label: Text(
-                        orderStatus == StatusOrder.selesai.name
+                        orderStatus == StatusOrder.paid.name
                             ? 'Lunas'
                             : 'Belum Lunas',
                       ),
-                      backgroundColor: orderStatus == StatusOrder.selesai.name
+                      backgroundColor: orderStatus == StatusOrder.paid.name
                           ? Colors.green[700]!
                           : Colors.orange[700]!,
                       textColor: cWhite,
@@ -262,7 +274,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                     ),
                   ],
                 ),
-                const Text('Invoices #70'),
+                Text('# Invoices ${widget.invoice.noInvoie}'),
               ],
             ),
           ),

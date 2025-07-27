@@ -4,7 +4,6 @@ import 'package:topmortarseller/model/cart_model.dart';
 import 'package:topmortarseller/model/contact_model.dart';
 import 'package:topmortarseller/model/order_model.dart';
 import 'package:topmortarseller/model/product_model.dart';
-import 'package:topmortarseller/screen/products/invoice_detail_screen.dart';
 import 'package:topmortarseller/services/cart_api.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/util/currency_format.dart';
@@ -188,13 +187,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   onPressed: () {
                     if (widget.orderItem != null &&
                         statusOrder == StatusOrder.waiting.name) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (ctx) =>
-                              InvoiceDetailScreen(orderItem: widget.orderItem!),
-                        ),
-                      );
+                      // Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //     builder: (ctx) =>
+                      //         InvoiceDetailScreen(invoice: widget.orderItem!),
+                      //   ),
+                      // );
                     } else {
                       _checkoutConfirmation();
                     }
@@ -270,22 +269,17 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                         color: cDark600,
                                         width: 90,
                                         height: 90,
-                                        child: Hero(
-                                          tag: widget.orderItem != null
-                                              ? 'product-${item.idProduk}-${widget.orderItem!.idAppOrder}'
-                                              : 'product-${item.idProduk}',
-                                          child: Image.network(
-                                            item.imageProduk ?? '',
-                                            fit: BoxFit.cover,
-                                            errorBuilder:
-                                                (context, error, stackTrace) {
-                                                  return const Icon(
-                                                    Icons.broken_image,
-                                                    size: 40,
-                                                    color: Colors.grey,
-                                                  );
-                                                },
-                                          ),
+                                        child: Image.network(
+                                          item.imageProduk ?? '',
+                                          fit: BoxFit.cover,
+                                          errorBuilder:
+                                              (context, error, stackTrace) {
+                                                return const Icon(
+                                                  Icons.broken_image,
+                                                  size: 40,
+                                                  color: Colors.grey,
+                                                );
+                                              },
                                         ),
                                       ),
                                     ),

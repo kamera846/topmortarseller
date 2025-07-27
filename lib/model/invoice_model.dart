@@ -1,16 +1,17 @@
 import 'package:topmortarseller/model/invoice_item_model.dart';
 
 class InvoiceModel {
-  final String idInvoice; //
-  final String noInvoie; //
-  final String subTotalInvoice; //
+  final String idInvoice;
+  final String noInvoie;
+  final String subTotalInvoice;
   final String discountAppOrder;
-  final String totalInvoice; //
-  final String statusInvoice; //
-  final String createdAt; //
-  final String updatedAt; //
-  final String deletedAt; //
-  final List<InvoiceItemModel> item; //
+  final String totalInvoice;
+  final String statusInvoice;
+  final String dateInvoice;
+  final String createdAt;
+  final String updatedAt;
+  final String deletedAt;
+  final List<InvoiceItemModel> item;
 
   InvoiceModel({
     required this.idInvoice,
@@ -19,6 +20,7 @@ class InvoiceModel {
     required this.discountAppOrder,
     required this.totalInvoice,
     required this.statusInvoice,
+    required this.dateInvoice,
     required this.createdAt,
     required this.updatedAt,
     required this.deletedAt,
@@ -34,6 +36,7 @@ class InvoiceModel {
     String? totalInvoice,
     String? statusInvoice,
     String? totalQty,
+    String? dateInvoice,
     String? createdAt,
     String? updatedAt,
     String? deletedAt,
@@ -46,6 +49,7 @@ class InvoiceModel {
       discountAppOrder: discountAppOrder ?? this.discountAppOrder,
       totalInvoice: totalInvoice ?? this.totalInvoice,
       statusInvoice: statusInvoice ?? this.statusInvoice,
+      dateInvoice: dateInvoice ?? this.dateInvoice,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       deletedAt: deletedAt ?? this.deletedAt,
@@ -60,6 +64,7 @@ class InvoiceModel {
     'discount_apporder': discountAppOrder,
     'total_invoice': totalInvoice,
     'status_invoice': statusInvoice,
+    'date_invoice': dateInvoice,
     'created_at': createdAt,
     'updated_at': updatedAt,
     'deleted_at': deletedAt,
@@ -74,6 +79,7 @@ class InvoiceModel {
       discountAppOrder: json['discount_apporder'] ?? '',
       totalInvoice: json['total_invoice'] ?? '',
       statusInvoice: json['status_invoice'] ?? '',
+      dateInvoice: json['date_invoice'] ?? '',
       createdAt: json['created_at'] ?? '',
       updatedAt: json['updated_at'] ?? '',
       deletedAt: json['deleted_at'] ?? '',

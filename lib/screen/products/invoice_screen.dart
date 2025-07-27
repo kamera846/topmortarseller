@@ -4,8 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:topmortarseller/model/contact_model.dart';
 import 'package:topmortarseller/model/invoice_model.dart';
 import 'package:topmortarseller/model/order_tabs_model.dart';
-import 'package:topmortarseller/model/product_model.dart';
-import 'package:topmortarseller/screen/products/checkout_screen.dart';
+import 'package:topmortarseller/screen/products/invoice_detail_screen.dart';
 import 'package:topmortarseller/services/invoice_api.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/util/currency_format.dart';
@@ -259,33 +258,32 @@ class CardInvoice extends StatelessWidget {
   final InvoiceModel item;
 
   void _navigateToDetail(BuildContext context) {
-    return;
     InvoiceModel invoiceItem = item;
-    List<ProductModel> listItems = [];
-    // convert order item modal to cart item
-    for (var element in invoiceItem.item) {
-      listItems.add(
-        ProductModel(
-          idCartDetail: '-',
-          idCart: '-',
-          qtyCartDetail: element.qtyProduk,
-          idProduk: '-',
-          idMasterProduk: '-',
-          namaProduk: element.namaProduk,
-          idSatuan: '-',
-          idCity: '-',
-          hargaProduk: element.price,
-          nameSatuan: '-',
-          imageProduk: element.imgProduk,
-          createdAt: element.createdAt,
-          updatedAt: element.updatedAt,
-        ),
-      );
-    }
+    // List<ProductModel> listItems = [];
+    // // convert order item modal to cart item
+    // for (var element in invoiceItem.item) {
+    //   listItems.add(
+    //     ProductModel(
+    //       idCartDetail: '-',
+    //       idCart: '-',
+    //       qtyCartDetail: element.qtyProduk,
+    //       idProduk: '-',
+    //       idMasterProduk: '-',
+    //       namaProduk: element.namaProduk,
+    //       idSatuan: '-',
+    //       idCity: '-',
+    //       hargaProduk: element.price,
+    //       nameSatuan: '-',
+    //       imageProduk: element.imgProduk,
+    //       createdAt: element.createdAt,
+    //       updatedAt: element.updatedAt,
+    //     ),
+    //   );
+    // }
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (ctx) => CheckoutScreen(items: [], orderItem: null),
+        builder: (ctx) => InvoiceDetailScreen(invoice: invoiceItem),
       ),
     );
   }
@@ -320,7 +318,7 @@ class CardInvoice extends StatelessWidget {
                     const SizedBox(width: 8),
                     Text(
                       MyDateFormat.formatDate(
-                        item.createdAt,
+                        item.dateInvoice,
                         outputFormat: 'dd MMMM yyyy, HH:mm',
                       ),
                       style: const TextStyle(color: cDark200),
@@ -340,7 +338,7 @@ class CardInvoice extends StatelessWidget {
             ),
             ListView.builder(
               shrinkWrap: true,
-              itemCount: item.item.length,
+              itemCount: item.item.length > 2 ? 2 : item.item.length,
               physics: const NeverScrollableScrollPhysics(),
               itemBuilder: (context, index) {
                 final product = item.item[index];
@@ -360,19 +358,16 @@ class CardInvoice extends StatelessWidget {
                           color: cDark600,
                           width: 50,
                           height: 50,
-                          child: Hero(
-                            tag: 'product-${item.idInvoice}',
-                            child: Image.network(
-                              product.imgProduk,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return const Icon(
-                                  Icons.broken_image,
-                                  size: 25,
-                                  color: Colors.grey,
-                                );
-                              },
-                            ),
+                          child: Image.network(
+                            product.imgProduk,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return const Icon(
+                                Icons.broken_image,
+                                size: 25,
+                                color: Colors.grey,
+                              );
+                            },
                           ),
                         ),
                       ),
@@ -403,6 +398,17 @@ class CardInvoice extends StatelessWidget {
                   ),
                 );
               },
+            ),
+            item.item.length > 2
+                ? Text(
+                    '+ ${item.item.length - 2} produk Lainnya',
+                    textAlign: TextAlign.end,
+                    style: TextStyle(color: cDark200),
+                  )
+                : const SizedBox.shrink(),
+            Container(
+              margin: const EdgeInsets.symmetric(vertical: 12),
+              child: const Divider(height: 1, color: cDark500),
             ),
             Row(
               // mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -455,7 +461,7 @@ class CardInvoice extends StatelessWidget {
                       ),
                     ),
                     child: const Text(
-                      'Lihat Invoice',
+                      'Lihat Detail',
                       style: TextStyle(
                         color: cPrimary100,
                         fontWeight: FontWeight.bold,

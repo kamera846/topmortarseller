@@ -384,20 +384,16 @@ class CardOrder extends StatelessWidget {
                           color: cDark600,
                           width: 50,
                           height: 50,
-                          child: Hero(
-                            tag:
-                                'product-${product.idProduk}-${item.idAppOrder}',
-                            child: Image.network(
-                              product.imgProduk,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return const Icon(
-                                  Icons.broken_image,
-                                  size: 25,
-                                  color: Colors.grey,
-                                );
-                              },
-                            ),
+                          child: Image.network(
+                            product.imgProduk,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return const Icon(
+                                Icons.broken_image,
+                                size: 25,
+                                color: Colors.grey,
+                              );
+                            },
                           ),
                         ),
                       ),
