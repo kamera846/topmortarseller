@@ -465,44 +465,72 @@ class CheckoutedItems extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(24),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border.symmetric(
-          horizontal: BorderSide(color: cDark600, width: 1),
-        ),
-      ),
-      child: SafeArea(
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    CurrencyFormat().format(
-                      amount: double.parse('$totalPrice'),
-                    ),
-                    style: const TextStyle(
-                      color: cPrimary100,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
-                  Text('Total ${items.length} produk'),
-                  // Text('${items.length} produk $totalItems item'),
-                ],
-              ),
+    int totalQtyItems = 0;
+
+    for (var item in items) {
+      totalQtyItems += int.parse(item.qtyCartDetail ?? '0');
+    }
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        totalQtyItems < 10
+            ? Container(
+                padding: const EdgeInsets.all(12),
+                color: Colors.orange.withValues(alpha: 0.45),
+                width: double.infinity,
+                child: Row(
+                  children: [
+                    Icon(Icons.info_outline, size: 16),
+                    const SizedBox(width: 8),
+                    Text('Minimal order 10 item!'),
+                  ],
+                ),
+              )
+            : const SizedBox.shrink(),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(24),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            border: Border.symmetric(
+              horizontal: BorderSide(color: cDark600, width: 1),
             ),
-            onCheckout != null
-                ? MElevatedButton(onPressed: onCheckout!, title: 'Checkout')
-                : CircularProgressIndicator.adaptive(),
-          ],
+          ),
+          child: SafeArea(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      CurrencyFormat().format(
+                        amount: double.parse('$totalPrice'),
+                      ),
+                      style: const TextStyle(
+                        color: cPrimary100,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    Text('Total ${items.length} produk, $totalQtyItems item.'),
+                    // Text('${items.length} produk $totalItems item'),
+                  ],
+                ),
+                onCheckout != null
+                    ? MElevatedButton(
+                        onPressed: onCheckout!,
+                        enabled: totalQtyItems > 9,
+                        title: 'Checkout',
+                      )
+                    : CircularProgressIndicator.adaptive(),
+              ],
+            ),
+          ),
         ),
-      ),
+      ],
     );
   }
 }
