@@ -137,6 +137,8 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                         decoration: item.isBonus == '1'
                             ? TextDecoration.lineThrough
                             : TextDecoration.none,
+                        decorationColor: cDark200,
+                        decorationThickness: 2,
                       ),
                     ),
                     item.isBonus == '1'

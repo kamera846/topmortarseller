@@ -52,7 +52,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   void _getList() async {
     await CartApiService().get(
       idContact: userData.idContact ?? '-1',
-      onSuccess: (e) => showSnackBar(context, e),
       onError: (e) => showSnackBar(context, e),
       onCompleted: (data) {
         setState(() {
@@ -384,6 +383,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                 style: const TextStyle(
                                   color: cPrimary200,
                                   decoration: TextDecoration.lineThrough,
+                                  decorationColor: cPrimary200,
+                                  decorationThickness: 2,
                                 ),
                               ),
                               Text(

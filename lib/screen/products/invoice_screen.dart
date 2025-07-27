@@ -426,6 +426,7 @@ class CardInvoice extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 12,
                                 decoration: TextDecoration.lineThrough,
+                                decorationThickness: 2,
                               ),
                             ),
                         ],

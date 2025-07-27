@@ -300,6 +300,8 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                     style: const TextStyle(
                                       color: cPrimary200,
                                       decoration: TextDecoration.lineThrough,
+                                      decorationColor: cPrimary200,
+                                      decorationThickness: 2,
                                     ),
                                   ),
                                 Text(
