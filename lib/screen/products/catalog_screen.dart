@@ -1,6 +1,5 @@
 import 'dart:ui';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:topmortarseller/model/cart_model.dart';
 import 'package:topmortarseller/model/contact_model.dart';
@@ -383,26 +382,20 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                                 maxLines: 2,
                                                 overflow: TextOverflow.ellipsis,
                                               ),
-                                              Text(
-                                                CurrencyFormat().format(
-                                                  amount: double.parse(
-                                                    item.hargaProduk!,
-                                                  ),
-                                                ),
-                                                style: const TextStyle(
-                                                  color: cPrimary400,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
                                             ],
                                           ),
                                           Row(
                                             children: [
                                               Expanded(
                                                 child: Text(
-                                                  'Stok tersedia',
+                                                  CurrencyFormat().format(
+                                                    amount: double.parse(
+                                                      item.hargaProduk!,
+                                                    ),
+                                                  ),
                                                   style: const TextStyle(
-                                                    color: cDark200,
+                                                    color: cPrimary400,
+                                                    fontWeight: FontWeight.bold,
                                                   ),
                                                 ),
                                               ),

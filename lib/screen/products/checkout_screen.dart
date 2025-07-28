@@ -63,7 +63,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           totalDiscountApp = double.tryParse(cart.totalDiscountApp) == null
               ? 0.0
               : double.parse(cart.totalDiscountApp);
-          print("DEBUG: $totalDiscountApp");
           if (totalDiscountApp > 0.0) {
             discounts.add(
               ProductDiscountModel(
