@@ -121,18 +121,14 @@ class _SplashScreenState extends State<SplashScreen> {
   void _returnHomeScreen(ContactModel? userData) {
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(
-        builder: (context) => HomeScreen(userData: userData),
-      ),
+      MaterialPageRoute(builder: (context) => HomeScreen(userData: userData)),
     );
   }
 
   void _returnAuthScreen() {
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(
-        builder: (context) => const AuthScreen(),
-      ),
+      MaterialPageRoute(builder: (context) => const AuthScreen()),
     );
   }
 

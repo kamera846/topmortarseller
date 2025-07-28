@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -11,48 +12,58 @@ import 'package:topmortarseller/util/enum.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/widget/drawer/main_drawer.dart';
 import 'package:topmortarseller/widget/card/card_promo_scanner.dart';
-import 'package:topmortarseller/widget/modal/loading_modal.dart';
 import 'package:topmortarseller/widget/snackbar/show_snackbar.dart';
 import 'package:upgrader/upgrader.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 import 'package:http/http.dart' as http;
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key, this.userData});
 
   final ContactModel? userData;
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  Widget build(BuildContext context) {
+    return UpgradeAlert(
+      upgrader: Upgrader(
+        languageCode: 'id',
+        durationUntilAlertAgain: const Duration(seconds: 1),
+      ),
+      dialogStyle: Platform.isIOS
+          ? UpgradeDialogStyle.cupertino
+          : UpgradeDialogStyle.material,
+      barrierDismissible: false,
+      showLater: false,
+      showReleaseNotes: false,
+      showIgnore: false,
+      child: const HomeDashboard(),
+    );
+  }
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class HomeDashboard extends StatefulWidget {
+  const HomeDashboard({super.key});
+
+  @override
+  State<HomeDashboard> createState() => _HomeDashboardState();
+}
+
+class _HomeDashboardState extends State<HomeDashboard> {
   ContactModel? _userData;
-  late Timer loadUiTimer;
-  bool isLoading = true;
   bool isFeedLoading = true;
   List<FeedModel>? listFeed;
   String? mediaLink;
 
   @override
   void initState() {
-    loadUiTimer = Timer(const Duration(seconds: 1), () {
-      _getUserData();
-    });
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    loadUiTimer.cancel();
-    super.dispose();
+    _getUserData();
   }
 
   Future<void> _onRefresh() async {
     setState(() {
       _userData = null;
-      isLoading = true;
       isFeedLoading = true;
       listFeed = null;
       mediaLink = null;
@@ -60,8 +71,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _getUserData();
   }
 
-  void _getUserData() async {
-    // final data = widget.userData ?? await getContactModel();
+  Future<void> _getUserData() async {
     final data = await getContactModel();
     setState(() => _userData = data);
     final prefs = await SharedPreferences.getInstance();
@@ -89,7 +99,6 @@ class _HomeScreenState extends State<HomeScreen> {
         true,
       );
     }
-    setState(() => isLoading = false);
     loadFeed();
   }
 
@@ -102,7 +111,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void loadFeed() async {
+  Future<void> loadFeed() async {
     List<FeedModel>? data;
     try {
       final url = Uri.https(baseUrl, 'api/konten');
@@ -185,68 +194,49 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     }
 
-    return UpgradeAlert(
-      upgrader: Upgrader(
-        debugLogging: true,
-        languageCode: 'id',
-        durationUntilAlertAgain: const Duration(seconds: 1),
-      ),
-      barrierDismissible: false,
-      showLater: false,
-      showReleaseNotes: false,
-      showIgnore: false,
-      child: Stack(
-        children: [
-          Scaffold(
-            appBar: AppBar(
-              title: const Text('Top Mortar Seller'),
-              backgroundColor: cWhite,
-              foregroundColor: cDark100,
-              actions: [
-                Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Hero(
-                    tag: TagHero.faviconAuth,
-                    child: Semantics(
-                      label: '${TagHero.faviconAuth}',
-                      child: Image.asset(
-                        'assets/favicon/favicon_circle.png',
-                        width: 32,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            drawer: MainDrawer(userData: _userData),
-            body: RefreshIndicator.adaptive(
-              onRefresh: () => _onRefresh(),
-              child: SingleChildScrollView(
-                child: Center(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      CardPromoScanner(userData: widget.userData),
-                      Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: Text(
-                          'Informasi menarik untuk anda',
-                          style: Theme.of(context).textTheme.titleSmall!
-                              .copyWith(
-                                color: cDark100,
-                                fontWeight: FontWeight.bold,
-                              ),
-                        ),
-                      ),
-                      listFeedContent,
-                    ],
-                  ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Top Mortar Seller'),
+        backgroundColor: cWhite,
+        foregroundColor: cDark100,
+        actions: [
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+            child: Hero(
+              tag: TagHero.faviconAuth,
+              child: Semantics(
+                label: '${TagHero.faviconAuth}',
+                child: Image.asset(
+                  'assets/favicon/favicon_circle.png',
+                  width: 32,
                 ),
               ),
             ),
           ),
-          if (isLoading) const LoadingModal(),
         ],
+      ),
+      drawer: _userData != null ? MainDrawer(userData: _userData) : null,
+      body: RefreshIndicator.adaptive(
+        onRefresh: () => _onRefresh(),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (_userData != null) CardPromoScanner(userData: _userData),
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: Text(
+                  'Informasi menarik untuk anda',
+                  style: Theme.of(context).textTheme.titleSmall!.copyWith(
+                    color: cDark100,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              listFeedContent,
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -258,7 +248,7 @@ class CardFeed extends StatelessWidget {
   final FeedModel? feed;
   final String? mediaLink;
 
-  void _launchNavigation(BuildContext context, String url) async {
+  Future<void> _launchNavigation(BuildContext context, String url) async {
     try {
       launchUrlString(url);
     } catch (e) {
