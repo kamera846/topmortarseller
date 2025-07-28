@@ -24,7 +24,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   late CartModel cart;
   List<ProductDiscountModel> discounts = [];
   double subTotalPrice = 0.0;
-  double discountApp = 0.0;
+  double totalPrice = 0.0;
+  double totalDiscountApp = 0.0;
   bool isLoading = true;
 
   @override
@@ -59,17 +60,19 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           subTotalPrice = double.tryParse(cart.subtotalPrice) == null
               ? 0.0
               : double.parse(cart.subtotalPrice);
-          discountApp = double.tryParse(cart.discountApp) == null
+          totalDiscountApp = double.tryParse(cart.totalDiscountApp) == null
               ? 0.0
-              : double.parse(cart.discountApp);
-          if (discountApp > 0.0) {
+              : double.parse(cart.totalDiscountApp);
+          print("DEBUG: $totalDiscountApp");
+          if (totalDiscountApp > 0.0) {
             discounts.add(
               ProductDiscountModel(
                 title: 'Diskon Aplikasi',
-                discount: discountApp,
+                discount: totalDiscountApp,
               ),
             );
           }
+          totalPrice = subTotalPrice - totalDiscountApp;
           isLoading = false;
         });
       },
@@ -333,26 +336,26 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                               ),
                             ],
                           ),
-                          const SizedBox(height: 24),
-                          ListView.separated(
-                            itemCount: discounts.length,
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            padding: const EdgeInsets.all(0),
-                            separatorBuilder: (context, index) =>
-                                const SizedBox(height: 12),
-                            itemBuilder: (ctx, idx) {
-                              var discountItem = discounts[idx];
-                              return Row(
-                                children: [
-                                  Expanded(child: Text(discountItem.title)),
-                                  Text(
-                                    '- ${CurrencyFormat().format(amount: discountItem.discount, fractionDigits: 2)}',
-                                  ),
-                                ],
-                              );
-                            },
-                          ),
+                          if (discounts.isNotEmpty)
+                            ListView.separated(
+                              itemCount: discounts.length,
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              padding: const EdgeInsets.only(top: 24),
+                              separatorBuilder: (context, index) =>
+                                  const SizedBox(height: 12),
+                              itemBuilder: (ctx, idx) {
+                                var discountItem = discounts[idx];
+                                return Row(
+                                  children: [
+                                    Expanded(child: Text(discountItem.title)),
+                                    Text(
+                                      '- ${CurrencyFormat().format(amount: discountItem.discount, fractionDigits: 2)}',
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
                         ],
                       ),
                     ),
@@ -375,20 +378,24 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
+                              if (subTotalPrice != totalPrice)
+                                Text(
+                                  CurrencyFormat().format(
+                                    amount: subTotalPrice,
+                                    fractionDigits: 2,
+                                  ),
+                                  style: const TextStyle(
+                                    color: cPrimary200,
+                                    decoration: TextDecoration.lineThrough,
+                                    decorationColor: cPrimary200,
+                                    decorationThickness: 2,
+                                  ),
+                                ),
                               Text(
                                 CurrencyFormat().format(
-                                  amount: double.parse(cart.subtotalPrice),
+                                  amount: totalPrice,
                                   fractionDigits: 2,
                                 ),
-                                style: const TextStyle(
-                                  color: cPrimary200,
-                                  decoration: TextDecoration.lineThrough,
-                                  decorationColor: cPrimary200,
-                                  decorationThickness: 2,
-                                ),
-                              ),
-                              Text(
-                                getTotalAfterDiskon(),
                                 style: const TextStyle(
                                   color: cPrimary200,
                                   fontSize: 16,
@@ -405,11 +412,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               ),
             ),
     );
-  }
-
-  String getTotalAfterDiskon() {
-    var totalAfterDiskon = subTotalPrice - discountApp;
-    return CurrencyFormat().format(amount: totalAfterDiskon);
   }
 
   Color getReminderBackgroundColor() {

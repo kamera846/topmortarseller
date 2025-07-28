@@ -7,6 +7,7 @@ class CartModel {
     this.statusCart = '',
     this.subtotalPrice = '',
     this.discountApp = '',
+    this.totalDiscountApp = '',
     this.details = const [],
     this.createdAt = '',
     this.updatedAt = '',
@@ -18,6 +19,7 @@ class CartModel {
   final String statusCart;
   final String subtotalPrice;
   final String discountApp;
+  final String totalDiscountApp;
   final List<ProductModel> details;
   final String createdAt;
   final String updatedAt;
@@ -29,6 +31,7 @@ class CartModel {
     String? statusCart,
     String? subtotalPrice,
     String? discountApp,
+    String? totalDiscountApp,
     List<ProductModel>? details,
     String? createdAt,
     String? updatedAt,
@@ -40,6 +43,7 @@ class CartModel {
       statusCart: statusCart ?? this.statusCart,
       subtotalPrice: subtotalPrice ?? this.subtotalPrice,
       discountApp: discountApp ?? this.discountApp,
+      totalDiscountApp: totalDiscountApp ?? this.totalDiscountApp,
       details: details ?? this.details,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -53,6 +57,7 @@ class CartModel {
     'status_cart': statusCart,
     'subtotal_price': subtotalPrice,
     'discount_app': discountApp,
+    'total_discount_app': totalDiscountApp,
     'details': details,
     'created_at': createdAt,
     'updated_at': updatedAt,
@@ -66,6 +71,7 @@ class CartModel {
       statusCart: json['status_cart'] ?? '',
       subtotalPrice: json['subtotal_price'] ?? '',
       discountApp: json['discount_app'] ?? '',
+      totalDiscountApp: json['total_discount_app'] ?? '',
       details: json['details'] != null && json['details'] is List
           ? (json['details'] as List)
                 .map((item) => ProductModel.fromJson(item))
