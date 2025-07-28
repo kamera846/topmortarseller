@@ -54,7 +54,6 @@ class _CatalogScreenState extends State<CatalogScreen> {
     setState(() {
       _isLoading = true;
       items = [];
-      checkoutedItems = [];
       _showOverlay = false;
       _selectedItem = null;
     });
@@ -62,6 +61,9 @@ class _CatalogScreenState extends State<CatalogScreen> {
   }
 
   void _getCart() async {
+    setState(() {
+      checkoutedItems = [];
+    });
     await CartApiService().get(
       idContact: _userData != null ? _userData?.idContact ?? '-1' : 'null',
       onError: (e) {
@@ -73,7 +75,6 @@ class _CatalogScreenState extends State<CatalogScreen> {
         }
 
         if (data != null && data.details.isNotEmpty) {
-          checkoutedItems = [];
           for (var product in data.details) {
             var dummyObject = product.copyWith(imageProduk: dummyImageUrl);
             checkoutedItems.add(dummyObject);
@@ -130,11 +131,12 @@ class _CatalogScreenState extends State<CatalogScreen> {
         showSnackBar(context, e);
       },
       onCompleted: () {
-        _getCart();
         setState(() {
           _selectedItem = null;
           _showOverlay = false;
         });
+
+        _getCart();
       },
     );
   }
@@ -209,7 +211,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                         });
                       },
                       child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           ClipRRect(
                             borderRadius: BorderRadiusGeometry.circular(4),
@@ -252,6 +254,23 @@ class _CatalogScreenState extends State<CatalogScreen> {
                               ],
                             ),
                           ),
+                          const SizedBox(width: 8),
+                          SizedBox(
+                            width: 35,
+                            height: 35,
+                            child: IconButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                                setState(() {
+                                  _selectedItem = item;
+                                });
+                                _deleteCart(_selectedItem?.idCartDetail ?? '0');
+                              },
+                              padding: EdgeInsets.zero,
+                              color: Colors.grey,
+                              icon: Icon(Icons.delete_forever),
+                            ),
+                          ),
                         ],
                       ),
                     );
@@ -262,7 +281,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
             backgroundColor: cWhite,
             foregroundColor: cDark100,
           ),
-          bottomNavigationBar: checkoutedItems.isNotEmpty
+          bottomNavigationBar: !_isCartLoading && checkoutedItems.isNotEmpty
               ? CheckoutedItems(
                   items: checkoutedItems,
                   totalItems: checkoutedItems.length,
@@ -735,10 +754,10 @@ class _OverlayItemState extends State<OverlayItem> {
                           IconButton(
                             onPressed: widget.onClear,
                             style: IconButton.styleFrom(
-                              backgroundColor: cDark200,
-                              foregroundColor: cWhite,
+                              backgroundColor: cDark400,
+                              foregroundColor: cDark200,
                             ),
-                            icon: const Icon(CupertinoIcons.trash),
+                            icon: const Icon(Icons.delete_forever),
                           ),
                           const SizedBox(width: 6),
                         ],
