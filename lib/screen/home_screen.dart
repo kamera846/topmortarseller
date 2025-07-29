@@ -9,6 +9,8 @@ import 'package:topmortarseller/services/customer_bank_api.dart';
 import 'package:topmortarseller/util/enum.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/widget/dashboard/content_section.dart';
+import 'package:topmortarseller/widget/dashboard/menu_section.dart';
+import 'package:topmortarseller/widget/dashboard/promo_slider_section.dart';
 import 'package:topmortarseller/widget/drawer/main_drawer.dart';
 import 'package:topmortarseller/widget/card/card_promo_scanner.dart';
 import 'package:upgrader/upgrader.dart';
@@ -132,6 +134,8 @@ class _HomeDashboardState extends State<HomeDashboard> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (_userData != null) CardPromoScanner(userData: _userData),
+              const MenuSection(),
+              const PromoSliderSection(),
               ContentSection(key: contentKey),
             ],
           ),
