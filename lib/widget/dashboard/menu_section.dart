@@ -14,27 +14,19 @@ class MenuSection extends StatelessWidget {
       {
         'icon': Icons.shopping_bag,
         'title': 'Produk',
-        'bgColor': Color(0xFFF6D6C8),
         'route': (context) => const CatalogScreen(),
       },
       {
         'icon': CupertinoIcons.cube_box_fill,
         'title': 'Pesanan',
-        'bgColor': Color(0xFFEEDDD3),
         'route': (context) => const OrderScreen(),
       },
       {
         'icon': Icons.receipt_long,
         'title': 'Invoice',
-        'bgColor': Color(0xFFE5D1D1),
         'route': (context) => const InvoiceScreen(),
       },
-      {
-        'icon': Icons.local_offer,
-        'title': 'Voucher',
-        'bgColor': Color(0xFFEAD5E6),
-        'route': null,
-      },
+      {'icon': Icons.local_offer, 'title': 'Voucher', 'route': null},
     ];
 
     return Padding(
@@ -45,7 +37,7 @@ class MenuSection extends StatelessWidget {
         children: [
           Text(
             'Menu',
-            style: Theme.of(context).textTheme.titleSmall!.copyWith(
+            style: Theme.of(context).textTheme.titleMedium!.copyWith(
               color: cDark100,
               fontWeight: FontWeight.bold,
             ),
@@ -64,11 +56,15 @@ class MenuSection extends StatelessWidget {
             itemBuilder: (context, index) {
               final item = menuItems[index];
               return Material(
-                color: item['bgColor'] as Color,
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
-                elevation: 2,
+                elevation: 0.5,
                 child: InkWell(
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.of(
+                      context,
+                    ).push(MaterialPageRoute(builder: item['route']));
+                  },
                   borderRadius: BorderRadius.circular(12),
                   child: Padding(
                     padding: const EdgeInsets.all(8),
@@ -79,7 +75,7 @@ class MenuSection extends StatelessWidget {
                           Icon(
                             item['icon'] as IconData,
                             size: 30,
-                            color: cDark100,
+                            color: cPrimary100,
                           ),
                           const SizedBox(height: 8),
                           Text(

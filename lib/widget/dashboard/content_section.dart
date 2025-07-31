@@ -89,7 +89,7 @@ class ContentSectionState extends State<ContentSection> {
           padding: const EdgeInsets.all(12),
           child: Text(
             'Informasi menarik untuk anda',
-            style: Theme.of(context).textTheme.titleSmall!.copyWith(
+            style: Theme.of(context).textTheme.titleMedium!.copyWith(
               color: cDark100,
               fontWeight: FontWeight.bold,
             ),
@@ -107,30 +107,37 @@ class ContentSectionState extends State<ContentSection> {
           itemCount: listFeed!.length,
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
+          padding: EdgeInsets.zero,
           itemBuilder: (conxtext, i) {
             final item = listFeed![i];
             return CardFeed(feed: item, mediaLink: mediaLink);
           },
         );
       } else {
-        return Padding(
-          padding: const EdgeInsets.all(12),
-          child: Text(
-            'Belum ada konten',
-            style: Theme.of(
-              context,
-            ).textTheme.bodyMedium!.copyWith(color: cDark200),
+        return SizedBox(
+          height: 300,
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Text(
+              'Belum ada konten',
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium!.copyWith(color: cDark200),
+            ),
           ),
         );
       }
     } else {
-      return Padding(
-        padding: const EdgeInsets.all(12),
-        child: Text(
-          'Sedang memuat konten...',
-          style: Theme.of(
-            context,
-          ).textTheme.bodyMedium!.copyWith(color: cDark200),
+      return SizedBox(
+        height: 300,
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Text(
+            'Sedang memuat konten...',
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium!.copyWith(color: cDark200),
+          ),
         ),
       );
     }

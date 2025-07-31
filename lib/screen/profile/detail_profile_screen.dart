@@ -319,17 +319,16 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
                   children: [
                     Padding(
                       padding: const EdgeInsets.only(
-                        top: 24,
-                        right: 24,
-                        left: 24,
-                        bottom: 12,
+                        left: 12,
+                        top: 12,
+                        right: 12,
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             'Daftar Rekening',
-                            style: Theme.of(context).textTheme.titleSmall!
+                            style: Theme.of(context).textTheme.titleMedium!
                                 .copyWith(fontWeight: FontWeight.bold),
                           ),
                           Text(
@@ -347,57 +346,12 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
                     aboutRedeem,
                     redeemList,
                     emptyRedeemList,
-                    // Expanded(
-                    //   child: ListView.builder(
-                    //     padding: const EdgeInsets.all(0),
-                    //     itemCount: myBanks!.length,
-                    //     itemBuilder: (context, i) {
-                    //       final bankItem = myBanks![i];
-                    //       return CardRekening(
-                    //         bankName: bankItem.namaBank!,
-                    //         rekening: bankItem.toAccount!,
-                    //         rekeningName: bankItem.toName!,
-                    //         rightIcon: Icons.mode_edit,
-                    //         action: () {
-                    //           Navigator.of(context).push(
-                    //             MaterialPageRoute(
-                    //               builder: (context) => NewRekeningScreen(
-                    //                 userData: _userData,
-                    //                 rekeningId: bankItem.idRekeningToko!,
-                    //                 onSuccess: (bool? state) {
-                    //                   if (state != null && state) {
-                    //                     setState(() => isLoading = true);
-                    //                     _getUserBanks();
-                    //                   }
-                    //                 },
-                    //               ),
-                    //             ),
-                    //           );
-                    //         },
-                    //       );
-                    //     },
-                    //   ),
-                    // ),
                   ],
                 ),
                 if (isLoading) const LoadingModal(),
               ],
             ),
           ),
-          // Container(
-          //   padding: const EdgeInsets.all(12),
-          //   child: MElevatedButton(
-          //     title: 'Tambah Rekening Lain',
-          //     isFullWidth: true,
-          //     onPressed: () {
-          //       Navigator.of(context).push(
-          //         MaterialPageRoute(
-          //           builder: (context) => const NewRekeningScreen(),
-          //         ),
-          //       );
-          //     },
-          //   ),
-          // )
         ],
       ),
     );
@@ -419,12 +373,7 @@ class DetailProfileHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top + 12,
-        right: 0,
-        bottom: 24,
-        left: 0,
-      ),
+      padding: EdgeInsets.only(right: 0, bottom: 24, left: 0),
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           colors: [
@@ -438,81 +387,76 @@ class DetailProfileHeader extends StatelessWidget {
           end: Alignment.bottomRight,
         ),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const SizedBox(width: 6),
-              IconButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                style: IconButton.styleFrom(padding: const EdgeInsets.all(0)),
-                icon: const Icon(Icons.arrow_back, color: cWhite),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  'Profil Saya',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleLarge!.copyWith(color: cWhite),
-                ),
-              ),
-              const SizedBox(width: 12),
-              PopupMenuButton<String>(
-                icon: const Icon(Icons.settings, color: cWhite),
-                itemBuilder: (ctx) {
-                  return [
-                    PopupMenuItem<String>(
-                      onTap: () {
-                        _onRequestDeleteAccount(context);
-                      },
-                      child: const Row(
-                        children: [SizedBox(width: 12), Text('Hapus Akun')],
-                      ),
-                    ),
-                  ];
-                },
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              const SizedBox(width: 24),
-              const Hero(
-                tag: TagHero.mainDrawerHeader,
-                child: Icon(Icons.storefront, size: 24, color: cWhite),
-              ),
-              const SizedBox(width: 12),
-              title == null
-                  ? const Expanded(child: LoadingItem(isPrimaryTheme: true))
-                  : Text(
-                      title!,
-                      style: Theme.of(
-                        context,
-                      ).textTheme.titleMedium!.copyWith(color: cWhite),
-                    ),
-              const SizedBox(width: 24),
-            ],
-          ),
-          const SizedBox(height: 6),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: description == null
-                ? const LoadingItem(isPrimaryTheme: true)
-                : Text(
-                    description!,
-                    softWrap: true,
-                    overflow: TextOverflow.visible,
+      child: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const SizedBox(width: 6),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'Profil Saya',
                     style: Theme.of(
                       context,
-                    ).textTheme.bodySmall!.copyWith(color: cPrimary600),
+                    ).textTheme.titleLarge!.copyWith(color: cWhite),
                   ),
-          ),
-        ],
+                ),
+                const SizedBox(width: 12),
+                PopupMenuButton<String>(
+                  icon: const Icon(Icons.settings, color: cWhite),
+                  itemBuilder: (ctx) {
+                    return [
+                      PopupMenuItem<String>(
+                        onTap: () {
+                          _onRequestDeleteAccount(context);
+                        },
+                        child: const Row(
+                          children: [SizedBox(width: 12), Text('Hapus Akun')],
+                        ),
+                      ),
+                    ];
+                  },
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                const SizedBox(width: 24),
+                const Hero(
+                  tag: TagHero.mainDrawerHeader,
+                  child: Icon(Icons.storefront, size: 24, color: cWhite),
+                ),
+                const SizedBox(width: 12),
+                title == null
+                    ? const Expanded(child: LoadingItem(isPrimaryTheme: true))
+                    : Text(
+                        title!,
+                        style: Theme.of(
+                          context,
+                        ).textTheme.titleMedium!.copyWith(color: cWhite),
+                      ),
+                const SizedBox(width: 24),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: description == null
+                  ? const LoadingItem(isPrimaryTheme: true)
+                  : Text(
+                      description!,
+                      softWrap: true,
+                      overflow: TextOverflow.visible,
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodySmall!.copyWith(color: cPrimary600),
+                    ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -8,19 +8,19 @@ class PromoSliderSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final List<String> promoItems = [
-      'Ayo! Order melalui aplikasi dan dapatkan potongan harga.',
-      'Belanja lebih hemat bonus koin aplikasi.',
-      'Kumpulkan koin aplikasi, dan tukarkan dengan produk unggulan kami.',
+      'https://media.istockphoto.com/id/1214771295/vector/realistic-red-grand-opening-banner-hanging-on-a-grey-wall.jpg?s=612x612&w=0&k=20&c=Pii5QNuYcEdTGxtMz_tS00v6ZtuhrFofWAdI4Dq8r8g=',
+      'https://img.freepik.com/free-photo/front-view-shop-word-red-table_23-2148281114.jpg?semt=ais_hybrid&w=740&q=80',
+      'https://media.istockphoto.com/id/1412949747/vector/sale-sticker-with-50-percent-off-weekend-discount.jpg?s=612x612&w=0&k=20&c=xOJuBoLp04OHo4R-w_Ub_jfRIbgJ0N77rWl8SjIBfCI=',
     ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.only(left: 12, top: 12, right: 12),
           child: Text(
             'Promo',
-            style: Theme.of(context).textTheme.titleSmall!.copyWith(
+            style: Theme.of(context).textTheme.titleMedium!.copyWith(
               color: cDark100,
               fontWeight: FontWeight.bold,
             ),
@@ -32,20 +32,23 @@ class PromoSliderSection extends StatelessWidget {
           itemBuilder: (context, index, realIndex) {
             final item = promoItems[index];
             return Padding(
-              padding: const EdgeInsets.all(6),
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 6),
               child: Material(
-                color: cPrimary200,
+                color: cWhite,
+                elevation: 1,
                 borderRadius: BorderRadius.circular(12),
-                elevation: 2,
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Text(
+                child: ClipRRect(
+                  borderRadius: BorderRadiusGeometry.circular(12),
+                  child: Image.network(
                     item,
-                    style: TextStyle(
-                      color: cWhite,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
+                    errorBuilder: (context, error, stackTrace) => SizedBox(
+                      width: double.infinity,
+                      height: double.infinity,
+                      child: Icon(Icons.error),
                     ),
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: double.infinity,
                   ),
                 ),
               ),

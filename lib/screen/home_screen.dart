@@ -1,18 +1,21 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:topmortarseller/model/contact_model.dart';
+import 'package:topmortarseller/screen/profile/detail_profile_screen.dart';
 import 'package:topmortarseller/screen/profile/new_rekening_screen.dart';
+import 'package:topmortarseller/screen/scanner/qr_scanner_screen.dart';
 import 'package:topmortarseller/services/customer_bank_api.dart';
 import 'package:topmortarseller/util/enum.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/widget/dashboard/content_section.dart';
+import 'package:topmortarseller/widget/dashboard/hero_section.dart';
 import 'package:topmortarseller/widget/dashboard/menu_section.dart';
 import 'package:topmortarseller/widget/dashboard/promo_slider_section.dart';
-import 'package:topmortarseller/widget/drawer/main_drawer.dart';
-import 'package:topmortarseller/widget/card/card_promo_scanner.dart';
 import 'package:upgrader/upgrader.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -49,6 +52,7 @@ class HomeDashboard extends StatefulWidget {
 class _HomeDashboardState extends State<HomeDashboard> {
   final GlobalKey<ContentSectionState> contentKey = GlobalKey();
   ContactModel? _userData;
+  int navCurrentIndex = 0;
 
   @override
   void initState() {
@@ -105,42 +109,68 @@ class _HomeDashboardState extends State<HomeDashboard> {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(
+        statusBarIconBrightness: Brightness.light, // For Android
+        statusBarBrightness: Brightness.dark, // For iOS
+      ),
+    );
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Top Mortar Seller'),
-        backgroundColor: cWhite,
-        foregroundColor: cDark100,
-        actions: [
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 16),
-            child: Hero(
-              tag: TagHero.faviconAuth,
-              child: Semantics(
-                label: '${TagHero.faviconAuth}',
-                child: Image.asset(
-                  'assets/favicon/favicon_circle.png',
-                  width: 32,
+      backgroundColor: cPrimary200,
+      bottomNavigationBar: _userData != null
+          ? BottomNavigationBar(
+              backgroundColor: Colors.white,
+              onTap: (value) => value == 1
+                  ? Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (ctx) => QRScannerScreen(userData: _userData),
+                      ),
+                    )
+                  : setState(() {
+                      navCurrentIndex = value;
+                    }),
+              currentIndex: navCurrentIndex,
+              selectedLabelStyle: TextStyle(fontWeight: FontWeight.bold),
+              items: const [
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.home_outlined),
+                  activeIcon: Icon(Icons.home_filled),
+                  label: 'Beranda',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.qr_code_scanner_outlined),
+                  label: 'Scanner',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(CupertinoIcons.person_alt_circle),
+                  activeIcon: Icon(CupertinoIcons.person_alt_circle_fill),
+                  label: 'Profil',
+                ),
+              ],
+            )
+          : null,
+      body: navCurrentIndex == 0
+          ? SafeArea(
+              child: RefreshIndicator.adaptive(
+                onRefresh: () => _onRefresh(),
+                child: SingleChildScrollView(
+                  child: Material(
+                    color: cWhite,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        HeroSection(userData: _userData),
+                        const MenuSection(),
+                        const PromoSliderSection(),
+                        ContentSection(key: contentKey),
+                      ],
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ),
-        ],
-      ),
-      drawer: _userData != null ? MainDrawer(userData: _userData) : null,
-      body: RefreshIndicator.adaptive(
-        onRefresh: () => _onRefresh(),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (_userData != null) CardPromoScanner(userData: _userData),
-              const MenuSection(),
-              const PromoSliderSection(),
-              ContentSection(key: contentKey),
-            ],
-          ),
-        ),
-      ),
+            )
+          : DetailProfileScreen(userData: _userData),
     );
   }
 }
