@@ -116,6 +116,7 @@ class _HomeDashboardState extends State<HomeDashboard> {
       ),
     );
     return Scaffold(
+      backgroundColor: Colors.transparent,
       bottomNavigationBar: _userData != null
           ? BottomNavigationBar(
               backgroundColor: Colors.white,
@@ -134,7 +135,7 @@ class _HomeDashboardState extends State<HomeDashboard> {
               items: const [
                 BottomNavigationBarItem(
                   icon: Icon(Icons.home_outlined),
-                  activeIcon: Icon(Icons.home_filled),
+                  activeIcon: Icon(Icons.home_sharp),
                   label: 'Beranda',
                 ),
                 BottomNavigationBarItem(

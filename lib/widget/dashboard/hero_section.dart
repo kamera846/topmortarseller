@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:topmortarseller/model/contact_model.dart';
 import 'package:topmortarseller/util/colors/color.dart';
-import 'package:topmortarseller/util/enum.dart';
 
 class HeroSection extends StatefulWidget {
   final ContactModel? userData;

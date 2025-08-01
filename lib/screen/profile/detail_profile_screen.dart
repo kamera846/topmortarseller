@@ -303,6 +303,7 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
     }
 
     return Scaffold(
+      backgroundColor: Colors.transparent,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -312,44 +313,47 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
             onRequestDeleteAccount: deleteAccount,
           ),
           Expanded(
-            child: Stack(
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(
-                        left: 12,
-                        top: 12,
-                        right: 12,
+            child: Material(
+              color: cWhite,
+              child: Stack(
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(
+                          left: 12,
+                          top: 12,
+                          right: 12,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Daftar Rekening',
+                              style: Theme.of(context).textTheme.titleMedium!
+                                  .copyWith(fontWeight: FontWeight.bold),
+                            ),
+                            Text(
+                              'Digunakan untuk tujuan transfer promo cashback dari kami.',
+                              softWrap: true,
+                              overflow: TextOverflow.visible,
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
+                            const SizedBox(height: 12),
+                            cardBank,
+                            emptyCardBank,
+                          ],
+                        ),
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Daftar Rekening',
-                            style: Theme.of(context).textTheme.titleMedium!
-                                .copyWith(fontWeight: FontWeight.bold),
-                          ),
-                          Text(
-                            'Digunakan untuk tujuan transfer promo cashback dari kami.',
-                            softWrap: true,
-                            overflow: TextOverflow.visible,
-                            style: Theme.of(context).textTheme.bodySmall,
-                          ),
-                          const SizedBox(height: 12),
-                          cardBank,
-                          emptyCardBank,
-                        ],
-                      ),
-                    ),
-                    aboutRedeem,
-                    redeemList,
-                    emptyRedeemList,
-                  ],
-                ),
-                if (isLoading) const LoadingModal(),
-              ],
+                      aboutRedeem,
+                      redeemList,
+                      emptyRedeemList,
+                    ],
+                  ),
+                  if (isLoading) const LoadingModal(),
+                ],
+              ),
             ),
           ),
         ],
@@ -372,22 +376,9 @@ class DetailProfileHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.only(right: 0, bottom: 24, left: 0),
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            cPrimary100,
-            cPrimary200,
-            cPrimary100,
-            cPrimary200,
-            cPrimary100,
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
-      child: SafeArea(
+    return SafeArea(
+      child: Padding(
+        padding: EdgeInsets.only(right: 0, bottom: 24, left: 0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -398,9 +389,10 @@ class DetailProfileHeader extends StatelessWidget {
                 Expanded(
                   child: Text(
                     'Profil Saya',
-                    style: Theme.of(
-                      context,
-                    ).textTheme.titleLarge!.copyWith(color: cWhite),
+                    style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                      color: cWhite,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -413,7 +405,19 @@ class DetailProfileHeader extends StatelessWidget {
                           _onRequestDeleteAccount(context);
                         },
                         child: const Row(
-                          children: [SizedBox(width: 12), Text('Hapus Akun')],
+                          children: [
+                            SizedBox(width: 12),
+                            Text('Hapus Akun Permanen'),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem<String>(
+                        onTap: () {},
+                        child: const Row(
+                          children: [
+                            SizedBox(width: 12),
+                            Text('Keluar Dari Akun'),
+                          ],
                         ),
                       ),
                     ];
@@ -434,9 +438,11 @@ class DetailProfileHeader extends StatelessWidget {
                     ? const Expanded(child: LoadingItem(isPrimaryTheme: true))
                     : Text(
                         title!,
-                        style: Theme.of(
-                          context,
-                        ).textTheme.titleMedium!.copyWith(color: cWhite),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.normal,
+                          fontSize: 20,
+                        ),
                       ),
                 const SizedBox(width: 24),
               ],
@@ -452,7 +458,7 @@ class DetailProfileHeader extends StatelessWidget {
                       overflow: TextOverflow.visible,
                       style: Theme.of(
                         context,
-                      ).textTheme.bodySmall!.copyWith(color: cPrimary600),
+                      ).textTheme.bodyMedium!.copyWith(color: cWhite),
                     ),
             ),
           ],
