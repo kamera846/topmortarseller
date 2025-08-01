@@ -15,7 +15,6 @@ import 'package:topmortarseller/util/loading_item.dart';
 import 'package:topmortarseller/widget/card/card_rekening.dart';
 import 'package:topmortarseller/widget/form/button/elevated_button.dart';
 import 'package:topmortarseller/widget/modal/info_modal.dart';
-import 'package:topmortarseller/widget/modal/loading_modal.dart';
 import 'package:topmortarseller/widget/snackbar/show_snackbar.dart';
 
 class DetailProfileScreen extends StatefulWidget {
@@ -35,18 +34,19 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
   String? description;
   int totalQuota = 0;
   bool isLoading = true;
+  bool isLoadingRedeem = true;
 
   @override
   void initState() {
-    _getUserData();
     super.initState();
+    _getUserData();
   }
 
   void _getUserData() async {
     setState(() => isLoading = true);
 
-    // // final data = widget.userData ?? await getContactModel();
-    final data = await getContactModel();
+    final data = widget.userData ?? await getContactModel();
+    // final data = await getContactModel();
     setState(() {
       _userData = data;
 
@@ -79,7 +79,10 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
     });
   }
 
-  void _getUserRedeemList() async {
+  Future<void> _getUserRedeemList() async {
+    setState(() {
+      isLoadingRedeem = true;
+    });
     final data = await ClaimCashbackServices().claimed(
       idContact: _userData!.idContact!,
       onSuccess: (msg) => null,
@@ -100,6 +103,7 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
     );
     setState(() {
       myRedeems = data;
+      isLoadingRedeem = false;
     });
   }
 
@@ -206,44 +210,49 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
 
       if (myRedeems != null && myRedeems!.isNotEmpty) {
         redeemList = Expanded(
-          child: ListView.builder(
-            padding: const EdgeInsets.all(0),
-            itemCount: myRedeems!.length,
-            itemBuilder: (context, i) {
-              final redeemItem = myRedeems![i];
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(24),
-                    width: double.infinity,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          redeemItem.nama ?? 'null',
-                          softWrap: true,
-                          overflow: TextOverflow.visible,
-                          style: Theme.of(context).textTheme.bodyLarge,
-                        ),
-                        Text(
-                          _formattedDate(redeemItem.claimDate ?? '-'),
-                          softWrap: true,
-                          overflow: TextOverflow.visible,
-                          style: Theme.of(context).textTheme.bodyMedium!
-                              .copyWith(
-                                fontStyle: FontStyle.italic,
-                                color: cDark200,
-                              ),
-                        ),
-                      ],
-                    ),
+          child: isLoadingRedeem
+              ? Center(child: CircularProgressIndicator.adaptive())
+              : RefreshIndicator.adaptive(
+                  onRefresh: () => _getUserRedeemList(),
+                  child: ListView.builder(
+                    padding: const EdgeInsets.all(0),
+                    itemCount: myRedeems!.length,
+                    itemBuilder: (context, i) {
+                      final redeemItem = myRedeems![i];
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(24),
+                            width: double.infinity,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  redeemItem.nama ?? 'null',
+                                  softWrap: true,
+                                  overflow: TextOverflow.visible,
+                                  style: Theme.of(context).textTheme.bodyLarge,
+                                ),
+                                Text(
+                                  _formattedDate(redeemItem.claimDate ?? '-'),
+                                  softWrap: true,
+                                  overflow: TextOverflow.visible,
+                                  style: Theme.of(context).textTheme.bodyMedium!
+                                      .copyWith(
+                                        fontStyle: FontStyle.italic,
+                                        color: cDark200,
+                                      ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Divider(height: 1, color: cDark500),
+                        ],
+                      );
+                    },
                   ),
-                  const Divider(height: 1, color: cDark500),
-                ],
-              );
-            },
-          ),
+                ),
         );
       }
 
@@ -315,45 +324,42 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
           Expanded(
             child: Material(
               color: cWhite,
-              child: Stack(
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(
-                          left: 12,
-                          top: 12,
-                          right: 12,
+              child: isLoading
+                  ? const Center(child: CircularProgressIndicator.adaptive())
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            left: 12,
+                            top: 12,
+                            right: 12,
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Daftar Rekening',
+                                style: Theme.of(context).textTheme.titleMedium!
+                                    .copyWith(fontWeight: FontWeight.bold),
+                              ),
+                              Text(
+                                'Digunakan untuk tujuan transfer promo cashback dari kami.',
+                                softWrap: true,
+                                overflow: TextOverflow.visible,
+                                style: Theme.of(context).textTheme.bodySmall,
+                              ),
+                              const SizedBox(height: 12),
+                              cardBank,
+                              emptyCardBank,
+                            ],
+                          ),
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Daftar Rekening',
-                              style: Theme.of(context).textTheme.titleMedium!
-                                  .copyWith(fontWeight: FontWeight.bold),
-                            ),
-                            Text(
-                              'Digunakan untuk tujuan transfer promo cashback dari kami.',
-                              softWrap: true,
-                              overflow: TextOverflow.visible,
-                              style: Theme.of(context).textTheme.bodySmall,
-                            ),
-                            const SizedBox(height: 12),
-                            cardBank,
-                            emptyCardBank,
-                          ],
-                        ),
-                      ),
-                      aboutRedeem,
-                      redeemList,
-                      emptyRedeemList,
-                    ],
-                  ),
-                  if (isLoading) const LoadingModal(),
-                ],
-              ),
+                        aboutRedeem,
+                        redeemList,
+                        emptyRedeemList,
+                      ],
+                    ),
             ),
           ),
         ],
