@@ -36,9 +36,9 @@ class PromoSliderSection extends StatelessWidget {
               child: Material(
                 color: cWhite,
                 elevation: 1,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(16),
                 child: ClipRRect(
-                  borderRadius: BorderRadiusGeometry.circular(12),
+                  borderRadius: BorderRadiusGeometry.circular(16),
                   child: Image.network(
                     item,
                     errorBuilder: (context, error, stackTrace) => SizedBox(

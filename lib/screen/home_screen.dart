@@ -116,7 +116,6 @@ class _HomeDashboardState extends State<HomeDashboard> {
       ),
     );
     return Scaffold(
-      backgroundColor: cPrimary200,
       bottomNavigationBar: _userData != null
           ? BottomNavigationBar(
               backgroundColor: Colors.white,
@@ -150,27 +149,54 @@ class _HomeDashboardState extends State<HomeDashboard> {
               ],
             )
           : null,
-      body: navCurrentIndex == 0
-          ? SafeArea(
-              child: RefreshIndicator.adaptive(
-                onRefresh: () => _onRefresh(),
-                child: SingleChildScrollView(
-                  child: Material(
-                    color: cWhite,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        HeroSection(userData: _userData),
-                        const MenuSection(),
-                        const PromoSliderSection(),
-                        ContentSection(key: contentKey),
-                      ],
-                    ),
-                  ),
-                ),
+      body: Stack(
+        children: [
+          Positioned(
+            left: 0,
+            top: 0,
+            right: 0,
+            child: Container(
+              color: Colors.amber,
+              width: double.infinity,
+              child: Image.asset(
+                'assets/bg_shape_primary_vertical.jpg',
+                fit: BoxFit.cover,
               ),
-            )
-          : DetailProfileScreen(userData: _userData),
+            ),
+          ),
+          Positioned.fill(
+            child: navCurrentIndex == 0
+                ? SafeArea(
+                    child: RefreshIndicator.adaptive(
+                      onRefresh: () => _onRefresh(),
+                      child: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            HeroSection(userData: _userData),
+                            Material(
+                              color: cWhite,
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(16),
+                                topRight: Radius.circular(16),
+                              ),
+                              child: Column(
+                                children: [
+                                  const MenuSection(),
+                                  const PromoSliderSection(),
+                                  ContentSection(key: contentKey),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  )
+                : DetailProfileScreen(userData: _userData),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -4,6 +4,7 @@ import 'package:topmortarseller/screen/products/catalog_screen.dart';
 import 'package:topmortarseller/screen/products/invoice_screen.dart';
 import 'package:topmortarseller/screen/products/order_screen.dart';
 import 'package:topmortarseller/util/colors/color.dart';
+import 'package:topmortarseller/widget/snackbar/show_snackbar.dart';
 
 class MenuSection extends StatelessWidget {
   const MenuSection({super.key});
@@ -55,37 +56,35 @@ class MenuSection extends StatelessWidget {
             ),
             itemBuilder: (context, index) {
               final item = menuItems[index];
-              return Material(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                elevation: 0.5,
-                child: InkWell(
-                  onTap: () {
+              return InkWell(
+                onTap: () {
+                  final Widget Function(BuildContext)? route = item['route'];
+                  if (route != null) {
                     Navigator.of(
                       context,
-                    ).push(MaterialPageRoute(builder: item['route']));
-                  },
-                  borderRadius: BorderRadius.circular(12),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            item['icon'] as IconData,
-                            size: 30,
-                            color: cPrimary100,
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            item['title'] as String,
-                            style: Theme.of(
-                              context,
-                            ).textTheme.titleSmall?.copyWith(color: cDark100),
-                          ),
-                        ],
-                      ),
+                    ).push(MaterialPageRoute(builder: route));
+                  } else {
+                    showSnackBar(context, 'Coming soon..');
+                  }
+                },
+                borderRadius: BorderRadius.circular(8),
+                child: Padding(
+                  padding: const EdgeInsets.all(0),
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          item['icon'] as IconData,
+                          size: 40,
+                          color: cPrimary100,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          item['title'] as String,
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                      ],
                     ),
                   ),
                 ),
