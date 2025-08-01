@@ -32,6 +32,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
   bool _showOverlay = false;
   bool _isLoading = true;
   bool _isCartLoading = true;
+  bool _isSearchTrigger = false;
   ProductModel? _selectedItem;
   String dummyImageUrl =
       'https://topmortar.com/wp-content/uploads/2021/10/TOP-THINBED-2.png';
@@ -43,11 +44,6 @@ class _CatalogScreenState extends State<CatalogScreen> {
   @override
   void initState() {
     super.initState();
-    if (widget.searchTrigger) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        FocusScope.of(context).requestFocus(_searchFocusNode);
-      });
-    }
     _searchController.addListener(_onTextChanged);
     _getUserData();
   }
@@ -144,9 +140,16 @@ class _CatalogScreenState extends State<CatalogScreen> {
           }
         }
 
+        if (widget.searchTrigger == true && _isSearchTrigger == false) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            FocusScope.of(context).requestFocus(_searchFocusNode);
+          });
+        }
+
         setState(() {
           cartItem = data;
           _isCartLoading = false;
+          _isSearchTrigger = true;
         });
       },
     );

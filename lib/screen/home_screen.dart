@@ -168,28 +168,34 @@ class _HomeDashboardState extends State<HomeDashboard> {
           Positioned.fill(
             child: navCurrentIndex == 0
                 ? SafeArea(
-                    child: RefreshIndicator.adaptive(
-                      onRefresh: () => _onRefresh(),
-                      child: SingleChildScrollView(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            HeroSection(userData: _userData),
-                            Material(
-                              color: cWhite,
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(16),
-                                topRight: Radius.circular(16),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(16),
+                        topRight: Radius.circular(16),
+                      ),
+                      child: RefreshIndicator.adaptive(
+                        onRefresh: () => _onRefresh(),
+                        child: SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              HeroSection(userData: _userData),
+                              Material(
+                                color: cWhite,
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(16),
+                                  topRight: Radius.circular(16),
+                                ),
+                                child: Column(
+                                  children: [
+                                    const MenuSection(),
+                                    const PromoSliderSection(),
+                                    ContentSection(key: contentKey),
+                                  ],
+                                ),
                               ),
-                              child: Column(
-                                children: [
-                                  const MenuSection(),
-                                  const PromoSliderSection(),
-                                  ContentSection(key: contentKey),
-                                ],
-                              ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
