@@ -124,6 +124,35 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
     );
   }
 
+  void accountLogout() {
+    showCupertinoDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return MInfoModal(
+          contentName: 'Keluar dari akun?',
+          contentDescription:
+              'Anda diharuskan login kembali ketika mengakses aplikasi jika keluar dari akun.',
+          contentIcon: Icons.warning_rounded,
+          contentIconColor: cPrimary100,
+          cancelText: 'Batal',
+          onCancel: () {
+            Navigator.of(context).pop();
+          },
+          onConfirm: () async {
+            await removeLoginState();
+            await removeContactModel();
+            if (context.mounted) {
+              Navigator.of(context).pop();
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: (ctx) => const AuthScreen()),
+              );
+            }
+          },
+        );
+      },
+    );
+  }
+
   void _clearAllScreenToAuth() {
     if (context.mounted) {
       Navigator.pop(context);
@@ -320,6 +349,7 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
             title: title,
             description: description,
             onRequestDeleteAccount: deleteAccount,
+            onTriggerLogout: accountLogout,
           ),
           Expanded(
             child: Material(
@@ -374,11 +404,13 @@ class DetailProfileHeader extends StatelessWidget {
     required this.title,
     required this.description,
     required this.onRequestDeleteAccount,
+    required this.onTriggerLogout,
   });
 
   final String? title;
   final String? description;
   final Function() onRequestDeleteAccount;
+  final Function() onTriggerLogout;
 
   @override
   Widget build(BuildContext context) {
@@ -413,16 +445,16 @@ class DetailProfileHeader extends StatelessWidget {
                         child: const Row(
                           children: [
                             SizedBox(width: 12),
-                            Text('Hapus Akun Permanen'),
+                            Text('Hapus akun permanen'),
                           ],
                         ),
                       ),
                       PopupMenuItem<String>(
-                        onTap: () {},
+                        onTap: onTriggerLogout,
                         child: const Row(
                           children: [
                             SizedBox(width: 12),
-                            Text('Keluar Dari Akun'),
+                            Text('Keluar dari akun'),
                           ],
                         ),
                       ),
