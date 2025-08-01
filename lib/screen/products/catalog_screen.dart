@@ -34,8 +34,6 @@ class _CatalogScreenState extends State<CatalogScreen> {
   bool _isCartLoading = true;
   bool _isSearchTrigger = false;
   ProductModel? _selectedItem;
-  String dummyImageUrl =
-      'https://topmortar.com/wp-content/uploads/2021/10/TOP-THINBED-2.png';
 
   final FocusNode _searchFocusNode = FocusNode();
   final TextEditingController _searchController = TextEditingController();
@@ -109,31 +107,31 @@ class _CatalogScreenState extends State<CatalogScreen> {
 
         if (data != null && data.details.isNotEmpty) {
           for (var product in data.details) {
-            var dummyObject = product.copyWith(imageProduk: dummyImageUrl);
-            checkoutedItems.add(dummyObject);
+            // var dummyObject = product.copyWith(imageProduk: dummyImageUrl);
+            checkoutedItems.add(product);
 
             int foundIndex = items.indexWhere(
-              (item) => item.idProduk == dummyObject.idProduk,
+              (item) => item.idProduk == product.idProduk,
             );
 
             if (foundIndex >= 0) {
               setState(() {
-                items[foundIndex] = dummyObject;
+                items[foundIndex] = product;
               });
             }
           }
           if (filteredItems.isNotEmpty) {
             for (var product in data.details) {
-              var dummyObject = product.copyWith(imageProduk: dummyImageUrl);
-              checkoutedItems.add(dummyObject);
+              // var dummyObject = product.copyWith(imageProduk: dummyImageUrl);
+              checkoutedItems.add(product);
 
               int foundIndex = filteredItems.indexWhere(
-                (item) => item.idProduk == dummyObject.idProduk,
+                (item) => item.idProduk == product.idProduk,
               );
 
               if (foundIndex >= 0) {
                 setState(() {
-                  filteredItems[foundIndex] = dummyObject;
+                  filteredItems[foundIndex] = product;
                 });
               }
             }
@@ -162,11 +160,11 @@ class _CatalogScreenState extends State<CatalogScreen> {
         showSnackBar(context, e);
       },
       onCompleted: (data) {
-        items = [];
-        for (var item in data) {
-          var dummyObject = item.copyWith(imageProduk: dummyImageUrl);
-          items.add(dummyObject);
-        }
+        items = data;
+        // for (var item in data) {
+        //   var dummyObject = item.copyWith(imageProduk: dummyImageUrl);
+        //   items.add(dummyObject);
+        // }
         setState(() {
           _isLoading = false;
         });
@@ -217,7 +215,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                 idCartDetail: '',
                 idCart: '',
                 qtyCartDetail: '',
-                imageProduk: dummyImageUrl,
+                // imageProduk: dummyImageUrl,
               );
             });
           }
@@ -282,7 +280,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                 fit: BoxFit.cover,
                                 errorBuilder: (context, error, stackTrace) {
                                   return const Icon(
-                                    Icons.broken_image,
+                                    Icons.error,
                                     size: 25,
                                     color: Colors.grey,
                                   );
@@ -427,7 +425,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                               errorBuilder:
                                                   (context, error, stackTrace) {
                                                     return const Icon(
-                                                      Icons.broken_image,
+                                                      Icons.error,
                                                       size: 80,
                                                       color: Colors.grey,
                                                     );
@@ -770,7 +768,7 @@ class _OverlayItemState extends State<OverlayItem> {
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) {
                           return const Icon(
-                            Icons.broken_image,
+                            Icons.error,
                             size: 80,
                             color: Colors.grey,
                           );

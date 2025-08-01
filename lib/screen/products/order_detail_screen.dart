@@ -154,7 +154,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                             errorBuilder:
                                                 (context, error, stackTrace) {
                                                   return const Icon(
-                                                    Icons.broken_image,
+                                                    Icons.error,
                                                     size: 40,
                                                     color: Colors.grey,
                                                   );
