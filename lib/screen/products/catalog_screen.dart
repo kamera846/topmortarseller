@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -10,13 +11,13 @@ import 'package:topmortarseller/services/product_api.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/util/currency_format.dart';
 import 'package:topmortarseller/widget/form/button/elevated_button.dart';
-import 'package:topmortarseller/widget/modal/loading_modal.dart';
 import 'package:topmortarseller/widget/snackbar/show_snackbar.dart';
 
 class CatalogScreen extends StatefulWidget {
-  const CatalogScreen({super.key, this.userData});
-
   final ContactModel? userData;
+  final bool searchTrigger;
+
+  const CatalogScreen({super.key, this.userData, this.searchTrigger = false});
 
   @override
   State<CatalogScreen> createState() => _CatalogScreenState();
@@ -25,6 +26,7 @@ class CatalogScreen extends StatefulWidget {
 class _CatalogScreenState extends State<CatalogScreen> {
   ContactModel? _userData;
   List<ProductModel> items = [];
+  List<ProductModel> filteredItems = [];
   List<ProductModel> checkoutedItems = [];
   CartModel? cartItem;
   bool _showOverlay = false;
@@ -34,10 +36,46 @@ class _CatalogScreenState extends State<CatalogScreen> {
   String dummyImageUrl =
       'https://topmortar.com/wp-content/uploads/2021/10/TOP-THINBED-2.png';
 
+  final FocusNode _searchFocusNode = FocusNode();
+  final TextEditingController _searchController = TextEditingController();
+  Timer? _searchDebounce;
+
   @override
   void initState() {
-    _getUserData();
     super.initState();
+    if (widget.searchTrigger) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        FocusScope.of(context).requestFocus(_searchFocusNode);
+      });
+    }
+    _searchController.addListener(_onTextChanged);
+    _getUserData();
+  }
+
+  @override
+  void dispose() {
+    _searchFocusNode.dispose();
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _onTextChanged() {
+    if (_isLoading == false && items.isNotEmpty) {
+      if (_searchDebounce?.isActive ?? false) _searchDebounce?.cancel();
+
+      filteredItems.clear();
+      _searchDebounce = Timer(Duration(seconds: 1), () {
+        String value = _searchController.text.toLowerCase();
+        setState(() {
+          filteredItems = items
+              .where(
+                (element) =>
+                    element.namaProduk?.toLowerCase().contains(value) ?? false,
+              )
+              .toList();
+        });
+      });
+    }
   }
 
   void _getUserData() async {
@@ -86,6 +124,22 @@ class _CatalogScreenState extends State<CatalogScreen> {
               setState(() {
                 items[foundIndex] = dummyObject;
               });
+            }
+          }
+          if (filteredItems.isNotEmpty) {
+            for (var product in data.details) {
+              var dummyObject = product.copyWith(imageProduk: dummyImageUrl);
+              checkoutedItems.add(dummyObject);
+
+              int foundIndex = filteredItems.indexWhere(
+                (item) => item.idProduk == dummyObject.idProduk,
+              );
+
+              if (foundIndex >= 0) {
+                setState(() {
+                  filteredItems[foundIndex] = dummyObject;
+                });
+              }
             }
           }
         }
@@ -189,6 +243,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
             ),
             title: const Text('Katalog Produk'),
             centerTitle: false,
+            scrolledUnderElevation: 0,
             actions: [
               PopupMenuButton(
                 enabled: !_isCartLoading && checkoutedItems.isNotEmpty,
@@ -306,141 +361,192 @@ class _CatalogScreenState extends State<CatalogScreen> {
                 )
               : null,
           body: SafeArea(
-            child: RefreshIndicator.adaptive(
-              onRefresh: () => _onRefresh(),
-              child: _isLoading
-                  ? const LoadingModal()
-                  : GridView.builder(
-                      padding: const EdgeInsets.all(12),
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            childAspectRatio: 1 / 1.5,
-                            crossAxisSpacing: 6,
-                            mainAxisSpacing: 6,
-                          ),
-                      itemCount: items.length,
-                      itemBuilder: (context, index) {
-                        final item = items[index];
-                        return Card(
-                          color: cWhite,
-                          clipBehavior: Clip.antiAliasWithSaveLayer,
-                          child: InkWell(
-                            onTap: () {
-                              setState(() {
-                                _selectedItem = item;
-                                _showOverlay = true;
-                              });
-                            },
-                            child: SizedBox(
-                              width: double.infinity,
-                              height: double.infinity,
-                              child: Column(
-                                children: [
-                                  Expanded(
-                                    flex: 3,
-                                    child: Container(
-                                      color: cDark600,
-                                      width: double.infinity,
-                                      height: double.infinity,
-                                      child: Image.network(
-                                        item.imageProduk ??
-                                            'https://google.com',
-                                        key: Key(
-                                          item.idProduk ?? index.toString(),
-                                        ),
-                                        fit: BoxFit.cover,
-                                        errorBuilder:
-                                            (context, error, stackTrace) {
-                                              return const Icon(
-                                                Icons.broken_image,
-                                                size: 80,
-                                                color: Colors.grey,
-                                              );
-                                            },
-                                      ),
-                                    ),
-                                  ),
-                                  Expanded(
-                                    flex: 2,
-                                    child: Container(
-                                      color: Colors.white,
-                                      padding: const EdgeInsets.all(12),
-                                      width: double.infinity,
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                item.namaProduk ?? '',
-                                                maxLines: 2,
-                                                overflow: TextOverflow.ellipsis,
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  top: 15,
+                  child: RefreshIndicator.adaptive(
+                    onRefresh: () => _onRefresh(),
+                    child: _isLoading
+                        ? const Center(
+                            child: CircularProgressIndicator.adaptive(),
+                          )
+                        : GridView.builder(
+                            padding: const EdgeInsets.only(
+                              left: 12,
+                              top: 50,
+                              right: 12,
+                              bottom: 12,
+                            ),
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2,
+                                  childAspectRatio: 1 / 1.5,
+                                  crossAxisSpacing: 6,
+                                  mainAxisSpacing: 6,
+                                ),
+                            itemCount: filteredItems.isNotEmpty
+                                ? filteredItems.length
+                                : items.length,
+                            itemBuilder: (context, index) {
+                              final item = filteredItems.isNotEmpty
+                                  ? filteredItems[index]
+                                  : items[index];
+                              return Card(
+                                color: cWhite,
+                                clipBehavior: Clip.antiAliasWithSaveLayer,
+                                child: InkWell(
+                                  onTap: () {
+                                    setState(() {
+                                      _selectedItem = item;
+                                      _showOverlay = true;
+                                    });
+                                  },
+                                  child: SizedBox(
+                                    width: double.infinity,
+                                    height: double.infinity,
+                                    child: Column(
+                                      children: [
+                                        Expanded(
+                                          flex: 3,
+                                          child: Container(
+                                            color: cDark600,
+                                            width: double.infinity,
+                                            height: double.infinity,
+                                            child: Image.network(
+                                              item.imageProduk ??
+                                                  'https://google.com',
+                                              key: Key(
+                                                item.idProduk ??
+                                                    index.toString(),
                                               ),
-                                            ],
+                                              fit: BoxFit.cover,
+                                              errorBuilder:
+                                                  (context, error, stackTrace) {
+                                                    return const Icon(
+                                                      Icons.broken_image,
+                                                      size: 80,
+                                                      color: Colors.grey,
+                                                    );
+                                                  },
+                                            ),
                                           ),
-                                          Row(
-                                            children: [
-                                              Expanded(
-                                                child: Text(
-                                                  CurrencyFormat().format(
-                                                    amount: double.parse(
-                                                      item.hargaProduk!,
+                                        ),
+                                        Expanded(
+                                          flex: 2,
+                                          child: Container(
+                                            color: Colors.white,
+                                            padding: const EdgeInsets.all(12),
+                                            width: double.infinity,
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      item.namaProduk ?? '',
+                                                      maxLines: 2,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
                                                     ),
-                                                  ),
-                                                  style: const TextStyle(
-                                                    color: cPrimary400,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
+                                                  ],
                                                 ),
-                                              ),
-                                              if (item
-                                                      .qtyCartDetail!
-                                                      .isNotEmpty &&
-                                                  item.qtyCartDetail !=
-                                                      '0') ...[
-                                                const Icon(Icons.shopping_bag),
-                                                Container(
-                                                  width: 20,
-                                                  height: 20,
-                                                  decoration: BoxDecoration(
-                                                    color: cPrimary100,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          100,
+                                                Row(
+                                                  children: [
+                                                    Expanded(
+                                                      child: Text(
+                                                        CurrencyFormat().format(
+                                                          amount: double.parse(
+                                                            item.hargaProduk!,
+                                                          ),
                                                         ),
-                                                  ),
-                                                  child: Center(
-                                                    child: Text(
-                                                      item.qtyCartDetail ?? '',
-                                                      style: const TextStyle(
-                                                        color: cWhite,
-                                                        fontSize: 10,
-                                                        fontWeight:
-                                                            FontWeight.bold,
+                                                        style: const TextStyle(
+                                                          color: cPrimary400,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
                                                       ),
                                                     ),
-                                                  ),
+                                                    if (item
+                                                            .qtyCartDetail!
+                                                            .isNotEmpty &&
+                                                        item.qtyCartDetail !=
+                                                            '0') ...[
+                                                      const Icon(
+                                                        Icons.shopping_bag,
+                                                      ),
+                                                      Container(
+                                                        width: 20,
+                                                        height: 20,
+                                                        decoration: BoxDecoration(
+                                                          color: cPrimary100,
+                                                          borderRadius:
+                                                              BorderRadius.circular(
+                                                                100,
+                                                              ),
+                                                        ),
+                                                        child: Center(
+                                                          child: Text(
+                                                            item.qtyCartDetail ??
+                                                                '',
+                                                            style:
+                                                                const TextStyle(
+                                                                  color: cWhite,
+                                                                  fontSize: 10,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ],
                                                 ),
                                               ],
-                                            ],
+                                            ),
                                           ),
-                                        ],
-                                      ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                ],
-                              ),
-                            ),
+                                ),
+                              );
+                            },
                           ),
-                        );
-                      },
+                  ),
+                ),
+                Positioned(
+                  left: 12,
+                  top: 0,
+                  right: 12,
+                  child: Hero(
+                    tag: "search-component",
+                    child: Material(
+                      elevation: 0.5,
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(100),
+                      child: TextFormField(
+                        controller: _searchController,
+                        focusNode: _searchFocusNode,
+                        onChanged: (value) => _onTextChanged(),
+                        decoration: InputDecoration(
+                          contentPadding: EdgeInsets.all(16),
+                          prefixIcon: Icon(Icons.search),
+                          hintText: "Ketik untuk mencari..",
+                          border: InputBorder.none,
+                        ),
+                      ),
                     ),
+                  ),
+                ),
+              ],
             ),
           ),
         ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:topmortarseller/model/contact_model.dart';
+import 'package:topmortarseller/screen/products/catalog_screen.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 
 class HeroSection extends StatefulWidget {
@@ -70,20 +71,30 @@ class _HeroSectionState extends State<HeroSection> {
             ),
           ),
           const SizedBox(height: 12),
-          Material(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(100),
-            child: InkWell(
-              onTap: () {},
+          Hero(
+            tag: "search-component",
+            child: Material(
+              color: Colors.white,
               borderRadius: BorderRadius.circular(100),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    Icon(Icons.search),
-                    const SizedBox(width: 12),
-                    Text("Cari produk sekarang"),
-                  ],
+              child: InkWell(
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          const CatalogScreen(searchTrigger: true),
+                    ),
+                  );
+                },
+                borderRadius: BorderRadius.circular(100),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      Icon(Icons.search),
+                      const SizedBox(width: 12),
+                      Text("Cari produk sekarang"),
+                    ],
+                  ),
                 ),
               ),
             ),
