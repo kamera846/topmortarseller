@@ -30,28 +30,37 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'MyTop Seller',
-      theme: ThemeData().copyWith(
-        colorScheme: mColorScheme,
-        appBarTheme: const AppBarTheme().copyWith(
-          backgroundColor: cPrimary100,
-          foregroundColor: cWhite,
-        ),
-        scaffoldBackgroundColor: cWhite,
-        textTheme: GoogleFonts.openSansTextTheme(),
-      ),
-      darkTheme: ThemeData.dark().copyWith(
-        colorScheme: mDarkColorScheme,
-        appBarTheme: const AppBarTheme().copyWith(
-          backgroundColor: cDark200,
-          foregroundColor: cWhite,
-        ),
-        scaffoldBackgroundColor: cDark100,
-        textTheme: GoogleFonts.openSansTextTheme(),
-      ),
-      themeMode: ThemeMode.light,
-      home: const SplashScreen(),
+    return Builder(
+      builder: (context) {
+        return MediaQuery(
+          data: MediaQuery.of(
+            context,
+          ).copyWith(textScaler: TextScaler.linear(1.0)),
+          child: MaterialApp(
+            title: 'MyTop Seller',
+            theme: ThemeData().copyWith(
+              colorScheme: mColorScheme,
+              appBarTheme: const AppBarTheme().copyWith(
+                backgroundColor: cPrimary100,
+                foregroundColor: cWhite,
+              ),
+              scaffoldBackgroundColor: cWhite,
+              textTheme: GoogleFonts.openSansTextTheme(),
+            ),
+            darkTheme: ThemeData.dark().copyWith(
+              colorScheme: mDarkColorScheme,
+              appBarTheme: const AppBarTheme().copyWith(
+                backgroundColor: cDark200,
+                foregroundColor: cWhite,
+              ),
+              scaffoldBackgroundColor: cDark100,
+              textTheme: GoogleFonts.openSansTextTheme(),
+            ),
+            themeMode: ThemeMode.light,
+            home: const SplashScreen(),
+          ),
+        );
+      },
     );
   }
 }
