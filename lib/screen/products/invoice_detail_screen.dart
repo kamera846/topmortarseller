@@ -170,7 +170,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
           children: [
             const Text('Total', style: TextStyle(fontWeight: FontWeight.bold)),
             Text(
-              CurrencyFormat().format(amount: totalInvoice, fractionDigits: 2),
+              CurrencyFormat().format(amount: totalInvoice),
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ],
