@@ -59,7 +59,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
 
       filteredItems.clear();
       _searchDebounce = Timer(Duration(seconds: 1), () {
-        String value = _searchController.text.toLowerCase();
+        String value = _searchController.text.toLowerCase().trim();
         setState(() {
           filteredItems = items
               .where(
@@ -120,7 +120,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
               });
             }
           }
-          if (filteredItems.isNotEmpty) {
+          if (_searchController.text.isNotEmpty) {
             for (var product in data.details) {
               // var dummyObject = product.copyWith(imageProduk: dummyImageUrl);
               checkoutedItems.add(product);
@@ -140,7 +140,11 @@ class _CatalogScreenState extends State<CatalogScreen> {
 
         if (widget.searchTrigger == true && _isSearchTrigger == false) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            FocusScope.of(context).requestFocus(_searchFocusNode);
+            Future.delayed(Duration(milliseconds: 300), () {
+              if (mounted) {
+                FocusScope.of(context).requestFocus(_searchFocusNode);
+              }
+            });
           });
         }
 
@@ -386,15 +390,16 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                   crossAxisSpacing: 6,
                                   mainAxisSpacing: 6,
                                 ),
-                            itemCount: filteredItems.isNotEmpty
+                            itemCount: _searchController.text.isNotEmpty
                                 ? filteredItems.length
                                 : items.length,
                             itemBuilder: (context, index) {
-                              final item = filteredItems.isNotEmpty
+                              final item = _searchController.text.isNotEmpty
                                   ? filteredItems[index]
                                   : items[index];
                               return Card(
                                 color: cWhite,
+                                elevation: 0.5,
                                 clipBehavior: Clip.antiAliasWithSaveLayer,
                                 child: InkWell(
                                   onTap: () {
