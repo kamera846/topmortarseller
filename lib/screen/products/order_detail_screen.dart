@@ -90,19 +90,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      Container(
-                        margin: const EdgeInsets.only(bottom: 24),
-                        padding: const EdgeInsets.all(24),
-                        color: getReminderBackgroundColor(),
-                        width: double.infinity,
-                        child: Row(
-                          children: [
-                            getReminderIcon(),
-                            const SizedBox(width: 12),
-                            getReminderTitleAndDescriptionText(),
-                          ],
-                        ),
-                      ),
+                      generateReminderSection(context),
                       Container(
                         margin: const EdgeInsets.only(bottom: 24),
                         padding: const EdgeInsets.all(24),
@@ -339,59 +327,62 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     return CurrencyFormat().format(amount: totalPrice, fractionDigits: 2);
   }
 
-  Color getReminderBackgroundColor() {
+  Widget generateReminderSection(BuildContext context) {
     var statusAppOrder = order.statusAppOrder.toLowerCase();
-    if (statusAppOrder == 'diproses') {
-      return Colors.grey[400]!;
-    } else if (statusAppOrder == 'dikirim') {
-      return Colors.blue[100]!;
-    } else if (statusAppOrder == 'invoice') {
-      return Colors.orange[100]!;
-    } else if (statusAppOrder == 'selesai') {
-      return Colors.green[100]!;
-    } else {
-      return Colors.yellow[700]!.withAlpha(180);
-    }
-  }
-
-  Widget getReminderIcon() {
-    var statusAppOrder = order.statusAppOrder.toLowerCase();
-    if (statusAppOrder == 'diproses') {
-      return const Icon(Icons.inventory_2_outlined);
-    } else if (statusAppOrder == 'dikirim') {
-      return const Icon(Icons.fire_truck_rounded);
-    } else if (statusAppOrder == 'invoice') {
-      return const Icon(Icons.payment_rounded);
-    } else if (statusAppOrder == 'selesai') {
-      return const Icon(Icons.check_circle_sharp);
-    } else {
-      return const Icon(Icons.info_outline);
-    }
-  }
-
-  Column getReminderTitleAndDescriptionText() {
+    Color color = Colors.yellow[700]!.withAlpha(180);
+    Icon icon = const Icon(Icons.info_outline);
     String title = '-';
     String description = '-';
-    var statusAppOrder = order.statusAppOrder.toLowerCase();
+
     if (statusAppOrder == 'diproses') {
-      title = 'Status pesanan sedang diproses';
-      description = 'Sabarr ngab :))';
+      color = Colors.grey[400]!;
+      icon = const Icon(Icons.inventory_2_outlined);
+      title = 'Pesanan dalam Proses';
+      description = 'Kami sedang menyiapkan pesanan Anda. Tunggu sebentar ya!';
     } else if (statusAppOrder == 'dikirim') {
-      title = 'Status pesanan sedang dikirim';
-      description = 'Otewe niih :)';
-    } else if (statusAppOrder == 'invoice') {
-      title = 'Status pesanan sudah diterima';
-      description = 'Bayarr woyy';
+      color = Colors.blue[100]!;
+      icon = const Icon(Icons.fire_truck_rounded);
+      title = 'Pesanan Sedang Dikirim';
+      description = 'Pesanan sudah dalam perjalanan. Ditunggu, ya!';
     } else if (statusAppOrder == 'selesai') {
-      title = 'Status pesanan sudah selesai';
-      description = 'Terimakasih bos, cair nih caiirr ..';
+      color = Colors.green[100]!;
+      icon = const Icon(Icons.check_circle_sharp);
+      title = 'Pesanan Selesai';
+      description =
+          'Terima kasih sudah berbelanja. Semoga suka dengan pesanannya!';
     }
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-        Text(description),
-      ],
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 24),
+      padding: const EdgeInsets.all(24),
+      color: color,
+      width: double.infinity,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              icon,
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(description, maxLines: 2, overflow: TextOverflow.ellipsis),
+        ],
+      ),
     );
   }
 }
