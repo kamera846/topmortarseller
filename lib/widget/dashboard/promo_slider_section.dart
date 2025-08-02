@@ -17,7 +17,7 @@ class PromoSliderSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(left: 12, top: 12, right: 12),
+          padding: const EdgeInsets.only(left: 12, right: 12),
           child: Text(
             'Promo',
             style: Theme.of(context).textTheme.titleMedium!.copyWith(

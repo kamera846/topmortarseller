@@ -6,16 +6,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:topmortarseller/model/contact_model.dart';
+import 'package:topmortarseller/screen/auth_screen.dart';
+import 'package:topmortarseller/screen/products/catalog_screen.dart';
 import 'package:topmortarseller/screen/profile/detail_profile_screen.dart';
 import 'package:topmortarseller/screen/profile/new_rekening_screen.dart';
 import 'package:topmortarseller/screen/scanner/qr_scanner_screen.dart';
+import 'package:topmortarseller/services/auth_api.dart';
 import 'package:topmortarseller/services/customer_bank_api.dart';
+import 'package:topmortarseller/util/auth_settings.dart';
 import 'package:topmortarseller/util/enum.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/widget/dashboard/content_section.dart';
 import 'package:topmortarseller/widget/dashboard/hero_section.dart';
 import 'package:topmortarseller/widget/dashboard/menu_section.dart';
 import 'package:topmortarseller/widget/dashboard/promo_slider_section.dart';
+import 'package:topmortarseller/widget/modal/info_modal.dart';
+import 'package:topmortarseller/widget/snackbar/show_snackbar.dart';
 import 'package:upgrader/upgrader.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -51,12 +57,25 @@ class HomeDashboard extends StatefulWidget {
 
 class _HomeDashboardState extends State<HomeDashboard> {
   final GlobalKey<ContentSectionState> contentKey = GlobalKey();
+  final GlobalKey<ContentSectionState> searchComponentKey = GlobalKey();
+  double searchComponentOffset = 0;
   ContactModel? _userData;
   int navCurrentIndex = 0;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final context = searchComponentKey.currentContext;
+      if (context != null) {
+        final box = context.findRenderObject() as RenderBox;
+        final height = box.size.height + 16;
+
+        setState(() {
+          searchComponentOffset = height / 2;
+        });
+      }
+    });
     _getUserData();
   }
 
@@ -107,6 +126,81 @@ class _HomeDashboardState extends State<HomeDashboard> {
     );
   }
 
+  void _onRequestDeleteAccount() {
+    showCupertinoDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return MInfoModal(
+          contentName: 'Apakah anda yakin ingin menghapus akun?',
+          contentDescription:
+              'Dengan menghapus akun, data anda akan kami hapus permanen dalam 7 hari.',
+          contentIcon: Icons.warning_rounded,
+          contentIconColor: cPrimary100,
+          cancelText: 'Batal',
+          confirmText: 'Hapus',
+          onCancel: () {
+            Navigator.of(context).pop();
+          },
+          onConfirm: () async {
+            await AuthApiService().requestDeleteAccount(
+              idContact: _userData?.idContact,
+              onError: (e) {
+                if (context.mounted) {
+                  Navigator.pop(context);
+                  showSnackBar(context, e);
+                }
+              },
+              onSuccess: (e) async {
+                await removeLoginState();
+                await removeContactModel();
+                _clearAllScreenToAuth();
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _onRequestLogoutAccount() {
+    showCupertinoDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return MInfoModal(
+          contentName: 'Keluar dari akun?',
+          contentDescription:
+              'Anda diharuskan login kembali ketika mengakses aplikasi jika keluar dari akun.',
+          contentIcon: Icons.warning_rounded,
+          contentIconColor: cPrimary100,
+          cancelText: 'Batal',
+          onCancel: () {
+            Navigator.of(context).pop();
+          },
+          onConfirm: () async {
+            await removeLoginState();
+            await removeContactModel();
+            if (context.mounted) {
+              Navigator.of(context).pop();
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: (ctx) => const AuthScreen()),
+              );
+            }
+          },
+        );
+      },
+    );
+  }
+
+  void _clearAllScreenToAuth() {
+    if (context.mounted) {
+      Navigator.pop(context);
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (ctx) => const AuthScreen()),
+        (Route<dynamic> route) => false,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(
@@ -145,7 +239,7 @@ class _HomeDashboardState extends State<HomeDashboard> {
                 BottomNavigationBarItem(
                   icon: Icon(CupertinoIcons.person_alt_circle),
                   activeIcon: Icon(CupertinoIcons.person_alt_circle_fill),
-                  label: 'Profil',
+                  label: 'Akun',
                 ),
               ],
             )
@@ -166,41 +260,197 @@ class _HomeDashboardState extends State<HomeDashboard> {
             ),
           ),
           Positioned.fill(
-            child: navCurrentIndex == 0
-                ? SafeArea(
+            child: SafeArea(
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: 60,
+                    child: Row(
+                      children: [
+                        const SizedBox(width: 24),
+                        Expanded(
+                          child: Text(
+                            'Top Mortar Seller',
+                            style: Theme.of(context).textTheme.titleLarge!
+                                .copyWith(
+                                  color: cWhite,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                          ),
+                        ),
+                        if (navCurrentIndex == 0) ...[
+                          Text(
+                            "0 Poin",
+                            style: TextStyle(
+                              color: Colors.amber,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                            ),
+                          ),
+                          const SizedBox(width: 24),
+                        ] else ...[
+                          PopupMenuButton<String>(
+                            icon: const Icon(Icons.settings, color: cWhite),
+
+                            itemBuilder: (ctx) {
+                              return [
+                                PopupMenuItem<String>(
+                                  onTap: _onRequestLogoutAccount,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Text('Keluar dari akun'),
+                                      const SizedBox(width: 8),
+                                    ],
+                                  ),
+                                ),
+                                PopupMenuItem<String>(
+                                  onTap: _onRequestDeleteAccount,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Text(
+                                        'Ajukan pengghapusan akun',
+                                        style: TextStyle(color: cPrimary100),
+                                      ),
+                                      const SizedBox(width: 8),
+                                    ],
+                                  ),
+                                ),
+                              ];
+                            },
+                          ),
+                          const SizedBox(width: 12),
+                        ],
+                      ],
+                    ),
+                  ),
+                  Expanded(
                     child: ClipRRect(
                       borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(16),
                         topRight: Radius.circular(16),
                       ),
-                      child: RefreshIndicator.adaptive(
-                        onRefresh: () => _onRefresh(),
-                        child: SingleChildScrollView(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              HeroSection(userData: _userData),
-                              Material(
-                                color: cWhite,
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(16),
-                                  topRight: Radius.circular(16),
-                                ),
+                      child: navCurrentIndex == 0
+                          ? RefreshIndicator.adaptive(
+                              onRefresh: () => _onRefresh(),
+                              child: SingleChildScrollView(
                                 child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const MenuSection(),
-                                    const PromoSliderSection(),
-                                    ContentSection(key: contentKey),
+                                    Padding(
+                                      padding: EdgeInsets.only(
+                                        left: 24,
+                                        right: 24,
+                                        bottom: 0,
+                                      ),
+                                      child: HeroSection(userData: _userData),
+                                    ),
+                                    SizedBox(
+                                      height: searchComponentOffset * 2,
+                                      child: Stack(
+                                        children: [
+                                          Positioned(
+                                            left: 0,
+                                            bottom: 0,
+                                            right: 0,
+                                            child: Container(
+                                              height: searchComponentOffset,
+                                              color: cWhite,
+                                            ),
+                                          ),
+                                          Positioned(
+                                            left: 0,
+                                            top: 8,
+                                            right: 0,
+                                            child: Padding(
+                                              key: searchComponentKey,
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 16,
+                                                    vertical: 0,
+                                                  ),
+                                              child: Hero(
+                                                tag: "search-component",
+                                                child: Material(
+                                                  color: Colors.white,
+                                                  elevation: 1,
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                        100,
+                                                      ),
+                                                  child: InkWell(
+                                                    onTap: () {
+                                                      Navigator.of(
+                                                        context,
+                                                      ).push(
+                                                        MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              const CatalogScreen(
+                                                                searchTrigger:
+                                                                    true,
+                                                              ),
+                                                        ),
+                                                      );
+                                                    },
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          100,
+                                                        ),
+                                                    child: Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                            16,
+                                                          ),
+                                                      child: Row(
+                                                        children: [
+                                                          Icon(Icons.search),
+                                                          const SizedBox(
+                                                            width: 12,
+                                                          ),
+                                                          Expanded(
+                                                            child: Text(
+                                                              "Cari produk sekarang",
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Material(
+                                      color: cWhite,
+                                      child: Column(
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                              left: 12,
+                                              right: 12,
+                                              bottom: 6,
+                                            ),
+                                            child: const MenuSection(),
+                                          ),
+                                          const PromoSliderSection(),
+                                          ContentSection(key: contentKey),
+                                        ],
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),
-                            ],
-                          ),
-                        ),
-                      ),
+                            )
+                          : DetailProfileScreen(userData: _userData),
                     ),
-                  )
-                : DetailProfileScreen(userData: _userData),
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
       ),

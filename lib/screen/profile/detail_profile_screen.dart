@@ -1,20 +1,15 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:topmortarseller/model/claimed_model.dart';
 import 'package:topmortarseller/model/contact_model.dart';
 import 'package:topmortarseller/model/customer_bank_model.dart';
-import 'package:topmortarseller/screen/auth_screen.dart';
-import 'package:topmortarseller/services/auth_api.dart';
 import 'package:topmortarseller/services/claim_api.dart';
 import 'package:topmortarseller/services/customer_bank_api.dart';
-import 'package:topmortarseller/util/auth_settings.dart';
 import 'package:topmortarseller/util/enum.dart';
 import 'package:topmortarseller/screen/profile/new_rekening_screen.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/util/loading_item.dart';
 import 'package:topmortarseller/widget/card/card_rekening.dart';
 import 'package:topmortarseller/widget/form/button/elevated_button.dart';
-import 'package:topmortarseller/widget/modal/info_modal.dart';
 import 'package:topmortarseller/widget/snackbar/show_snackbar.dart';
 
 class DetailProfileScreen extends StatefulWidget {
@@ -105,62 +100,6 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
       myRedeems = data;
       isLoadingRedeem = false;
     });
-  }
-
-  void deleteAccount() async {
-    await AuthApiService().requestDeleteAccount(
-      idContact: _userData?.idContact,
-      onError: (e) {
-        if (context.mounted) {
-          Navigator.pop(context);
-          showSnackBar(context, e);
-        }
-      },
-      onSuccess: (e) async {
-        await removeLoginState();
-        await removeContactModel();
-        _clearAllScreenToAuth();
-      },
-    );
-  }
-
-  void accountLogout() {
-    showCupertinoDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return MInfoModal(
-          contentName: 'Keluar dari akun?',
-          contentDescription:
-              'Anda diharuskan login kembali ketika mengakses aplikasi jika keluar dari akun.',
-          contentIcon: Icons.warning_rounded,
-          contentIconColor: cPrimary100,
-          cancelText: 'Batal',
-          onCancel: () {
-            Navigator.of(context).pop();
-          },
-          onConfirm: () async {
-            await removeLoginState();
-            await removeContactModel();
-            if (context.mounted) {
-              Navigator.of(context).pop();
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (ctx) => const AuthScreen()),
-              );
-            }
-          },
-        );
-      },
-    );
-  }
-
-  void _clearAllScreenToAuth() {
-    if (context.mounted) {
-      Navigator.pop(context);
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (ctx) => const AuthScreen()),
-        (Route<dynamic> route) => false,
-      );
-    }
   }
 
   String _monthName(int month) {
@@ -345,11 +284,9 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          DetailProfileHeader(
-            title: title,
-            description: description,
-            onRequestDeleteAccount: deleteAccount,
-            onTriggerLogout: accountLogout,
+          Padding(
+            padding: const EdgeInsets.all(24),
+            child: DetailProfileHeader(title: title, description: description),
           ),
           Expanded(
             child: Material(
@@ -361,9 +298,10 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
                       children: [
                         Padding(
                           padding: const EdgeInsets.only(
-                            left: 12,
-                            top: 12,
-                            right: 12,
+                            left: 16,
+                            top: 16,
+                            right: 16,
+                            bottom: 16,
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -379,7 +317,7 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
                                 overflow: TextOverflow.visible,
                                 style: Theme.of(context).textTheme.bodySmall,
                               ),
-                              const SizedBox(height: 12),
+                              const SizedBox(height: 16),
                               cardBank,
                               emptyCardBank,
                             ],
@@ -403,126 +341,47 @@ class DetailProfileHeader extends StatelessWidget {
     super.key,
     required this.title,
     required this.description,
-    required this.onRequestDeleteAccount,
-    required this.onTriggerLogout,
   });
 
   final String? title;
   final String? description;
-  final Function() onRequestDeleteAccount;
-  final Function() onTriggerLogout;
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Padding(
-        padding: EdgeInsets.only(right: 0, bottom: 24, left: 0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
           children: [
-            Row(
-              children: [
-                const SizedBox(width: 6),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    'Profil Saya',
-                    style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                      color: cWhite,
-                      fontWeight: FontWeight.bold,
+            const Hero(
+              tag: TagHero.mainDrawerHeader,
+              child: Icon(Icons.storefront, size: 24, color: cWhite),
+            ),
+            const SizedBox(width: 12),
+            title == null
+                ? const Expanded(child: LoadingItem(isPrimaryTheme: true))
+                : Text(
+                    title!,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.normal,
+                      fontSize: 20,
                     ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                PopupMenuButton<String>(
-                  icon: const Icon(Icons.settings, color: cWhite),
-                  itemBuilder: (ctx) {
-                    return [
-                      PopupMenuItem<String>(
-                        onTap: () {
-                          _onRequestDeleteAccount(context);
-                        },
-                        child: const Row(
-                          children: [
-                            SizedBox(width: 12),
-                            Text('Hapus akun permanen'),
-                          ],
-                        ),
-                      ),
-                      PopupMenuItem<String>(
-                        onTap: onTriggerLogout,
-                        child: const Row(
-                          children: [
-                            SizedBox(width: 12),
-                            Text('Keluar dari akun'),
-                          ],
-                        ),
-                      ),
-                    ];
-                  },
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                const SizedBox(width: 24),
-                const Hero(
-                  tag: TagHero.mainDrawerHeader,
-                  child: Icon(Icons.storefront, size: 24, color: cWhite),
-                ),
-                const SizedBox(width: 12),
-                title == null
-                    ? const Expanded(child: LoadingItem(isPrimaryTheme: true))
-                    : Text(
-                        title!,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.normal,
-                          fontSize: 20,
-                        ),
-                      ),
-                const SizedBox(width: 24),
-              ],
-            ),
-            const SizedBox(height: 6),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: description == null
-                  ? const LoadingItem(isPrimaryTheme: true)
-                  : Text(
-                      description!,
-                      softWrap: true,
-                      overflow: TextOverflow.visible,
-                      style: Theme.of(
-                        context,
-                      ).textTheme.bodyMedium!.copyWith(color: cWhite),
-                    ),
-            ),
           ],
         ),
-      ),
-    );
-  }
-
-  void _onRequestDeleteAccount(BuildContext context) {
-    showCupertinoDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return MInfoModal(
-          contentName: 'Apakah anda yakin ingin menghapus akun?',
-          contentDescription:
-              'Dengan menghapus akun, data anda akan kami hapus permanen dalam 7 hari.',
-          contentIcon: Icons.warning_rounded,
-          contentIconColor: cPrimary100,
-          cancelText: 'Batal',
-          confirmText: 'Hapus',
-          onCancel: () {
-            Navigator.of(context).pop();
-          },
-          onConfirm: onRequestDeleteAccount,
-        );
-      },
+        const SizedBox(height: 6),
+        description == null
+            ? const LoadingItem(isPrimaryTheme: true)
+            : Text(
+                description!,
+                softWrap: true,
+                overflow: TextOverflow.visible,
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium!.copyWith(color: cWhite),
+              ),
+      ],
     );
   }
 }
