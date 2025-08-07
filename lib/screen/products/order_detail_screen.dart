@@ -191,7 +191,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                                               .toDouble(),
                                                     ),
                                                     style: const TextStyle(
-                                                      color: cPrimary100,
+                                                      color: cPrimary200,
                                                     ),
                                                   ),
                                                 ],
@@ -234,7 +234,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                     amount: subTotalAppOrder,
                                     fractionDigits: 2,
                                   ),
-                                  style: const TextStyle(color: cPrimary100),
+                                  style: const TextStyle(color: cPrimary200),
                                 ),
                               ],
                             ),
