@@ -8,6 +8,7 @@ import 'package:topmortarseller/util/enum.dart';
 import 'package:topmortarseller/screen/profile/new_rekening_screen.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/util/loading_item.dart';
+import 'package:topmortarseller/util/phone_format.dart';
 import 'package:topmortarseller/widget/card/card_rekening.dart';
 import 'package:topmortarseller/widget/form/button/elevated_button.dart';
 import 'package:topmortarseller/widget/snackbar/show_snackbar.dart';
@@ -26,6 +27,7 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
   List<CustomerBankModel>? myBanks = [];
   List<ClaimedModel>? myRedeems = [];
   String? title;
+  String? phone;
   String? description;
   int totalQuota = 0;
   bool isLoading = true;
@@ -46,15 +48,14 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
       _userData = data;
 
       if (data != null) {
-        if (data.nama != null && data.nama != null && data.nama!.isNotEmpty) {
+        if (data.nama != null && data.nama!.isNotEmpty) {
           title = data.nama!;
+        }
+        if (data.nomorhp != null && data.nomorhp!.isNotEmpty) {
+          phone = data.nomorhp!;
         }
         if (data.address != null && data.address!.isNotEmpty) {
           description = data.address!;
-        } else if (data.nomorhp != null &&
-            data.nomorhp != null &&
-            data.nomorhp!.isNotEmpty) {
-          description = data.nomorhp!;
         }
       }
     });
@@ -286,7 +287,11 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
         children: [
           Padding(
             padding: const EdgeInsets.all(24),
-            child: DetailProfileHeader(title: title, description: description),
+            child: DetailProfileHeader(
+              title: title,
+              phone: phone,
+              description: description,
+            ),
           ),
           Expanded(
             child: Material(
@@ -340,10 +345,12 @@ class DetailProfileHeader extends StatelessWidget {
   const DetailProfileHeader({
     super.key,
     required this.title,
+    required this.phone,
     required this.description,
   });
 
   final String? title;
+  final String? phone;
   final String? description;
 
   @override
@@ -371,6 +378,16 @@ class DetailProfileHeader extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 6),
+        phone == null
+            ? const LoadingItem(isPrimaryTheme: true)
+            : Text(
+                MyPhoneFormat.format(phone!),
+                softWrap: true,
+                overflow: TextOverflow.visible,
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium!.copyWith(color: cWhite),
+              ),
         description == null
             ? const LoadingItem(isPrimaryTheme: true)
             : Text(

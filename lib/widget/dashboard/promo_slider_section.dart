@@ -8,9 +8,9 @@ class PromoSliderSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final List<String> promoItems = [
-      'https://media.istockphoto.com/id/1214771295/vector/realistic-red-grand-opening-banner-hanging-on-a-grey-wall.jpg?s=612x612&w=0&k=20&c=Pii5QNuYcEdTGxtMz_tS00v6ZtuhrFofWAdI4Dq8r8g=',
-      'https://img.freepik.com/free-photo/front-view-shop-word-red-table_23-2148281114.jpg?semt=ais_hybrid&w=740&q=80',
-      'https://media.istockphoto.com/id/1412949747/vector/sale-sticker-with-50-percent-off-weekend-discount.jpg?s=612x612&w=0&k=20&c=xOJuBoLp04OHo4R-w_Ub_jfRIbgJ0N77rWl8SjIBfCI=',
+      'https://google.com',
+      'https://google.com',
+      'https://google.com',
     ];
 
     return Column(
@@ -34,7 +34,7 @@ class PromoSliderSection extends StatelessWidget {
             return Padding(
               padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 6),
               child: Material(
-                color: cWhite,
+                color: Colors.white,
                 elevation: 1,
                 borderRadius: BorderRadius.circular(16),
                 child: ClipRRect(
