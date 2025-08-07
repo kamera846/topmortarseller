@@ -408,7 +408,7 @@ class CardInvoice extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text('Total $totalItems produk'),
+                      Text('Total $totalQty produk'),
                       Row(
                         children: [
                           Text(
@@ -420,7 +420,8 @@ class CardInvoice extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(width: 8),
-                          if (item.discountAppOrder.isNotEmpty)
+                          if (item.discountAppInvoice.isNotEmpty &&
+                              item.discountAppInvoice != '0')
                             Text(
                               CurrencyFormat().format(amount: subTotalInvoice),
                               style: TextStyle(

@@ -7,7 +7,7 @@ class InvoiceModel {
   final String billToPhone;
   final String billToAddress;
   final String subTotalInvoice;
-  final String discountAppOrder;
+  final String discountAppInvoice;
   final String totalInvoice;
   final String statusInvoice;
   final String dateInvoice;
@@ -24,7 +24,7 @@ class InvoiceModel {
     this.billToPhone = '',
     this.billToAddress = '',
     this.subTotalInvoice = '',
-    this.discountAppOrder = '',
+    this.discountAppInvoice = '',
     this.totalInvoice = '',
     this.statusInvoice = '',
     this.dateInvoice = '',
@@ -42,7 +42,7 @@ class InvoiceModel {
     String? billToPhone,
     String? billToAddress,
     String? subTotalInvoice,
-    String? discountAppOrder,
+    String? discountAppInvoice,
     String? totalInvoice,
     String? statusInvoice,
     String? totalQty,
@@ -59,7 +59,7 @@ class InvoiceModel {
       billToPhone: billToPhone ?? this.billToPhone,
       billToAddress: billToAddress ?? this.billToAddress,
       subTotalInvoice: subTotalInvoice ?? this.subTotalInvoice,
-      discountAppOrder: discountAppOrder ?? this.discountAppOrder,
+      discountAppInvoice: discountAppInvoice ?? this.discountAppInvoice,
       totalInvoice: totalInvoice ?? this.totalInvoice,
       statusInvoice: statusInvoice ?? this.statusInvoice,
       dateInvoice: dateInvoice ?? this.dateInvoice,
@@ -78,7 +78,7 @@ class InvoiceModel {
     'bill_to_phone': billToPhone,
     'bill_to_address': billToAddress,
     'subtotal_invoice': subTotalInvoice,
-    'discount_apporder': discountAppOrder,
+    'discount_app_invoice': discountAppInvoice,
     'total_invoice': totalInvoice,
     'status_invoice': statusInvoice,
     'date_invoice': dateInvoice,
@@ -97,7 +97,7 @@ class InvoiceModel {
       billToPhone: json['bill_to_phone'] ?? '',
       billToAddress: json['bill_to_address'] ?? '',
       subTotalInvoice: json['subtotal_invoice'] ?? '',
-      discountAppOrder: json['discount_apporder'] ?? '',
+      discountAppInvoice: json['discount_app_invoice'] ?? '',
       totalInvoice: json['total_invoice'] ?? '',
       statusInvoice: json['status_invoice'] ?? '',
       dateInvoice: json['date_invoice'] ?? '',
