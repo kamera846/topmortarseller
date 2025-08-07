@@ -285,7 +285,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                 errorBuilder: (context, error, stackTrace) {
                                   return const Icon(
                                     Icons.error,
-                                    size: 25,
+                                    size: 20,
                                     color: Colors.grey,
                                   );
                                 },
@@ -431,7 +431,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                                   (context, error, stackTrace) {
                                                     return const Icon(
                                                       Icons.error,
-                                                      size: 80,
+                                                      size: 40,
                                                       color: Colors.grey,
                                                     );
                                                   },
@@ -774,7 +774,7 @@ class _OverlayItemState extends State<OverlayItem> {
                         errorBuilder: (context, error, stackTrace) {
                           return const Icon(
                             Icons.error,
-                            size: 80,
+                            size: 40,
                             color: Colors.grey,
                           );
                         },

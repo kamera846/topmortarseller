@@ -44,7 +44,7 @@ class PromoSliderSection extends StatelessWidget {
                     errorBuilder: (context, error, stackTrace) => SizedBox(
                       width: double.infinity,
                       height: double.infinity,
-                      child: Icon(Icons.error),
+                      child: Icon(Icons.error, color: Colors.grey),
                     ),
                     fit: BoxFit.cover,
                     width: double.infinity,

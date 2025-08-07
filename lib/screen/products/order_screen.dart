@@ -376,7 +376,7 @@ class CardOrder extends StatelessWidget {
                             errorBuilder: (context, error, stackTrace) {
                               return const Icon(
                                 Icons.error,
-                                size: 25,
+                                size: 20,
                                 color: Colors.grey,
                               );
                             },

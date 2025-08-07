@@ -358,6 +358,7 @@ class _HomeDashboardState extends State<HomeDashboard> {
                   Material(
                     color: cWhite,
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Padding(
                           padding: const EdgeInsets.only(

@@ -103,11 +103,12 @@ class ContentSectionState extends State<ContentSection> {
   Widget _generateContent() {
     if (!isLoading) {
       if (listFeed != null && listFeed!.isNotEmpty) {
-        return ListView.builder(
+        return ListView.separated(
           itemCount: listFeed!.length,
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          padding: EdgeInsets.zero,
+          padding: const EdgeInsets.all(12),
+          separatorBuilder: (context, index) => const SizedBox(height: 12),
           itemBuilder: (conxtext, i) {
             final item = listFeed![i];
             return CardFeed(feed: item, mediaLink: mediaLink);
