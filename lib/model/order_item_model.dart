@@ -4,6 +4,7 @@ class OrderItemModel {
   final String idProduct;
   final String imgProduk;
   final String nameProduk;
+  final String isBonus;
   final String priceProduk;
   final String qtyAppOrderDetail;
   final String totalAppOrderDetail;
@@ -18,6 +19,7 @@ class OrderItemModel {
     required this.idProduct,
     required this.imgProduk,
     required this.nameProduk,
+    required this.isBonus,
     required this.priceProduk,
     required this.qtyAppOrderDetail,
     required this.totalAppOrderDetail,
@@ -33,6 +35,7 @@ class OrderItemModel {
     String? idProduct,
     String? imgProduk,
     String? nameProduk,
+    String? isBonus,
     String? priceProduk,
     String? qtyAppOrderDetail,
     String? totalAppOrderDetail,
@@ -47,6 +50,7 @@ class OrderItemModel {
       idProduct: idProduct ?? this.idProduct,
       imgProduk: imgProduk ?? this.imgProduk,
       nameProduk: nameProduk ?? this.nameProduk,
+      isBonus: isBonus ?? this.isBonus,
       priceProduk: priceProduk ?? this.priceProduk,
       qtyAppOrderDetail: qtyAppOrderDetail ?? this.qtyAppOrderDetail,
       totalAppOrderDetail: totalAppOrderDetail ?? this.totalAppOrderDetail,
@@ -63,6 +67,7 @@ class OrderItemModel {
     'id_produk': idProduct,
     'img_produk': imgProduk,
     'name_produk': nameProduk,
+    'is_bonus': isBonus,
     'price_produk': priceProduk,
     'qty_apporder_detail': qtyAppOrderDetail,
     'total_apporder_detail': totalAppOrderDetail,
@@ -79,6 +84,7 @@ class OrderItemModel {
       idProduct: json['id_produk'] ?? '',
       imgProduk: json['img_produk'] ?? '',
       nameProduk: json['name_produk'] ?? '',
+      isBonus: json['is_bonus'] ?? '',
       priceProduk: json['price_produk'] ?? '',
       qtyAppOrderDetail: json['qty_apporder_detail'] ?? '',
       totalAppOrderDetail: json['total_apporder_detail'] ?? '',

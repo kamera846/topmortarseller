@@ -180,16 +180,10 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                                   ),
                                                   Text(
                                                     CurrencyFormat().format(
-                                                      amount:
-                                                          (int.parse(
-                                                                    product
-                                                                        .priceProduk,
-                                                                  ) *
-                                                                  int.parse(
-                                                                    product
-                                                                        .qtyAppOrderDetail,
-                                                                  ))
-                                                              .toDouble(),
+                                                      amount: (double.parse(
+                                                        product
+                                                            .totalAppOrderDetail,
+                                                      )),
                                                     ),
                                                     style: const TextStyle(
                                                       color: cPrimary200,
@@ -197,8 +191,15 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                                   ),
                                                 ],
                                               ),
-                                              Text(
-                                                'x ${product.qtyAppOrderDetail}',
+                                              Row(
+                                                children: [
+                                                  Text(
+                                                    'x${product.qtyAppOrderDetail}',
+                                                  ),
+                                                  product.isBonus == '1'
+                                                      ? const Text(" (Free)")
+                                                      : const SizedBox.shrink(),
+                                                ],
                                               ),
                                             ],
                                           ),

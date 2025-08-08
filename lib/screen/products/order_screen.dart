@@ -60,8 +60,8 @@ class _OrderScreenState extends State<OrderScreen>
 
   @override
   void initState() {
-    _tabController = TabController(length: 4, vsync: this);
     super.initState();
+    _tabController = TabController(length: 4, vsync: this);
   }
 
   @override
@@ -402,6 +402,12 @@ class CardOrder extends StatelessWidget {
                                   color: cPrimary100,
                                 ),
                               ),
+                              product.isBonus == '1'
+                                  ? const Text(
+                                      " Free",
+                                      style: TextStyle(fontSize: 12),
+                                    )
+                                  : const SizedBox.shrink(),
                             ],
                           ),
                         ],
