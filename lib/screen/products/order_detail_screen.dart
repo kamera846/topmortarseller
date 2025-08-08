@@ -43,6 +43,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       onError: (e) => showSnackBar(context, e),
       onCompleted: (data) {
         setState(() {
+          discounts.clear();
           order = data ?? OrderModel();
           subTotalAppOrder = double.tryParse(order.subTotalAppOrder) == null
               ? 0.0

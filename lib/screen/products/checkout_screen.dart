@@ -56,6 +56,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       onError: (e) => showSnackBar(context, e),
       onCompleted: (data) {
         setState(() {
+          discounts.clear();
           cart = data ?? CartModel();
           subTotalPrice = double.tryParse(cart.subtotalPrice) == null
               ? 0.0

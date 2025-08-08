@@ -46,6 +46,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
       onError: (e) => showSnackBar(context, e),
       onCompleted: (data) {
         setState(() {
+          discounts.clear();
           invoice = data ?? InvoiceModel();
           subTotalInvoice = double.tryParse(invoice.subTotalInvoice) != null
               ? double.parse(invoice.subTotalInvoice)
