@@ -75,6 +75,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    double bottomInsets = MediaQuery.of(context).padding.bottom;
     return Scaffold(
       backgroundColor: cDark600,
       appBar: AppBar(
@@ -89,35 +90,38 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
         scrolledUnderElevation: 0,
         shape: Border(bottom: BorderSide(color: cDark500)),
       ),
-      body: SafeArea(
-        child: isLoading
-            ? const LoadingModal()
-            : RefreshIndicator.adaptive(
-                onRefresh: () => _onRefresh(),
-                child: SingleChildScrollView(
-                  child: Card(
-                    margin: const EdgeInsets.all(12),
-                    color: cWhite,
-                    elevation: 0,
-                    child: Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          // Section Header
-                          _sectionHeader(),
-                          // Section Detail Invoice
-                          _sectionDetailInvoice(),
-                          // Section List Product
-                          _sectionProducts(),
-                        ],
-                      ),
+      body: isLoading
+          ? const LoadingModal()
+          : RefreshIndicator.adaptive(
+              onRefresh: () => _onRefresh(),
+              child: SingleChildScrollView(
+                child: Card(
+                  margin: EdgeInsets.only(
+                    left: 12,
+                    top: 12,
+                    right: 12,
+                    bottom: 12 + bottomInsets,
+                  ),
+                  color: cWhite,
+                  elevation: 0,
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Section Header
+                        _sectionHeader(),
+                        // Section Detail Invoice
+                        _sectionDetailInvoice(),
+                        // Section List Product
+                        _sectionProducts(),
+                      ],
                     ),
                   ),
                 ),
               ),
-      ),
+            ),
     );
   }
 
