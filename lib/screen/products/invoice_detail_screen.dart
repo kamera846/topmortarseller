@@ -144,42 +144,50 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
             double price = double.tryParse(item.price) != null
                 ? double.parse(item.price)
                 : 0.0;
+            String formatPrice = CurrencyFormat().format(
+              amount: price,
+              fractionDigits: 2,
+            );
+            double amount = double.tryParse(item.amount) != null
+                ? double.parse(item.amount)
+                : 0.0;
+            String formatAmount = CurrencyFormat().format(
+              amount: amount,
+              fractionDigits: 2,
+            );
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   item.namaProduk,
-                  style: TextStyle(fontWeight: FontWeight.w400),
+                  style: TextStyle(
+                    color: cDark200,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 Row(
                   children: [
                     Text(
-                      CurrencyFormat().format(amount: price, fractionDigits: 2),
+                      formatPrice,
                       style: TextStyle(
                         color: cDark200,
                         decoration: item.isBonus == '1'
                             ? TextDecoration.lineThrough
                             : TextDecoration.none,
-                        decorationColor: cDark200,
-                        decorationThickness: 2,
                       ),
                     ),
-                    item.isBonus == '1'
-                        ? Padding(
-                            padding: const EdgeInsets.only(left: 8),
-                            child: Text(
-                              '(Free)',
-                              style: TextStyle(color: cDark200),
-                            ),
-                          )
-                        : const SizedBox.shrink(),
-                    const Spacer(),
                     Text(
-                      'x${item.qtyProduk}',
+                      ' x${item.qtyProduk}',
                       style: TextStyle(color: cDark200),
                     ),
+                    const Spacer(),
+                    Text(formatAmount, style: TextStyle(color: cPrimary200)),
                   ],
                 ),
+
+                item.isBonus == '1'
+                    ? Text('(Free)', style: TextStyle(color: cDark200))
+                    : const SizedBox.shrink(),
               ],
             );
           },
@@ -287,10 +295,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
             children: [
               Text(
                 'Ditagihkan Kepada:',
-                style: TextStyle(
-                  color: Colors.grey.shade700,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(color: cDark200, fontWeight: FontWeight.bold),
               ),
               const SizedBox(width: 8),
               Expanded(
@@ -308,10 +313,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
             children: [
               Text(
                 'Nomor Telpon:',
-                style: TextStyle(
-                  color: Colors.grey.shade700,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(color: cDark200, fontWeight: FontWeight.bold),
               ),
               const SizedBox(width: 8),
               Expanded(
@@ -327,10 +329,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
           const SizedBox(height: 8),
           Text(
             'Alamat:',
-            style: TextStyle(
-              color: Colors.grey.shade700,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(color: cDark200, fontWeight: FontWeight.bold),
           ),
           Text(
             invoice.billToAddress,

@@ -376,6 +376,12 @@ class CardInvoice extends StatelessWidget {
                                   color: cPrimary100,
                                 ),
                               ),
+                              product.isBonus == '1'
+                                  ? const Text(
+                                      " Free",
+                                      style: TextStyle(fontSize: 12),
+                                    )
+                                  : const SizedBox.shrink(),
                             ],
                           ),
                         ],
