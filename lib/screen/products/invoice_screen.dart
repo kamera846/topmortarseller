@@ -317,7 +317,7 @@ class CardInvoice extends StatelessWidget {
             ),
             Padding(
               padding: const EdgeInsets.only(bottom: 16),
-              child: Text('# Invoice ${item.noInvoie}'),
+              child: Text('Invoice #${item.noInvoie}'),
             ),
             ListView.separated(
               shrinkWrap: true,

@@ -17,6 +17,7 @@ class MTextField extends StatefulWidget {
     this.onSubmitted,
     this.obscure = false,
     this.enabled = true,
+    this.prefixText,
     this.prefixIcon,
     this.suffixIcon,
     this.keyboardType = TextInputType.text,
@@ -36,6 +37,7 @@ class MTextField extends StatefulWidget {
   final bool enabled;
   final int? maxLength;
   final int? maxLines;
+  final String? prefixText;
   final IconData? prefixIcon;
   final IconData? suffixIcon;
   final Function(String) onChanged;
@@ -122,6 +124,7 @@ class _MTextFieldState extends State<MTextField> {
                     labelStyle: TextStyle(
                       color: _isFocused ? cPrimary100 : cDark300,
                     ),
+                    prefixText: widget.prefixText,
                     prefixIcon: widget.prefixIcon == null
                         ? null
                         : Icon(widget.prefixIcon),

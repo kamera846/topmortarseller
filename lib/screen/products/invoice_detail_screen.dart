@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:topmortarseller/model/invoice_model.dart';
 import 'package:topmortarseller/model/product_discount_modal.dart';
+import 'package:topmortarseller/screen/products/invoice_payment_screen.dart';
 import 'package:topmortarseller/services/invoice_api.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/util/currency_format.dart';
 import 'package:topmortarseller/util/date_format.dart';
 import 'package:topmortarseller/util/enum.dart';
 import 'package:topmortarseller/util/phone_format.dart';
+import 'package:topmortarseller/widget/form/button/elevated_button.dart';
 import 'package:topmortarseller/widget/modal/loading_modal.dart';
 import 'package:topmortarseller/widget/snackbar/show_snackbar.dart';
 
@@ -75,7 +77,14 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    double bottomInsets = MediaQuery.of(context).padding.bottom;
+    double bottomInsets = 0;
+    String status = 'waiting';
+    if (!isLoading) {
+      status = invoice.statusInvoice.toLowerCase();
+      if (status == StatusOrder.paid.name) {
+        bottomInsets = MediaQuery.of(context).padding.bottom;
+      }
+    }
     return Scaffold(
       backgroundColor: cDark600,
       appBar: AppBar(
@@ -90,6 +99,37 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
         scrolledUnderElevation: 0,
         shape: Border(bottom: BorderSide(color: cDark500)),
       ),
+      bottomNavigationBar: !isLoading && status == StatusOrder.waiting.name
+          ? Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(24),
+              decoration: const BoxDecoration(
+                color: cWhite,
+                border: Border.symmetric(
+                  horizontal: BorderSide(color: cDark600, width: 1),
+                ),
+              ),
+              child: SafeArea(
+                child: MElevatedButton(
+                  // onPressed: () => _paidConfirmation(),
+                  onPressed: () {
+                    Navigator.of(context)
+                        .push(
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                InvoicePaymentScreen(invoice: invoice),
+                          ),
+                        )
+                        .then(
+                          (value) => value == 'isPaid' ? _onRefresh() : null,
+                        );
+                  },
+                  title: 'Buat Pembayaran',
+                  isFullWidth: true,
+                ),
+              ),
+            )
+          : const SizedBox.shrink(),
       body: isLoading
           ? const LoadingModal()
           : RefreshIndicator.adaptive(
@@ -382,7 +422,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                     _generateStatusBadge(),
                   ],
                 ),
-                Text('# Invoices ${invoice.noInvoie}'),
+                Text('Invoices #${invoice.noInvoie}'),
               ],
             ),
           ),
@@ -409,9 +449,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
         borderRadius: BorderRadius.circular(6),
       ),
       child: Text(
-        invoice.statusInvoice == StatusOrder.paid.name
-            ? 'LUNAS'
-            : 'BELUM LUNAS',
+        status == StatusOrder.waiting.name ? 'BELUM LUNAS' : 'LUNAS',
         style: TextStyle(
           color: badgeColor[1],
           fontWeight: FontWeight.bold,
