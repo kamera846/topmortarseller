@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:topmortarseller/model/cart_model.dart';
 import 'package:topmortarseller/model/contact_model.dart';
@@ -8,6 +7,7 @@ import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/util/currency_format.dart';
 import 'package:topmortarseller/widget/form/button/elevated_button.dart';
 import 'package:topmortarseller/widget/modal/loading_modal.dart';
+import 'package:topmortarseller/widget/modal/modal_action.dart';
 import 'package:topmortarseller/widget/snackbar/show_snackbar.dart';
 
 class CheckoutScreen extends StatefulWidget {
@@ -87,12 +87,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           title: Text('Konfirmasi'),
           content: Text('Apakah anda yakin ingin checkout sekarang?'),
           actions: <Widget>[
-            adaptiveAction(
+            ModalAction.adaptiveAction(
               context: context,
               onPressed: () => Navigator.pop(context),
               child: const Text('Batal'),
             ),
-            adaptiveAction(
+            ModalAction.adaptiveAction(
               context: context,
               onPressed: () {
                 Navigator.pop(context);
@@ -129,24 +129,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         }
       },
     );
-  }
-
-  Widget adaptiveAction({
-    required BuildContext context,
-    required VoidCallback onPressed,
-    required Widget child,
-  }) {
-    final ThemeData theme = Theme.of(context);
-    switch (theme.platform) {
-      case TargetPlatform.android:
-      case TargetPlatform.fuchsia:
-      case TargetPlatform.linux:
-      case TargetPlatform.windows:
-        return TextButton(onPressed: onPressed, child: child);
-      case TargetPlatform.iOS:
-      case TargetPlatform.macOS:
-        return CupertinoDialogAction(onPressed: onPressed, child: child);
-    }
   }
 
   @override
