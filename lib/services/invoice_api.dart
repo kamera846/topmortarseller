@@ -113,7 +113,7 @@ class InvoiceApi {
       final response = await http.post(
         url,
         headers: headerSetup,
-        body: json.encode({'id_invoice': idInvoice, 'nominal': amount}),
+        body: json.encode({'id_invoice': idInvoice, 'amount_payment': amount}),
       );
 
       if (response.statusCode == 200) {
