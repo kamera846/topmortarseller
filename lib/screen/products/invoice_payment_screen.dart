@@ -190,7 +190,7 @@ class _InvoicePaymentScreenState extends State<InvoicePaymentScreen> {
                       const Text(
                         'Pilih Metode Pembayaran',
                         style: TextStyle(
-                          fontSize: 18,
+                          fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -217,7 +217,7 @@ class _InvoicePaymentScreenState extends State<InvoicePaymentScreen> {
                         const Text(
                           'Isi Nominal Pembayaran',
                           style: TextStyle(
-                            fontSize: 18,
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -272,6 +272,7 @@ class _InvoicePaymentScreenState extends State<InvoicePaymentScreen> {
     return Card(
       color: cWhite,
       elevation: 0.5,
+      margin: EdgeInsets.zero,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -279,7 +280,7 @@ class _InvoicePaymentScreenState extends State<InvoicePaymentScreen> {
           children: [
             Text(
               'Invoice #${invoice.noInvoie}',
-              style: const TextStyle(fontSize: 16, color: cDark200),
+              style: const TextStyle(color: cDark200),
             ),
             const Divider(),
             _buildSummaryRow('Total Tagihan', _totalInvoice),
@@ -308,7 +309,6 @@ class _InvoicePaymentScreenState extends State<InvoicePaymentScreen> {
           Text(
             label,
             style: TextStyle(
-              fontSize: 16,
               fontWeight: isHighlight ? FontWeight.bold : FontWeight.normal,
               color: isHighlight ? cPrimary200 : cDark100,
             ),
@@ -316,7 +316,6 @@ class _InvoicePaymentScreenState extends State<InvoicePaymentScreen> {
           Text(
             CurrencyFormat().format(amount: amount),
             style: TextStyle(
-              fontSize: 16,
               fontWeight: isHighlight ? FontWeight.bold : FontWeight.normal,
               color: isHighlight ? cPrimary200 : cDark100,
             ),
@@ -373,7 +372,6 @@ class _InvoicePaymentScreenState extends State<InvoicePaymentScreen> {
                     Text(
                       title,
                       style: TextStyle(
-                        fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: isSelected ? cPrimary200 : cDark100,
                       ),
@@ -382,8 +380,7 @@ class _InvoicePaymentScreenState extends State<InvoicePaymentScreen> {
                     Text(
                       subtitle,
                       style: TextStyle(
-                        fontSize: 14,
-                        color: isSelected ? cPrimary200 : Colors.grey,
+                        color: isSelected ? cPrimary200 : cDark300,
                       ),
                     ),
                   ],
@@ -474,7 +471,7 @@ class QrisBottomSheet extends StatelessWidget {
                 const Text(
                   'Scan QR Code di atas dengan aplikasi pembayaran Anda untuk menyelesaikan transaksi.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                  style: TextStyle(fontSize: 16, color: cDark300),
                 ),
                 const SizedBox(height: 32),
                 ElevatedButton.icon(

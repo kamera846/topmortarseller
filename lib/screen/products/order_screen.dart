@@ -10,7 +10,6 @@ import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/util/currency_format.dart';
 import 'package:topmortarseller/util/date_format.dart';
 import 'package:topmortarseller/util/enum.dart';
-import 'package:topmortarseller/widget/modal/loading_modal.dart';
 import 'package:topmortarseller/widget/snackbar/show_snackbar.dart';
 
 class OrderScreen extends StatefulWidget {
@@ -260,7 +259,7 @@ class _ListOrderState extends State<ListOrder> {
     return RefreshIndicator.adaptive(
       onRefresh: () => _onRefresh(),
       child: _isLoading
-          ? const LoadingModal()
+          ? Center(child: CircularProgressIndicator.adaptive())
           : Padding(
               padding: _items.isEmpty
                   ? const EdgeInsets.all(12)

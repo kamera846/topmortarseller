@@ -4,7 +4,6 @@ import 'package:topmortarseller/model/product_discount_modal.dart';
 import 'package:topmortarseller/services/app_order_api.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/util/currency_format.dart';
-import 'package:topmortarseller/widget/modal/loading_modal.dart';
 import 'package:topmortarseller/widget/snackbar/show_snackbar.dart';
 
 class OrderDetailScreen extends StatefulWidget {
@@ -85,7 +84,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       ),
       body: SafeArea(
         child: isLoading
-            ? const LoadingModal()
+            ? Center(child: CircularProgressIndicator.adaptive())
             : RefreshIndicator.adaptive(
                 onRefresh: () => _onRefresh(),
                 child: SingleChildScrollView(

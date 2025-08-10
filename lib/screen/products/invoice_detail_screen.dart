@@ -9,7 +9,6 @@ import 'package:topmortarseller/util/date_format.dart';
 import 'package:topmortarseller/util/enum.dart';
 import 'package:topmortarseller/util/phone_format.dart';
 import 'package:topmortarseller/widget/form/button/elevated_button.dart';
-import 'package:topmortarseller/widget/modal/loading_modal.dart';
 import 'package:topmortarseller/widget/snackbar/show_snackbar.dart';
 
 class InvoiceDetailScreen extends StatefulWidget {
@@ -131,21 +130,21 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
             )
           : const SizedBox.shrink(),
       body: isLoading
-          ? const LoadingModal()
+          ? Center(child: CircularProgressIndicator.adaptive())
           : RefreshIndicator.adaptive(
               onRefresh: () => _onRefresh(),
               child: SingleChildScrollView(
                 child: Card(
                   margin: EdgeInsets.only(
-                    left: 12,
-                    top: 12,
-                    right: 12,
-                    bottom: 12 + bottomInsets,
+                    left: 16,
+                    top: 16,
+                    right: 16,
+                    bottom: 16 + bottomInsets,
                   ),
                   color: cWhite,
                   elevation: 0,
                   child: Padding(
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
