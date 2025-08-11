@@ -33,11 +33,16 @@ class _InvoicePaymentScreenState extends State<InvoicePaymentScreen> {
   @override
   void initState() {
     super.initState();
-    _totalInvoice = double.tryParse(widget.invoice.totalInvoice) != null
-        ? double.parse(widget.invoice.totalInvoice)
+    final invoice = widget.invoice;
+    _totalInvoice = double.tryParse(invoice.totalInvoice) != null
+        ? double.parse(invoice.totalInvoice)
         : 0.0;
-    _paidAmount = 0.0;
-    _remainingPaidAmount = _totalInvoice - _paidAmount;
+    _paidAmount = double.tryParse(invoice.totalPayment) != null
+        ? double.parse(invoice.totalPayment)
+        : 0.0;
+    _remainingPaidAmount = double.tryParse(invoice.sisaInvoice) != null
+        ? double.parse(invoice.sisaInvoice)
+        : 0.0;
     _amountController.text = _totalInvoice.toStringAsFixed(0);
   }
 
@@ -60,30 +65,30 @@ class _InvoicePaymentScreenState extends State<InvoicePaymentScreen> {
   }
 
   void _proceedToPayment() {
-    if (_amountController.text.isEmpty) {
-      setState(() {
-        _amountErrorText = 'Nominal tidak boleh kosong';
-      });
-      return;
-    }
-    final amount = double.tryParse(_amountController.text);
-    if (amount == null || amount <= 0) {
-      setState(() {
-        _amountErrorText = 'Nominal harus lebih dari nol';
-      });
-      return;
-    }
-    if (amount > _remainingPaidAmount) {
-      setState(() {
-        _amountErrorText = 'Nominal tidak boleh melebihi sisa tagihan';
-      });
-      return;
-    }
     double paymentAmount;
     if (_selectedPaymentType == PaymentType.full) {
-      paymentAmount = _totalInvoice;
+      paymentAmount = _remainingPaidAmount;
     } else {
       if (_formKey.currentState!.validate()) {
+        if (_amountController.text.isEmpty) {
+          setState(() {
+            _amountErrorText = 'Nominal tidak boleh kosong';
+          });
+          return;
+        }
+        final amount = double.tryParse(_amountController.text);
+        if (amount == null || amount <= 0) {
+          setState(() {
+            _amountErrorText = 'Nominal harus lebih dari nol';
+          });
+          return;
+        }
+        if (amount > _remainingPaidAmount) {
+          setState(() {
+            _amountErrorText = 'Nominal tidak boleh melebihi sisa tagihan';
+          });
+          return;
+        }
         paymentAmount = double.parse(_amountController.text);
       } else {
         return;
@@ -138,19 +143,13 @@ class _InvoicePaymentScreenState extends State<InvoicePaymentScreen> {
       amount: paymentAmount.toString(),
       onError: (e) {
         showSnackBar(context, e);
+        setState(() => isLoading = false);
       },
       onSuccess: (e) {
         showSnackBar(context, e);
+        Navigator.pop(context, 'isPaid');
       },
-      onCompleted: (data) {
-        if (data != null) {
-          Navigator.pop(context, 'isPaid');
-        } else {
-          setState(() {
-            isLoading = false;
-          });
-        }
-      },
+      onCompleted: () {},
     );
   }
 
@@ -200,6 +199,7 @@ class _InvoicePaymentScreenState extends State<InvoicePaymentScreen> {
                         title: 'Bayar Lunas',
                         subtitle:
                             'Bayar sisa tagihan sebesar ${CurrencyFormat().format(amount: _remainingPaidAmount)}',
+                        value: PaymentType.full,
                         isSelected: _selectedPaymentType == PaymentType.full,
                         onTap: () => _onPaymentTypeChanged(PaymentType.full),
                       ),
@@ -209,6 +209,7 @@ class _InvoicePaymentScreenState extends State<InvoicePaymentScreen> {
                         title: 'Bayar Sebagian (Cicilan)',
                         subtitle:
                             'Masukkan nominal pembayaran sesuai keinginan',
+                        value: PaymentType.partial,
                         isSelected: _selectedPaymentType == PaymentType.partial,
                         onTap: () => _onPaymentTypeChanged(PaymentType.partial),
                       ),
@@ -328,6 +329,7 @@ class _InvoicePaymentScreenState extends State<InvoicePaymentScreen> {
   Widget _buildPaymentOptionCard({
     required String title,
     required String subtitle,
+    required PaymentType value,
     required bool isSelected,
     required VoidCallback onTap,
   }) {
@@ -359,7 +361,7 @@ class _InvoicePaymentScreenState extends State<InvoicePaymentScreen> {
           child: Row(
             children: [
               Radio<PaymentType>(
-                value: isSelected ? _selectedPaymentType : PaymentType.partial,
+                value: value,
                 groupValue: _selectedPaymentType,
                 onChanged: (PaymentType? value) => onTap(),
                 activeColor: cPrimary200,

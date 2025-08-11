@@ -1,4 +1,5 @@
 import 'package:topmortarseller/model/invoice_item_model.dart';
+import 'package:topmortarseller/model/payment_model.dart';
 
 class InvoiceModel {
   final String idInvoice;
@@ -16,6 +17,9 @@ class InvoiceModel {
   final String updatedAt;
   final String deletedAt;
   final List<InvoiceItemModel> item;
+  final String totalPayment;
+  final String sisaInvoice;
+  final List<PaymentModel> payments;
 
   InvoiceModel({
     this.idInvoice = '',
@@ -33,6 +37,9 @@ class InvoiceModel {
     this.updatedAt = '',
     this.deletedAt = '',
     this.item = const [],
+    this.totalPayment = '0',
+    this.sisaInvoice = '0',
+    this.payments = const [],
   });
 
   InvoiceModel copyWith({
@@ -51,6 +58,9 @@ class InvoiceModel {
     String? updatedAt,
     String? deletedAt,
     List<InvoiceItemModel>? item,
+    String? totalPayment,
+    String? sisaInvoice,
+    List<PaymentModel>? payments,
   }) {
     return InvoiceModel(
       idInvoice: idInvoice ?? this.idInvoice,
@@ -68,6 +78,9 @@ class InvoiceModel {
       updatedAt: updatedAt ?? this.updatedAt,
       deletedAt: deletedAt ?? this.deletedAt,
       item: item ?? this.item,
+      totalPayment: totalPayment ?? this.totalPayment,
+      sisaInvoice: sisaInvoice ?? this.sisaInvoice,
+      payments: payments ?? this.payments,
     );
   }
 
@@ -87,6 +100,9 @@ class InvoiceModel {
     'updated_at': updatedAt,
     'deleted_at': deletedAt,
     'item': item,
+    'totalPayment': totalPayment,
+    'sisaInvoice': sisaInvoice,
+    'payment': payments,
   };
 
   factory InvoiceModel.fromJson(Map<String, dynamic> json) {
@@ -108,6 +124,13 @@ class InvoiceModel {
       item: json['item'] != null && json['item'] is List
           ? (json['item'] as List)
                 .map((e) => InvoiceItemModel.fromJson(e))
+                .toList()
+          : [],
+      totalPayment: json['totalPayment'] ?? '0',
+      sisaInvoice: json['sisaInvoice'] ?? '0',
+      payments: json['payment'] != null && json['payment'] is List
+          ? (json['payment'] as List)
+                .map((e) => PaymentModel.fromJson(e))
                 .toList()
           : [],
     );
