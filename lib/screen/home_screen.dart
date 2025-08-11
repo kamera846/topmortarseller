@@ -159,10 +159,10 @@ class _HomeDashboardState extends State<HomeDashboard>
     );
     if (isSucces && mounted) {
       if (savedTotalPoint < currentPoint) {
-        final newPoint = currentPoint - savedTotalPoint;
-        showSnackBar(
+        showPointRewardDialog(
           context,
-          'Selamat, anda telah mendapat $newPoint poin tambahan.',
+          previousPoints: savedTotalPoint,
+          currentPoints: currentPoint,
         );
       }
       prefs.setInt(
@@ -174,6 +174,120 @@ class _HomeDashboardState extends State<HomeDashboard>
         totalPoint = currentPoint;
       });
     }
+  }
+
+  void showPointRewardDialog(
+    BuildContext context, {
+    required int previousPoints,
+    required int currentPoints,
+  }) {
+    final newPoints = currentPoints - previousPoints;
+
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          backgroundColor: cWhite,
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.celebration_rounded,
+                  size: 64,
+                  color: Colors.amber.shade700,
+                ),
+
+                const SizedBox(height: 16),
+
+                Text(
+                  "Selamat",
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: cDark100,
+                  ),
+                ),
+
+                const SizedBox(height: 8),
+
+                RichText(
+                  textAlign: TextAlign.center,
+                  text: TextSpan(
+                    style: TextStyle(fontSize: 16, color: cDark100),
+                    children: [
+                      const TextSpan(text: 'Kamu berhasil mendapatkan '),
+                      TextSpan(
+                        text: '$newPoints poin',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.amber.shade800,
+                          fontSize: 18,
+                        ),
+                      ),
+                      const TextSpan(text: ' tambahan!'),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _buildPointBox(previousPoints),
+                    Icon(Icons.arrow_forward, color: cDark100),
+                    _buildPointBox(currentPoints),
+                  ],
+                ),
+
+                const SizedBox(height: 24),
+
+                ElevatedButton(
+                  onPressed: () => Navigator.pop(context),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.amber.shade700,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 32,
+                      vertical: 12,
+                    ),
+                  ),
+                  child: const Text(
+                    "Tutup",
+                    style: TextStyle(color: Colors.white, fontSize: 16),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildPointBox(int point) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.amber.shade100,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        "$point",
+        style: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+          color: Colors.amber.shade800,
+        ),
+      ),
+    );
   }
 
   void _goToNewRekeningScreen() {
