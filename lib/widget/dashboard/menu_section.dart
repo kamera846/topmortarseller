@@ -7,7 +7,8 @@ import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/widget/snackbar/show_snackbar.dart';
 
 class MenuSection extends StatelessWidget {
-  const MenuSection({super.key});
+  final void Function() onResumed;
+  const MenuSection({super.key, required this.onResumed});
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +59,9 @@ class MenuSection extends StatelessWidget {
               onTap: () {
                 final Widget Function(BuildContext)? route = item['route'];
                 if (route != null) {
-                  Navigator.of(context).push(MaterialPageRoute(builder: route));
+                  Navigator.of(context)
+                      .push(MaterialPageRoute(builder: route))
+                      .then((value) => onResumed());
                 } else {
                   showSnackBar(context, 'Coming soon..');
                 }

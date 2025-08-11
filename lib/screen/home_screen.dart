@@ -13,9 +13,11 @@ import 'package:topmortarseller/screen/profile/new_rekening_screen.dart';
 import 'package:topmortarseller/screen/scanner/qr_scanner_screen.dart';
 import 'package:topmortarseller/services/auth_api.dart';
 import 'package:topmortarseller/services/customer_bank_api.dart';
+import 'package:topmortarseller/services/point_api.dart';
 import 'package:topmortarseller/util/auth_settings.dart';
 import 'package:topmortarseller/util/enum.dart';
 import 'package:topmortarseller/util/colors/color.dart';
+import 'package:topmortarseller/util/loading_item.dart';
 import 'package:topmortarseller/widget/dashboard/content_section.dart';
 import 'package:topmortarseller/widget/dashboard/hero_section.dart';
 import 'package:topmortarseller/widget/dashboard/menu_section.dart';
@@ -55,16 +57,77 @@ class HomeDashboard extends StatefulWidget {
   State<HomeDashboard> createState() => _HomeDashboardState();
 }
 
-class _HomeDashboardState extends State<HomeDashboard> {
+class _HomeDashboardState extends State<HomeDashboard>
+    with WidgetsBindingObserver {
+  late ContactModel _userData;
   final GlobalKey<ContentSectionState> contentKey = GlobalKey();
   final GlobalKey<ContentSectionState> searchComponentKey = GlobalKey();
   double searchComponentOffset = 0;
-  ContactModel? _userData;
   int navCurrentIndex = 0;
+  int totalPoint = 0;
+  bool isLoadPoint = true;
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _getUserData();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) {
+      _getTotalPoint();
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  Future<void> _onRefresh() async {
+    setState(() {
+      isLoading = true;
+    });
+    _getUserData();
+    contentKey.currentState?.onRefresh();
+  }
+
+  Future<void> _getUserData() async {
+    final user = await getContactModel();
+    setState(() {
+      _userData = user ?? ContactModel();
+      isLoading = false;
+    });
+    final prefs = await SharedPreferences.getInstance();
+    final isSkipCreateBank = prefs.getBool(
+      '${_userData.idContact!}-${GlobalEnum.skipCreateBank}',
+    );
+    if (isSkipCreateBank == null || isSkipCreateBank == false) {
+      final userBanks = await CustomerBankApiService().banks(
+        idContact: _userData.idContact!,
+        onSuccess: (msg) {},
+        onError: (e) {},
+        onCompleted: () {},
+      );
+      if (userBanks == null || userBanks.isEmpty) {
+        _goToNewRekeningScreen();
+      } else {
+        prefs.setBool(
+          '${_userData.idContact!}-${GlobalEnum.skipCreateBank}',
+          true,
+        );
+      }
+    } else {
+      prefs.setBool(
+        '${_userData.idContact!}-${GlobalEnum.skipCreateBank}',
+        true,
+      );
+    }
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final context = searchComponentKey.currentContext;
       if (context != null) {
@@ -76,44 +139,40 @@ class _HomeDashboardState extends State<HomeDashboard> {
         });
       }
     });
-    _getUserData();
+    _getTotalPoint();
   }
 
-  Future<void> _onRefresh() async {
-    setState(() {
-      _userData = null;
-    });
-    _getUserData();
-    contentKey.currentState?.onRefresh();
-  }
-
-  Future<void> _getUserData() async {
-    final data = await getContactModel();
-    setState(() => _userData = data);
+  Future<void> _getTotalPoint() async {
+    setState(() => isLoadPoint = true);
     final prefs = await SharedPreferences.getInstance();
-    final isSkipCreateBank = prefs.getBool(
-      '${_userData!.idContact!}-${GlobalEnum.skipCreateBank}',
+    final savedTotalPoint =
+        prefs.getInt('${_userData.idContact!}-${GlobalEnum.savedTotalPoint}') ??
+        0;
+    bool isSucces = false;
+    final currentPoint = await PointApi.total(
+      idContact: _userData.idContact!,
+      onError: (e) => showSnackBar(context, e),
+      onSuccess: (e) {
+        isSucces = true;
+      },
+      onCompleted: (point) {},
     );
-    if (isSkipCreateBank == null || isSkipCreateBank == false) {
-      final userBanks = await CustomerBankApiService().banks(
-        idContact: _userData!.idContact!,
-        onSuccess: (msg) {},
-        onError: (e) {},
-        onCompleted: () {},
-      );
-      if (userBanks == null || userBanks.isEmpty) {
-        _goToNewRekeningScreen();
-      } else {
-        prefs.setBool(
-          '${_userData!.idContact!}-${GlobalEnum.skipCreateBank}',
-          true,
+    if (isSucces && mounted) {
+      if (savedTotalPoint < currentPoint) {
+        final newPoint = currentPoint - savedTotalPoint;
+        showSnackBar(
+          context,
+          'Selamat, anda telah mendapat $newPoint poin tambahan.',
         );
       }
-    } else {
-      prefs.setBool(
-        '${_userData!.idContact!}-${GlobalEnum.skipCreateBank}',
-        true,
+      prefs.setInt(
+        '${_userData.idContact!}-${GlobalEnum.savedTotalPoint}',
+        currentPoint,
       );
+      setState(() {
+        isLoadPoint = false;
+        totalPoint = currentPoint;
+      });
     }
   }
 
@@ -143,7 +202,7 @@ class _HomeDashboardState extends State<HomeDashboard> {
           },
           onConfirm: () async {
             await AuthApiService().requestDeleteAccount(
-              idContact: _userData?.idContact,
+              idContact: _userData.idContact,
               onError: (e) {
                 if (context.mounted) {
                   Navigator.pop(context);
@@ -211,8 +270,9 @@ class _HomeDashboardState extends State<HomeDashboard> {
     );
     return Scaffold(
       backgroundColor: Colors.transparent,
-      bottomNavigationBar: _userData != null
-          ? BottomNavigationBar(
+      bottomNavigationBar: isLoading
+          ? null
+          : BottomNavigationBar(
               backgroundColor: Colors.white,
               onTap: (value) => value == 1
                   ? Navigator.push(
@@ -242,8 +302,7 @@ class _HomeDashboardState extends State<HomeDashboard> {
                   label: 'Akun',
                 ),
               ],
-            )
-          : null,
+            ),
       body: Stack(
         children: [
           Positioned(
@@ -270,7 +329,9 @@ class _HomeDashboardState extends State<HomeDashboard> {
                         topLeft: Radius.circular(16),
                         topRight: Radius.circular(16),
                       ),
-                      child: _generateBodyWidget(context),
+                      child: isLoading
+                          ? const SizedBox.shrink()
+                          : _generateBodyWidget(context),
                     ),
                   ),
                 ],
@@ -325,14 +386,16 @@ class _HomeDashboardState extends State<HomeDashboard> {
                                 borderRadius: BorderRadius.circular(100),
                                 child: InkWell(
                                   onTap: () {
-                                    Navigator.of(context).push(
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            const CatalogScreen(
-                                              searchTrigger: true,
-                                            ),
-                                      ),
-                                    );
+                                    Navigator.of(context)
+                                        .push(
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                const CatalogScreen(
+                                                  searchTrigger: true,
+                                                ),
+                                          ),
+                                        )
+                                        .then((value) => _getTotalPoint());
                                   },
                                   borderRadius: BorderRadius.circular(100),
                                   child: Padding(
@@ -366,7 +429,7 @@ class _HomeDashboardState extends State<HomeDashboard> {
                             right: 12,
                             bottom: 6,
                           ),
-                          child: const MenuSection(),
+                          child: MenuSection(onResumed: () => _getTotalPoint()),
                         ),
                         const PromoSliderSection(),
                         ContentSection(key: contentKey),
@@ -394,14 +457,19 @@ class _HomeDashboardState extends State<HomeDashboard> {
           ),
         ),
         if (navCurrentIndex == 0) ...[
-          Text(
-            "0 Poin",
-            style: TextStyle(
-              color: Colors.amber,
-              fontWeight: FontWeight.bold,
-              fontSize: 20,
-            ),
-          ),
+          isLoadPoint
+              ? const SizedBox(
+                  width: 50,
+                  child: LoadingItem(isPrimaryTheme: true),
+                )
+              : Text(
+                  "$totalPoint Poin",
+                  style: TextStyle(
+                    color: Colors.amber,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                  ),
+                ),
           const SizedBox(width: 24),
         ] else ...[
           PopupMenuButton<String>(
