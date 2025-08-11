@@ -145,9 +145,6 @@ class _HomeDashboardState extends State<HomeDashboard>
   Future<void> _getTotalPoint() async {
     setState(() => isLoadPoint = true);
     final prefs = await SharedPreferences.getInstance();
-    final savedTotalPoint =
-        prefs.getInt('${_userData.idContact!}-${GlobalEnum.savedTotalPoint}') ??
-        0;
     bool isSucces = false;
     final currentPoint = await PointApi.total(
       idContact: _userData.idContact!,
@@ -158,6 +155,11 @@ class _HomeDashboardState extends State<HomeDashboard>
       onCompleted: (point) {},
     );
     if (isSucces && mounted) {
+      final savedTotalPoint =
+          prefs.getInt(
+            '${_userData.idContact!}-${GlobalEnum.savedTotalPoint}',
+          ) ??
+          currentPoint;
       if (savedTotalPoint < currentPoint) {
         showPointRewardDialog(
           context,
