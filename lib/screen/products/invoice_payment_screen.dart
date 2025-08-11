@@ -3,6 +3,7 @@ import 'package:topmortarseller/model/invoice_model.dart';
 import 'package:topmortarseller/services/invoice_api.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/util/currency_format.dart';
+import 'package:topmortarseller/util/enum.dart';
 import 'package:topmortarseller/widget/form/button/elevated_button.dart';
 import 'package:topmortarseller/widget/form/textfield/text_field.dart';
 import 'package:topmortarseller/widget/modal/loading_modal.dart';
@@ -147,7 +148,7 @@ class _InvoicePaymentScreenState extends State<InvoicePaymentScreen> {
       },
       onSuccess: (e) {
         showSnackBar(context, e);
-        Navigator.pop(context, 'isPaid');
+        Navigator.pop(context, PopValue.isPaid);
       },
       onCompleted: () {},
     );

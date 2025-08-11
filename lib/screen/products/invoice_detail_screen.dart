@@ -23,9 +23,12 @@ class InvoiceDetailScreen extends StatefulWidget {
 class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
   late InvoiceModel invoice;
   List<ProductDiscountModel> discounts = [];
+  PopValue popValue = PopValue.nothing;
   double subTotalInvoice = 0.0;
   double discountAppInvoice = 0.0;
   double totalInvoice = 0.0;
+  double remainingInvoice = 0.0;
+  double totalPayment = 0.0;
   bool isLoading = true;
 
   @override
@@ -54,6 +57,12 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
               : 0.0;
           totalInvoice = double.tryParse(invoice.totalInvoice) != null
               ? double.parse(invoice.totalInvoice)
+              : 0.0;
+          remainingInvoice = double.tryParse(invoice.sisaInvoice) != null
+              ? double.parse(invoice.sisaInvoice)
+              : 0.0;
+          totalPayment = double.tryParse(invoice.totalPayment) != null
+              ? double.parse(invoice.totalPayment)
               : 0.0;
 
           discountAppInvoice =
@@ -84,83 +93,207 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
         bottomInsets = MediaQuery.of(context).padding.bottom;
       }
     }
-    return Scaffold(
-      backgroundColor: cDark600,
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop(),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        Navigator.of(context).pop(popValue);
+      },
+      child: Scaffold(
+        backgroundColor: cDark600,
+        appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => Navigator.of(context).pop(popValue),
+          ),
+          title: const Text('Tagihan Saya'),
+          centerTitle: false,
+          backgroundColor: cWhite,
+          foregroundColor: cDark100,
+          scrolledUnderElevation: 0,
+          shape: Border(bottom: BorderSide(color: cDark500)),
         ),
-        title: const Text('Tagihan Saya'),
-        centerTitle: false,
-        backgroundColor: cWhite,
-        foregroundColor: cDark100,
-        scrolledUnderElevation: 0,
-        shape: Border(bottom: BorderSide(color: cDark500)),
+        bottomNavigationBar: !isLoading && status == StatusOrder.waiting.name
+            ? _generateBottomNav(context)
+            : const SizedBox.shrink(),
+        body: isLoading
+            ? Center(child: CircularProgressIndicator.adaptive())
+            : RefreshIndicator.adaptive(
+                onRefresh: () => _onRefresh(),
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 16),
+                      _generateCardInvoice(),
+                      const SizedBox(height: 16),
+                      _generateCardPayment(),
+                      SizedBox(height: 16 + bottomInsets),
+                    ],
+                  ),
+                ),
+              ),
       ),
-      bottomNavigationBar: !isLoading && status == StatusOrder.waiting.name
-          ? Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(24),
-              decoration: const BoxDecoration(
-                color: cWhite,
-                border: Border.symmetric(
-                  horizontal: BorderSide(color: cDark600, width: 1),
-                ),
-              ),
-              child: SafeArea(
-                child: MElevatedButton(
-                  // onPressed: () => _paidConfirmation(),
-                  onPressed: () {
-                    Navigator.of(context)
-                        .push(
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                InvoicePaymentScreen(invoice: invoice),
-                          ),
-                        )
-                        .then(
-                          (value) => value == 'isPaid' ? _onRefresh() : null,
-                        );
-                  },
-                  title: 'Buat Pembayaran',
-                  isFullWidth: true,
-                ),
-              ),
-            )
-          : const SizedBox.shrink(),
-      body: isLoading
-          ? Center(child: CircularProgressIndicator.adaptive())
-          : RefreshIndicator.adaptive(
-              onRefresh: () => _onRefresh(),
-              child: SingleChildScrollView(
-                child: Card(
-                  margin: EdgeInsets.only(
-                    left: 16,
-                    top: 16,
-                    right: 16,
-                    bottom: 16 + bottomInsets,
-                  ),
-                  color: cWhite,
-                  elevation: 0,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // Section Header
-                        _sectionHeader(),
-                        // Section Detail Invoice
-                        _sectionDetailInvoice(),
-                        // Section List Product
-                        _sectionProducts(),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
+    );
+  }
+
+  Card _generateCardInvoice() {
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      color: cWhite,
+      elevation: 0,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Section Header
+            _sectionHeader(),
+            // Section Detail Invoice
+            _sectionDetailInvoice(),
+            // Section List Product
+            _sectionProducts(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Container _sectionHeader() {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 24),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            width: 70,
+            height: 70,
+            decoration: BoxDecoration(
+              color: cDark600,
+              border: Border.all(color: cDark600, width: 1),
+              borderRadius: BorderRadius.circular(70),
             ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(70),
+              child: Image.asset('assets/favicon/favicon_white.png'),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Top Mortar Seller',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    _generateStatusBadge(),
+                  ],
+                ),
+                Text('Invoices #${invoice.noInvoie}'),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Container _generateStatusBadge() {
+    final status = invoice.statusInvoice.toLowerCase();
+    List<Color> badgeColor = List.of({
+      Colors.grey.shade400,
+      Colors.grey.shade800,
+    });
+    if (status == StatusOrder.waiting.name) {
+      badgeColor = List.of({Colors.orange.shade100, Colors.orange.shade800});
+    } else if (status == StatusOrder.paid.name) {
+      badgeColor = List.of({Colors.green.shade100, Colors.green.shade800});
+    }
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: badgeColor[0].withValues(alpha: 0.4),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Text(
+        status == StatusOrder.waiting.name ? 'BELUM LUNAS' : 'LUNAS',
+        style: TextStyle(
+          color: badgeColor[1],
+          fontWeight: FontWeight.bold,
+          fontSize: 10,
+        ),
+      ),
+    );
+  }
+
+  Container _sectionDetailInvoice() {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Diterbitkan ${MyDateFormat.formatDateTime(invoice.dateInvoice)}',
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+          Container(
+            margin: const EdgeInsets.symmetric(vertical: 12),
+            child: const Divider(height: 1, color: cDark500),
+          ),
+          Row(
+            children: [
+              Text(
+                'Ditagihkan Kepada:',
+                style: TextStyle(color: cDark200, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  invoice.billToName,
+                  textAlign: TextAlign.end,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Text(
+                'Nomor Telpon:',
+                style: TextStyle(color: cDark200, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  MyPhoneFormat.format(invoice.billToPhone),
+                  maxLines: 1,
+                  textAlign: TextAlign.end,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Alamat:',
+            style: TextStyle(color: cDark200, fontWeight: FontWeight.bold),
+          ),
+          Text(
+            invoice.billToAddress,
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
     );
   }
 
@@ -275,15 +408,16 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
           },
         ),
 
-        Container(
-          margin: const EdgeInsets.symmetric(vertical: 24),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 24),
           child: const Divider(height: 1, color: cDark500),
         ),
+
         Row(
           children: [
             const Expanded(
               child: Text(
-                'Total Bayar',
+                'Total Tagihan',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ),
@@ -315,144 +449,192 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
             ),
           ],
         ),
-        const SizedBox(height: 16),
       ],
     );
   }
 
-  Container _sectionDetailInvoice() {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Diterbitkan ${MyDateFormat.formatDateTime(invoice.dateInvoice)}',
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-          Container(
-            margin: const EdgeInsets.symmetric(vertical: 12),
-            child: const Divider(height: 1, color: cDark500),
-          ),
-          Row(
-            children: [
-              Text(
-                'Ditagihkan Kepada:',
-                style: TextStyle(color: cDark200, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  invoice.billToName,
-                  textAlign: TextAlign.end,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              Text(
-                'Nomor Telpon:',
-                style: TextStyle(color: cDark200, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  MyPhoneFormat.format(invoice.billToPhone),
-                  maxLines: 1,
-                  textAlign: TextAlign.end,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Alamat:',
-            style: TextStyle(color: cDark200, fontWeight: FontWeight.bold),
-          ),
-          Text(
-            invoice.billToAddress,
-            maxLines: 3,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
-      ),
-    );
-  }
+  Card _generateCardPayment() {
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      color: cWhite,
+      elevation: 0,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Riwayat Pembayaran',
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+            const SizedBox(height: 24),
+            if (invoice.payments.isEmpty)
+              const Row(children: [Text('Belum ada pembayaran.')])
+            else ...[
+              ListView.separated(
+                itemBuilder: (context, index) {
+                  final payment = invoice.payments[index];
+                  final amountPayment =
+                      double.tryParse(payment.amountPayment) ?? 0.0;
 
-  Container _sectionHeader() {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 24),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Container(
-            width: 70,
-            height: 70,
-            decoration: BoxDecoration(
-              color: cDark600,
-              border: Border.all(color: cDark600, width: 1),
-              borderRadius: BorderRadius.circular(70),
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(70),
-              child: Image.asset('assets/favicon/favicon_white.png'),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Top Mortar Seller',
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              payment.remarkPayment,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                          Text(
+                            CurrencyFormat().format(amount: amountPayment),
+                            style: const TextStyle(color: Colors.green),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 4),
+
+                      Text(
+                        MyDateFormat.formatDateTime(
+                          payment.datePayment,
+                          outputFormat: 'E, dd MMM yyy - HH:mm',
+                        ),
+                        style: const TextStyle(color: Colors.grey),
+                      ),
+
+                      // if (payment.source.isNotEmpty) ...[
+                      //   const SizedBox(height: 8),
+                      //   Row(
+                      //     children: [
+                      //       const Icon(
+                      //         Icons.payment,
+                      //         size: 16,
+                      //         color: Colors.blueGrey,
+                      //       ),
+                      //       const SizedBox(width: 6),
+                      //       Text(
+                      //         "Source: ${payment.source}",
+                      //         style: const TextStyle(
+                      //           fontSize: 13,
+                      //           color: Colors.blueGrey,
+                      //         ),
+                      //       ),
+                      //     ],
+                      //   ),
+                      // ],
+                    ],
+                  );
+                },
+                separatorBuilder: (context, index) => Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: const Divider(height: 1, color: cDark600),
+                ),
+                itemCount: invoice.payments.length,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 24),
+                child: const Divider(height: 1, color: cDark500),
+              ),
+
+              Row(
+                children: [
+                  const Expanded(
+                    child: Text(
+                      'Total Dibayarkan',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    _generateStatusBadge(),
-                  ],
-                ),
-                Text('Invoices #${invoice.noInvoie}'),
-              ],
-            ),
-          ),
-        ],
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        CurrencyFormat().format(amount: totalPayment),
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.green,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }
 
-  Container _generateStatusBadge() {
-    final status = invoice.statusInvoice.toLowerCase();
-    List<Color> badgeColor = List.of({
-      Colors.grey.shade400,
-      Colors.grey.shade800,
-    });
-    if (status == StatusOrder.waiting.name) {
-      badgeColor = List.of({Colors.orange.shade100, Colors.orange.shade800});
-    } else if (status == StatusOrder.paid.name) {
-      badgeColor = List.of({Colors.green.shade100, Colors.green.shade800});
-    }
+  Container _generateBottomNav(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: badgeColor[0].withValues(alpha: 0.4),
-        borderRadius: BorderRadius.circular(6),
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: const BoxDecoration(
+        color: cWhite,
+        border: Border.symmetric(
+          horizontal: BorderSide(color: cDark600, width: 1),
+        ),
       ),
-      child: Text(
-        status == StatusOrder.waiting.name ? 'BELUM LUNAS' : 'LUNAS',
-        style: TextStyle(
-          color: badgeColor[1],
-          fontWeight: FontWeight.bold,
-          fontSize: 10,
+      child: SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              children: [
+                const Expanded(
+                  child: Text(
+                    'Sisa Pembayaran',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                Text(
+                  CurrencyFormat().format(amount: remainingInvoice),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: cPrimary200,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            MElevatedButton(
+              onPressed: () {
+                Navigator.of(context)
+                    .push(
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            InvoicePaymentScreen(invoice: invoice),
+                      ),
+                    )
+                    .then((value) {
+                      if (value is PopValue && value == PopValue.isPaid) {
+                        setState(() {
+                          popValue = value;
+                        });
+                        _onRefresh();
+                      }
+                      ;
+                    });
+              },
+              title: 'Buat Pembayaran',
+              isFullWidth: true,
+            ),
+          ],
         ),
       ),
     );

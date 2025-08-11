@@ -241,7 +241,10 @@ class _ListInvoiceState extends State<ListInvoice> {
                               : idx == _items.length - 1
                               ? const EdgeInsets.only(bottom: 12)
                               : const EdgeInsets.all(0),
-                          child: CardInvoice(item: orderItem),
+                          child: CardInvoice(
+                            item: orderItem,
+                            onRefresh: () => _onRefresh(),
+                          ),
                         );
                       },
                     ),
@@ -252,9 +255,10 @@ class _ListInvoiceState extends State<ListInvoice> {
 
 // Card Order Widget
 class CardInvoice extends StatelessWidget {
-  const CardInvoice({super.key, required this.item});
+  const CardInvoice({super.key, required this.item, required this.onRefresh});
 
   final InvoiceModel item;
+  final void Function() onRefresh;
 
   void _navigateToDetail(BuildContext context) {
     Navigator.push(
@@ -262,7 +266,11 @@ class CardInvoice extends StatelessWidget {
       MaterialPageRoute(
         builder: (ctx) => InvoiceDetailScreen(idInvoice: item.idInvoice),
       ),
-    );
+    ).then((value) {
+      if (value is PopValue && value == PopValue.isPaid) {
+        onRefresh();
+      }
+    });
   }
 
   @override
