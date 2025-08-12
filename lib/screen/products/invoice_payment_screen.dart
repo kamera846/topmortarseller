@@ -29,6 +29,7 @@ class _InvoicePaymentScreenState extends State<InvoicePaymentScreen> {
   double _totalInvoice = 0.0;
   double _paidAmount = 0.0;
   double _remainingPaidAmount = 0.0;
+  bool isAvailablePoin = false;
   bool isLoading = false;
 
   @override
@@ -45,6 +46,7 @@ class _InvoicePaymentScreenState extends State<InvoicePaymentScreen> {
         ? double.parse(invoice.sisaInvoice)
         : 0.0;
     _amountController.text = _totalInvoice.toStringAsFixed(0);
+    isAvailablePoin = invoice.payments.isEmpty;
   }
 
   @override
@@ -197,7 +199,8 @@ class _InvoicePaymentScreenState extends State<InvoicePaymentScreen> {
                       const SizedBox(height: 16),
                       // Opsi Pembayaran Penuh
                       _buildPaymentOptionCard(
-                        title: 'Bayar Lunas',
+                        title:
+                            'Bayar Lunas ${isAvailablePoin ? '(+poin)' : ''}',
                         subtitle:
                             'Bayar sisa tagihan sebesar ${CurrencyFormat().format(amount: _remainingPaidAmount)}',
                         value: PaymentType.full,
@@ -215,28 +218,7 @@ class _InvoicePaymentScreenState extends State<InvoicePaymentScreen> {
                         onTap: () => _onPaymentTypeChanged(PaymentType.partial),
                       ),
                       const SizedBox(height: 16),
-                      if (_selectedPaymentType == PaymentType.partial) ...[
-                        const Text(
-                          'Isi Nominal Pembayaran',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        MTextField(
-                          controller: _amountController,
-                          label: 'Nominal',
-                          prefixText: 'Rp. ',
-                          keyboardType: TextInputType.number,
-                          errorText: _amountErrorText,
-                          onChanged: (String value) {
-                            setState(() {
-                              _amountErrorText = null;
-                            });
-                          },
-                        ),
-                      ],
+                      _buildSelectedOptionDetail(),
                     ],
                   ),
                 ),
@@ -254,7 +236,7 @@ class _InvoicePaymentScreenState extends State<InvoicePaymentScreen> {
                 decoration: const BoxDecoration(
                   color: cWhite,
                   border: Border.symmetric(
-                    horizontal: BorderSide(color: cDark600, width: 1),
+                    horizontal: BorderSide(color: cDark500, width: 1),
                   ),
                 ),
                 child: SafeArea(
@@ -271,10 +253,19 @@ class _InvoicePaymentScreenState extends State<InvoicePaymentScreen> {
   }
 
   Widget _buildInvoiceSummary(InvoiceModel invoice) {
-    return Card(
-      color: cWhite,
-      elevation: 0.5,
-      margin: EdgeInsets.zero,
+    return Container(
+      decoration: BoxDecoration(
+        color: cWhite,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: cDark500, width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: cDark600.withValues(alpha: 0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -284,11 +275,11 @@ class _InvoicePaymentScreenState extends State<InvoicePaymentScreen> {
               'Invoice #${invoice.noInvoie}',
               style: const TextStyle(color: cDark200),
             ),
-            const Divider(),
+            const Divider(color: cDark500),
             _buildSummaryRow('Total Tagihan', _totalInvoice),
             _buildSummaryRow('Sudah Dibayar', _paidAmount),
             _buildSummaryRow(
-              'Sisa Pembayaran',
+              'Sisa Tagihan',
               _remainingPaidAmount,
               isHighlight: true,
             ),
@@ -341,8 +332,8 @@ class _InvoicePaymentScreenState extends State<InvoicePaymentScreen> {
         color: isSelected ? cPrimary600.withValues(alpha: 0.1) : cWhite,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
-          color: isSelected ? cPrimary200 : Colors.grey.shade300,
-          width: isSelected ? 2 : 1,
+          color: isSelected ? cPrimary200 : cDark500,
+          width: 1,
         ),
         boxShadow: isSelected
             ? [
@@ -393,6 +384,100 @@ class _InvoicePaymentScreenState extends State<InvoicePaymentScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildSelectedOptionDetail() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (_selectedPaymentType == PaymentType.full && isAvailablePoin) ...[
+          const Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(Icons.info_outline, size: 20, color: cDark200),
+              SizedBox(width: 8),
+              Text(
+                'Bonus Poin Aplikasi',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: cWhite,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: cDark500, width: 1),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: RichText(
+                text: TextSpan(
+                  style: TextStyle(color: cDark200),
+                  children: [
+                    TextSpan(
+                      text:
+                          'Dapatkan poin aplikasi dengan menggunakan opsi pembayaran',
+                    ),
+                    TextSpan(
+                      style: TextStyle(
+                        color: cDark100,
+                        fontStyle: FontStyle.italic,
+                      ),
+                      text: ' Bayar lunas (+poin)',
+                    ),
+                    TextSpan(text: '.\n\n'),
+                    TextSpan(
+                      text:
+                          'Bonus poin tidak berlaku jika sebelumnya anda sudah pernah menggunakan opsi pembayaran',
+                    ),
+                    TextSpan(
+                      style: TextStyle(
+                        color: cDark100,
+                        fontStyle: FontStyle.italic,
+                      ),
+                      text: ' Bayar Sebagian (Cicilan) ',
+                    ),
+                    TextSpan(text: 'di invoice ini.\n\n'),
+                    TextSpan(
+                      text: 'Catatan: Bonus poin berlaku di setiap invoice.',
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ] else if (_selectedPaymentType == PaymentType.partial) ...[
+          const Text(
+            'Isi Nominal Pembayaran',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 16),
+          // TextFormField(
+          //   controller: _amountController,
+          //   keyboardType: TextInputType.number,
+          //   decoration: InputDecoration(
+          //     labelText: 'Nominal',
+          //     prefixText: 'Rp. '
+          //   ),
+          // ),
+          MTextField(
+            controller: _amountController,
+            label: 'Nominal',
+            prefixText: 'Rp. ',
+            keyboardType: TextInputType.number,
+            errorText: _amountErrorText,
+            onChanged: (String value) {
+              setState(() {
+                _amountErrorText = null;
+              });
+            },
+          ),
+        ],
+      ],
     );
   }
 }

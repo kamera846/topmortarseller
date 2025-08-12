@@ -586,30 +586,36 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
       decoration: const BoxDecoration(
         color: cWhite,
         border: Border.symmetric(
-          horizontal: BorderSide(color: cDark600, width: 1),
+          horizontal: BorderSide(color: cDark500, width: 1),
         ),
       ),
       child: SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Row(
-              children: [
-                const Expanded(
-                  child: Text(
-                    'Sisa Pembayaran',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                children: [
+                  const Expanded(
+                    child: Text(
+                      'Sisa Tagihan',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
-                ),
-                Text(
-                  CurrencyFormat().format(amount: remainingInvoice),
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: cPrimary200,
+                  Text(
+                    CurrencyFormat().format(amount: remainingInvoice),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: cPrimary200,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
             const SizedBox(height: 16),
             MElevatedButton(
