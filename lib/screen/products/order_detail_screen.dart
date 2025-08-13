@@ -152,56 +152,51 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                                       ),
                                       const SizedBox(width: 12),
                                       Expanded(
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                            vertical: 12,
-                                          ),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                product.nameProduk,
-                                                maxLines: 2,
-                                                overflow: TextOverflow.ellipsis,
-                                                style: const TextStyle(
-                                                  fontWeight: FontWeight.bold,
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              product.nameProduk,
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            const Spacer(),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Text(
+                                                  '${CurrencyFormat().format(amount: double.parse(product.priceProduk))} / ${product.nameSatuan}',
                                                 ),
-                                              ),
-                                              const Spacer(),
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Text(
-                                                    '${CurrencyFormat().format(amount: double.parse(product.priceProduk))} / ${product.nameSatuan}',
+                                                Text(
+                                                  CurrencyFormat().format(
+                                                    amount: (double.parse(
+                                                      product
+                                                          .totalAppOrderDetail,
+                                                    )),
                                                   ),
-                                                  Text(
-                                                    CurrencyFormat().format(
-                                                      amount: (double.parse(
-                                                        product
-                                                            .totalAppOrderDetail,
-                                                      )),
-                                                    ),
-                                                    style: const TextStyle(
-                                                      color: cPrimary200,
-                                                    ),
+                                                  style: const TextStyle(
+                                                    color: cPrimary200,
                                                   ),
-                                                ],
-                                              ),
-                                              Row(
-                                                children: [
-                                                  Text(
-                                                    'x${product.qtyAppOrderDetail}',
-                                                  ),
-                                                  product.isBonus == '1'
-                                                      ? const Text(" (Free)")
-                                                      : const SizedBox.shrink(),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
+                                                ),
+                                              ],
+                                            ),
+                                            Row(
+                                              children: [
+                                                Text(
+                                                  'x${product.qtyAppOrderDetail}',
+                                                ),
+                                                product.isBonus == '1'
+                                                    ? const Text(" (Free)")
+                                                    : const SizedBox.shrink(),
+                                              ],
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     ],
