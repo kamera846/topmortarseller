@@ -561,17 +561,33 @@ class _HomeDashboardState extends State<HomeDashboard>
 
   Row _generateHeaderWidget(BuildContext context) {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         const SizedBox(width: 24),
-        Expanded(
-          child: Text(
-            'Top Mortar Seller',
-            style: Theme.of(context).textTheme.titleLarge!.copyWith(
-              color: cWhite,
-              fontWeight: FontWeight.bold,
-            ),
+        // Text(
+        //   'Top Mortar Seller',
+        //   style: Theme.of(context).textTheme.titleLarge!.copyWith(
+        //     color: cWhite,
+        //     fontWeight: FontWeight.bold,
+        //   ),
+        // ),
+        ClipRRect(
+          borderRadius: BorderRadiusGeometry.circular(100),
+          child: SizedBox(
+            width: 35,
+            height: 35,
+            child: Image.asset('assets/favicon/favicon_white.png'),
           ),
         ),
+        // const SizedBox(width: 12),
+        // Text(
+        //   'Top Mortar Seller',
+        //   style: Theme.of(context).textTheme.titleLarge!.copyWith(
+        //     color: cWhite,
+        //     fontWeight: FontWeight.bold,
+        //   ),
+        // ),
+        const Spacer(),
         if (navCurrentIndex == 0) ...[
           isLoadPoint
               ? const SizedBox(
