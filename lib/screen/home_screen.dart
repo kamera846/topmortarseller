@@ -421,6 +421,7 @@ class _HomeDashboardState extends State<HomeDashboard>
             ),
       body: Stack(
         children: [
+          /// -- Background Stack --
           Positioned(
             left: 0,
             top: 0,
@@ -434,11 +435,16 @@ class _HomeDashboardState extends State<HomeDashboard>
               ),
             ),
           ),
+
+          /// -- Content Stack --
           Positioned.fill(
             child: SafeArea(
               child: Column(
                 children: [
+                  /// -- Header Section --
                   SizedBox(height: 60, child: _generateHeaderWidget(context)),
+
+                  /// -- Body Section --
                   Expanded(
                     child: ClipRRect(
                       borderRadius: BorderRadius.only(
@@ -461,16 +467,20 @@ class _HomeDashboardState extends State<HomeDashboard>
 
   Widget _generateBodyWidget(BuildContext context) {
     return navCurrentIndex == 0
+        /// -- Home Body --
         ? RefreshIndicator.adaptive(
             onRefresh: () => _onRefresh(),
             child: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  /// -- Hero Section --
                   Padding(
                     padding: EdgeInsets.only(left: 24, right: 24, bottom: 0),
                     child: HeroSection(userData: _userData),
                   ),
+
+                  /// -- Search Container Section --
                   SizedBox(
                     height: searchComponentOffset * 2,
                     child: Stack(
@@ -534,11 +544,14 @@ class _HomeDashboardState extends State<HomeDashboard>
                       ],
                     ),
                   ),
+
+                  /// -- Body Content Section --
                   Material(
                     color: cWhite,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        /// -- Menu --
                         Padding(
                           padding: const EdgeInsets.only(
                             left: 12,
@@ -547,7 +560,11 @@ class _HomeDashboardState extends State<HomeDashboard>
                           ),
                           child: MenuSection(onResumed: () => _getTotalPoint()),
                         ),
+
+                        /// -- Promo Slider --
                         const PromoSliderSection(),
+
+                        /// -- Socmed Content --
                         ContentSection(key: contentKey),
                       ],
                     ),
@@ -556,6 +573,7 @@ class _HomeDashboardState extends State<HomeDashboard>
               ),
             ),
           )
+        /// -- Detail Profil Body --
         : DetailProfileScreen(userData: _userData);
   }
 
