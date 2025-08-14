@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:topmortarseller/model/order_item_model.dart';
 import 'package:topmortarseller/model/order_model.dart';
 import 'package:topmortarseller/model/product_discount_modal.dart';
 import 'package:topmortarseller/services/app_order_api.dart';
@@ -17,6 +18,8 @@ class OrderDetailScreen extends StatefulWidget {
 
 class _OrderDetailScreenState extends State<OrderDetailScreen> {
   late OrderModel order;
+  List<OrderItemModel> products = [];
+  List<OrderItemModel> freeProducts = [];
   List<ProductDiscountModel> discounts = [];
   double subTotalAppOrder = 0.0;
   double discountAppOrder = 0.0;
@@ -42,6 +45,8 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       onError: (e) => showSnackBar(context, e),
       onCompleted: (data) {
         setState(() {
+          products.clear();
+          freeProducts.clear();
           discounts.clear();
           order = data ?? OrderModel();
           subTotalAppOrder = double.tryParse(order.subTotalAppOrder) == null
@@ -61,6 +66,15 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 discount: discountAppOrder,
               ),
             );
+          }
+          if (order.items.isNotEmpty) {
+            final orders = order.items;
+            products = orders
+                .where((orderItem) => orderItem.isBonus == "0")
+                .toList();
+            freeProducts = orders
+                .where((orderItem) => orderItem.isBonus == "1")
+                .toList();
           }
           isLoading = false;
         });
@@ -90,123 +104,16 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
+                      /// --- Reminder Section ---
                       generateReminderSection(context),
-                      Container(
-                        margin: const EdgeInsets.only(bottom: 24),
-                        padding: const EdgeInsets.all(24),
-                        color: cWhite,
-                        width: double.infinity,
-                        child: Column(
-                          children: [
-                            Row(
-                              children: [
-                                const Text(
-                                  'Keranjang',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                const SizedBox(width: 12),
-                                Text(
-                                  '${order.items.length} produk',
-                                  style: const TextStyle(color: cDark200),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 24),
-                            ListView.separated(
-                              itemCount: order.items.length,
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              padding: const EdgeInsets.all(0),
-                              separatorBuilder: (context, index) =>
-                                  const SizedBox(height: 24),
-                              itemBuilder: (conxtext, i) {
-                                final product = order.items[i];
-                                return SizedBox(
-                                  height: 90,
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.circular(12),
-                                        child: Container(
-                                          color: cDark600,
-                                          width: 90,
-                                          height: 90,
-                                          child: Image.network(
-                                            product.imgProduk.isNotEmpty
-                                                ? product.imgProduk
-                                                : 'https://google.com',
-                                            key: Key(product.idProduct),
-                                            fit: BoxFit.cover,
-                                            errorBuilder:
-                                                (context, error, stackTrace) {
-                                                  return const Icon(
-                                                    Icons.error,
-                                                    size: 40,
-                                                    color: Colors.grey,
-                                                  );
-                                                },
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 12),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              product.nameProduk,
-                                              maxLines: 2,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: const TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            const Spacer(),
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Text(
-                                                  '${CurrencyFormat().format(amount: double.parse(product.priceProduk))} / ${product.nameSatuan}',
-                                                ),
-                                                Text(
-                                                  CurrencyFormat().format(
-                                                    amount: (double.parse(
-                                                      product
-                                                          .totalAppOrderDetail,
-                                                    )),
-                                                  ),
-                                                  style: const TextStyle(
-                                                    color: cPrimary200,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            Row(
-                                              children: [
-                                                Text(
-                                                  'x${product.qtyAppOrderDetail}',
-                                                ),
-                                                product.isBonus == '1'
-                                                    ? const Text(" (Free)")
-                                                    : const SizedBox.shrink(),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
+
+                      /// --- List Products Section ---
+                      generateProductItems(context, products, 'Pesanan'),
+
+                      /// --- List Free Products Section ---
+                      if (freeProducts.isNotEmpty)
+                        generateProductItems(context, freeProducts, '🎉Bonus'),
+
                       Container(
                         margin: const EdgeInsets.only(bottom: 24),
                         padding: const EdgeInsets.all(24),
@@ -377,6 +284,109 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           ),
           const SizedBox(height: 8),
           Text(description, maxLines: 2, overflow: TextOverflow.ellipsis),
+        ],
+      ),
+    );
+  }
+
+  Widget generateProductItems(
+    BuildContext context,
+    List<OrderItemModel> products,
+    String title,
+  ) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 24),
+      padding: const EdgeInsets.all(24),
+      color: cWhite,
+      width: double.infinity,
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(width: 12),
+              Text(
+                '${products.length} produk',
+                style: const TextStyle(color: cDark200),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          ListView.separated(
+            itemCount: products.length,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            padding: const EdgeInsets.all(0),
+            separatorBuilder: (context, index) => const SizedBox(height: 24),
+            itemBuilder: (conxtext, i) {
+              final product = products[i];
+              return SizedBox(
+                height: 90,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        color: cDark600,
+                        width: 90,
+                        height: 90,
+                        child: Image.network(
+                          product.imgProduk.isNotEmpty
+                              ? product.imgProduk
+                              : 'https://google.com',
+                          key: Key(product.idProduct),
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return const Icon(
+                              Icons.error,
+                              size: 40,
+                              color: Colors.grey,
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            product.nameProduk,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          const Spacer(),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                '${CurrencyFormat().format(amount: double.parse(product.priceProduk))} / ${product.nameSatuan}',
+                              ),
+                              Text(
+                                CurrencyFormat().format(
+                                  amount: (double.parse(
+                                    product.totalAppOrderDetail,
+                                  )),
+                                ),
+                                style: const TextStyle(color: cPrimary200),
+                              ),
+                            ],
+                          ),
+                          Text(
+                            'x${product.qtyAppOrderDetail}${product.isBonus == "1" ? ' (Free)' : ''}',
+                            style: TextStyle(color: cDark200),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
         ],
       ),
     );

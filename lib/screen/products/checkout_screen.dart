@@ -255,6 +255,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                               fontWeight: FontWeight.bold,
                                             ),
                                           ),
+                                          const Spacer(),
                                           Row(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.spaceBetween,
@@ -281,7 +282,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                               ),
                                             ],
                                           ),
-                                          Text('x ${product.qtyCartDetail}'),
+                                          Text(
+                                            'x ${product.qtyCartDetail}',
+                                            style: TextStyle(color: cDark200),
+                                          ),
                                         ],
                                       ),
                                     ),
