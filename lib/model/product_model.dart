@@ -73,7 +73,7 @@ class ProductModel {
     'id_city': idCity ?? '',
     'harga_produk': hargaProduk ?? '',
     'name_satuan': nameSatuan ?? '',
-    'image_produk': imageProduk ?? '',
+    'img_produk': imageProduk ?? '',
     'created_at': createdAt ?? '',
     'updated_at': updatedAt ?? '',
   };
@@ -90,7 +90,7 @@ class ProductModel {
       idCity: json['id_city'] ?? '',
       hargaProduk: json['harga_produk'] ?? '',
       nameSatuan: json['name_satuan'] ?? '',
-      imageProduk: json['image_produk'] ?? '',
+      imageProduk: json['img_produk'] ?? '',
       createdAt: json['created_at'] ?? '',
       updatedAt: json['updated_at'] ?? '',
     );

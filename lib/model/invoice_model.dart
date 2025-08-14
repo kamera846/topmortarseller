@@ -1,5 +1,6 @@
 import 'package:topmortarseller/model/invoice_item_model.dart';
 import 'package:topmortarseller/model/payment_model.dart';
+import 'package:topmortarseller/util/enum.dart';
 
 class InvoiceModel {
   final String idInvoice;
@@ -122,9 +123,10 @@ class InvoiceModel {
       updatedAt: json['updated_at'] ?? '',
       deletedAt: json['deleted_at'] ?? '',
       item: json['item'] != null && json['item'] is List
-          ? (json['item'] as List)
-                .map((e) => InvoiceItemModel.fromJson(e))
-                .toList()
+          ? (json['item'] as List).map((item) {
+              item['img_produk'] = '$dummyMediaLink${item['img_produk']}';
+              return InvoiceItemModel.fromJson(item);
+            }).toList()
           : [],
       totalPayment: json['totalPayment'] ?? '0',
       sisaInvoice: json['sisaInvoice'] ?? '0',
