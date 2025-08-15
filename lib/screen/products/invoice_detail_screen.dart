@@ -634,7 +634,6 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                         });
                         _onRefresh();
                       }
-                      ;
                     });
               },
               title: 'Buat Pembayaran',

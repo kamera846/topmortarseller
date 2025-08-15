@@ -27,6 +27,7 @@ dependencies:
   money_formatter: ^0.0.6
   intl: ^0.19.0
   carousel_slider: ^5.1.1
+  flutter_local_notifications: ^19.4.0
 
 dev_dependencies:
   flutter_test:

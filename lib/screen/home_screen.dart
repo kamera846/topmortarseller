@@ -13,6 +13,7 @@ import 'package:topmortarseller/screen/profile/new_rekening_screen.dart';
 import 'package:topmortarseller/screen/scanner/qr_scanner_screen.dart';
 import 'package:topmortarseller/services/auth_api.dart';
 import 'package:topmortarseller/services/customer_bank_api.dart';
+import 'package:topmortarseller/services/notification_service.dart';
 import 'package:topmortarseller/services/point_api.dart';
 import 'package:topmortarseller/util/auth_settings.dart';
 import 'package:topmortarseller/util/enum.dart';
@@ -129,6 +130,7 @@ class _HomeDashboardState extends State<HomeDashboard>
       );
     }
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      NotificationService().initialize();
       final context = searchComponentKey.currentContext;
       if (context != null) {
         final box = context.findRenderObject() as RenderBox;

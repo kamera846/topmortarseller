@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:topmortarseller/model/invoice_model.dart';
 import 'package:topmortarseller/services/invoice_api.dart';
+import 'package:topmortarseller/services/notification_service.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/util/currency_format.dart';
 import 'package:topmortarseller/util/enum.dart';
@@ -138,22 +139,35 @@ class _InvoicePaymentScreenState extends State<InvoicePaymentScreen> {
   }
 
   Future<void> _submitPaid(double paymentAmount) async {
-    setState(() {
-      isLoading = true;
-    });
-    await InvoiceApi().payment(
-      idInvoice: widget.invoice.idInvoice,
-      amount: paymentAmount.toString(),
-      onError: (e) {
-        showSnackBar(context, e);
-        setState(() => isLoading = false);
-      },
-      onSuccess: (e) {
-        showSnackBar(context, e);
-        Navigator.pop(context, PopValue.isPaid);
-      },
-      onCompleted: () {},
-    );
+    if (isAvailablePoin && _selectedPaymentType == PaymentType.full) {
+      NotificationService().show(
+        title: "Wahh!, Kamu Keren 😎",
+        body: "Poin berhasil ditambahkan ke akunmu.",
+      );
+    }
+    // setState(() {
+    //   isLoading = true;
+    // });
+    // await InvoiceApi().payment(
+    //   idInvoice: widget.invoice.idInvoice,
+    //   amount: paymentAmount.toString(),
+    //   onError: (e) {
+    //     showSnackBar(context, e);
+    //     setState(() => isLoading = false);
+    //   },
+    //   onSuccess: (e) {
+    //     showSnackBar(context, e);
+    //     Navigator.pop(context, PopValue.isPaid);
+    //   },
+    //   onCompleted: () {
+    //     if (isAvailablePoin && _selectedPaymentType == PaymentType.full) {
+    //       NotificationService().show(
+    //         title: "Keren! Kamu dapat poin tambahan 🎉",
+    //         body: "Cek sekarang dan raih lebih banyak keuntungan.",
+    //       );
+    //     }
+    //   },
+    // );
   }
 
   @override
