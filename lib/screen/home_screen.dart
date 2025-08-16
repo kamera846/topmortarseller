@@ -28,9 +28,10 @@ import 'package:topmortarseller/widget/snackbar/show_snackbar.dart';
 import 'package:upgrader/upgrader.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key, this.userData});
-
   final ContactModel? userData;
+  final String? payload;
+
+  const HomeScreen({super.key, this.userData, this.payload});
 
   @override
   Widget build(BuildContext context) {
@@ -46,13 +47,15 @@ class HomeScreen extends StatelessWidget {
       showLater: false,
       showReleaseNotes: false,
       showIgnore: false,
-      child: const HomeDashboard(),
+      child: HomeDashboard(payload: payload),
     );
   }
 }
 
 class HomeDashboard extends StatefulWidget {
-  const HomeDashboard({super.key});
+  final String? payload;
+
+  const HomeDashboard({super.key, this.payload});
 
   @override
   State<HomeDashboard> createState() => _HomeDashboardState();
@@ -148,6 +151,7 @@ class _HomeDashboardState extends State<HomeDashboard>
     setState(() => isLoadPoint = true);
     final prefs = await SharedPreferences.getInstance();
     bool isSucces = false;
+    String payload = widget.payload ?? '';
     final currentPoint = await PointApi.total(
       idContact: _userData.idContact!,
       onError: (e) => showSnackBar(context, e),
@@ -162,20 +166,24 @@ class _HomeDashboardState extends State<HomeDashboard>
             '${_userData.idContact!}-${GlobalEnum.savedTotalPoint}',
           ) ??
           currentPoint;
-      if (savedTotalPoint < currentPoint) {
+
+      // SHOW MODAL WHEN NAVIGATE FROM NOTIFICATION
+      if (savedTotalPoint < currentPoint &&
+          payload == GlobalEnum.showModalPoint.name) {
         showPointRewardDialog(
           context,
           previousPoints: savedTotalPoint,
           currentPoints: currentPoint,
         );
       }
+
       prefs.setInt(
         '${_userData.idContact!}-${GlobalEnum.savedTotalPoint}',
         currentPoint,
       );
       setState(() {
-        isLoadPoint = false;
         totalPoint = currentPoint;
+        isLoadPoint = false;
       });
     }
   }
@@ -386,6 +394,7 @@ class _HomeDashboardState extends State<HomeDashboard>
         statusBarBrightness: Brightness.dark, // For iOS
       ),
     );
+
     return Scaffold(
       backgroundColor: Colors.transparent,
       bottomNavigationBar: isLoading

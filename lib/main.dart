@@ -28,6 +28,7 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+  static final navigatorKey = GlobalKey<NavigatorState>();
 
   // This widget is the root of your application.
   @override
@@ -39,6 +40,7 @@ class MyApp extends StatelessWidget {
             context,
           ).copyWith(textScaler: TextScaler.linear(1.0)),
           child: MaterialApp(
+            navigatorKey: navigatorKey,
             title: 'MyTop Seller',
             theme: ThemeData().copyWith(
               colorScheme: mColorScheme,
@@ -59,7 +61,8 @@ class MyApp extends StatelessWidget {
               textTheme: GoogleFonts.openSansTextTheme(),
             ),
             themeMode: ThemeMode.light,
-            home: const SplashScreen(),
+            routes: {'/': (context) => const SplashScreen()},
+            // home: const SplashScreen(),
           ),
         );
       },

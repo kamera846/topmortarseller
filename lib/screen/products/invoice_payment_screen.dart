@@ -139,35 +139,31 @@ class _InvoicePaymentScreenState extends State<InvoicePaymentScreen> {
   }
 
   Future<void> _submitPaid(double paymentAmount) async {
-    if (isAvailablePoin && _selectedPaymentType == PaymentType.full) {
-      NotificationService().show(
-        title: "Wahh!, Kamu Keren 😎",
-        body: "Poin berhasil ditambahkan ke akunmu.",
-      );
-    }
-    // setState(() {
-    //   isLoading = true;
-    // });
-    // await InvoiceApi().payment(
-    //   idInvoice: widget.invoice.idInvoice,
-    //   amount: paymentAmount.toString(),
-    //   onError: (e) {
-    //     showSnackBar(context, e);
-    //     setState(() => isLoading = false);
-    //   },
-    //   onSuccess: (e) {
-    //     showSnackBar(context, e);
-    //     Navigator.pop(context, PopValue.isPaid);
-    //   },
-    //   onCompleted: () {
-    //     if (isAvailablePoin && _selectedPaymentType == PaymentType.full) {
-    //       NotificationService().show(
-    //         title: "Keren! Kamu dapat poin tambahan 🎉",
-    //         body: "Cek sekarang dan raih lebih banyak keuntungan.",
-    //       );
-    //     }
-    //   },
-    // );
+    setState(() {
+      isLoading = true;
+    });
+    await InvoiceApi().payment(
+      idInvoice: widget.invoice.idInvoice,
+      amount: paymentAmount.toString(),
+      onError: (e) {
+        showSnackBar(context, e);
+        setState(() => isLoading = false);
+      },
+      onSuccess: (e) {
+        showSnackBar(context, e);
+        Navigator.pop(context, PopValue.isPaid);
+      },
+      onCompleted: () {
+        if (isAvailablePoin && _selectedPaymentType == PaymentType.full) {
+          NotificationService().show(
+            title: "Kamu Keren! 😎",
+            body:
+                "Poin dari transaksi kali ini berhasil ditambahkan ke akunmu.",
+            payload: GlobalEnum.showModalPoint.name,
+          );
+        }
+      },
+    );
   }
 
   @override

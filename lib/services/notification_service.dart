@@ -1,4 +1,5 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:topmortarseller/main.dart';
 
 class NotificationService {
   final notificationsPlugin = FlutterLocalNotificationsPlugin();
@@ -13,7 +14,7 @@ class NotificationService {
 
     // android init settings
     const initSettingsAndroid = AndroidInitializationSettings(
-      '@mipmap/fav_android_launcher_round',
+      '@drawable/notification_icon',
     );
 
     // ios init settings
@@ -35,7 +36,12 @@ class NotificationService {
           AndroidFlutterLocalNotificationsPlugin
         >()
         ?.requestNotificationsPermission();
-    await notificationsPlugin.initialize(initSettings);
+    await notificationsPlugin.initialize(
+      initSettings,
+      onDidReceiveNotificationResponse: (response) =>
+          notificationResponse(response),
+    );
+    _isInitialized = true;
   }
 
   // NOTIFICATION DETAILS
@@ -53,12 +59,31 @@ class NotificationService {
   }
 
   // SHOW NOTIFICATION
-  Future<void> show({int id = 0, String? title, String? body}) async {
+  Future<void> show({
+    int id = 0,
+    String? title,
+    String? body,
+    String? payload,
+  }) async {
     return notificationsPlugin.show(
       id,
       title,
       body,
-      const NotificationDetails(),
+      details(),
+      payload: payload,
     );
+  }
+
+  // ONCLICK NOTIFICATION
+  void notificationResponse(NotificationResponse response) {
+    final payload = response.payload;
+
+    if (payload != null) {
+      MyApp.navigatorKey.currentState?.pushNamedAndRemoveUntil(
+        '/',
+        (route) => false,
+        arguments: payload,
+      );
+    }
   }
 }

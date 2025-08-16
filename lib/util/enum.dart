@@ -20,6 +20,7 @@ enum GlobalEnum {
   contactModel,
   skipCreateBank,
   savedTotalPoint,
+  showModalPoint,
 }
 
 enum AuthType { login, register, forgot, otp, resetPassword }

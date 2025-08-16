@@ -119,9 +119,13 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   void _returnHomeScreen(ContactModel? userData) {
+    final String? payload =
+        ModalRoute.of(context)?.settings.arguments as String?;
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => HomeScreen(userData: userData)),
+      MaterialPageRoute(
+        builder: (context) => HomeScreen(userData: userData, payload: payload),
+      ),
     );
   }
 
