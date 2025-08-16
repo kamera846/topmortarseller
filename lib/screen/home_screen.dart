@@ -80,10 +80,13 @@ class _HomeDashboardState extends State<HomeDashboard>
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
     super.didChangeAppLifecycleState(state);
     if (state == AppLifecycleState.resumed) {
-      _getTotalPoint();
+      await Future.delayed(Duration(milliseconds: 500));
+      if (mounted) {
+        _getTotalPoint();
+      }
     }
   }
 
@@ -532,7 +535,14 @@ class _HomeDashboardState extends State<HomeDashboard>
                                                 ),
                                           ),
                                         )
-                                        .then((value) => _getTotalPoint());
+                                        .then((value) async {
+                                          await Future.delayed(
+                                            Duration(milliseconds: 500),
+                                          );
+                                          if (mounted) {
+                                            _getTotalPoint();
+                                          }
+                                        });
                                   },
                                   borderRadius: BorderRadius.circular(100),
                                   child: Padding(
@@ -569,7 +579,14 @@ class _HomeDashboardState extends State<HomeDashboard>
                             right: 12,
                             bottom: 6,
                           ),
-                          child: MenuSection(onResumed: () => _getTotalPoint()),
+                          child: MenuSection(
+                            onResumed: () async {
+                              await Future.delayed(Duration(milliseconds: 500));
+                              if (mounted) {
+                                _getTotalPoint();
+                              }
+                            },
+                          ),
                         ),
 
                         /// -- Promo Slider --
