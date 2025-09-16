@@ -5,9 +5,10 @@ import 'dart:ui' as ui;
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:media_store_plus/media_store_plus.dart';
+import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/util/enum.dart';
 import 'package:topmortarseller/widget/modal/modal_action.dart';
@@ -124,28 +125,63 @@ class _QrPaymentScreenState extends State<QrPaymentScreen> {
 
       // Simpan byte ke file sementara
       final tempDir = await getTemporaryDirectory();
-      final tempFilePath =
-          '${tempDir.path}/qr_mytop_seller_invoice_123456_${DateTime.now().millisecondsSinceEpoch}.png';
+      final filename =
+          "qrmytopsellerinvoice123456${DateTime.now().millisecondsSinceEpoch}";
+      final tempFilePath = '${tempDir.path}/$filename.jpg';
       final tempFile = File(tempFilePath);
       await tempFile.writeAsBytes(pngBytes);
 
-      final mediaStore = MediaStore();
-      final result = await mediaStore.saveFile(
-        tempFilePath: tempFilePath,
-        dirType: DirType.download,
-        dirName: DirName.download,
-      );
-
       if (!mounted) return;
 
-      if (result != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("QR Code berhasil disimpan ke galeri!")),
+      // Save image on android
+      if (Platform.isAndroid) {
+        final result = await ImageGallerySaverPlus.saveImage(
+          pngBytes,
+          name: filename,
+          quality: 100,
         );
+
+        if (!mounted) return;
+        if (result['isSuccess'] == true) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('QRIS berhasil disimpan ke Galeri!')),
+          );
+        } else if (result['errorMessage'] != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Gagal menyimpan ke Galeri: Error ${result['errorMessage']}',
+              ),
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Gagal menyimpan ke Galeri: $result')),
+          );
+        }
+        // Share image to save on IOS
+      } else if (Platform.isIOS) {
+        final result = await SharePlus.instance.share(
+          ShareParams(
+            files: [XFile(tempFile.path, name: "$filename.jpg")],
+            title: "$filename.jpg",
+          ),
+        );
+
+        if (!mounted) return;
+        if (result.status == ShareResultStatus.success) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(result.raw)));
+        } else if (result.status != ShareResultStatus.dismissed) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(result.toString())));
+        }
       } else {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text("Gagal menyimpan QR Code")));
+        ).showSnackBar(SnackBar(content: Text("Gagal menyimpan!")));
       }
     } catch (e) {
       if (!mounted) return;
@@ -169,9 +205,6 @@ class _QrPaymentScreenState extends State<QrPaymentScreen> {
         final storagePermission = await Permission.storage.request();
         return storagePermission.isGranted;
       }
-    } else if (Platform.isIOS) {
-      final photosPermission = await Permission.photos.request();
-      return photosPermission.isGranted;
     } else {
       return true;
     }
@@ -227,22 +260,23 @@ class _QrPaymentScreenState extends State<QrPaymentScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    ElevatedButton.icon(
-                      onPressed: _downloadQrCode,
-                      icon: const Icon(Icons.file_download),
-                      label: const Text('Unduh'),
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        backgroundColor: Colors.blueAccent,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 32,
-                          vertical: 12,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
+                    if (Platform.isAndroid || Platform.isIOS)
+                      ElevatedButton.icon(
+                        onPressed: _downloadQrCode,
+                        icon: const Icon(Icons.file_download),
+                        label: Text(Platform.isAndroid ? 'Unduh' : 'Save'),
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          backgroundColor: Colors.blueAccent,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 32,
+                            vertical: 12,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
                         ),
                       ),
-                    ),
                     const SizedBox(width: 24),
                     ElevatedButton.icon(
                       onPressed: _onReload,

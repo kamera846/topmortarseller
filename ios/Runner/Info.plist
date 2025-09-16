@@ -61,10 +61,10 @@
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
 	<key>NSCameraUsageDescription</key>
-	<string>We use your camera to scan QR to claim available promos.</string>
+	<string>Aplikasi memerlukan akses untuk melakukan scan QR-CODE pada program promo yang tersedia.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Aplikasi memerlukan akses untuk menyimpan Gambar (QRIS) ke galeri Anda.</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
-	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Aplikasi memerlukan akses untuk menyimpan Gambar (QR Code) ke galeri Anda.</string>
 </dict>
 </plist>

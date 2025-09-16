@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:media_store_plus/media_store_plus.dart';
 import 'package:topmortarseller/screen/splash_screen.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -23,11 +22,6 @@ void main() async {
   await Upgrader.clearSavedSettings();
   await initializeDateFormatting('id_ID', null);
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-  if (Platform.isAndroid) {
-    await MediaStore.ensureInitialized();
-  }
-  // You have set this otherwise it throws AppFolderNotSetException
-  MediaStore.appFolder = "MyTop Seller";
   HttpOverrides.global = MyHttpOverrides();
   runApp(const MyApp());
 }

@@ -12,13 +12,7 @@ dependencies:
 
   cupertino_icons: ^1.0.2
   flutter_launcher_icons: ^0.14.4
-  # qr_code_scanner: ^1.0.1
   qr_code_scanner_plus: ^2.0.10+1
-  # qr_code_scanner:
-  #   git:
-  #     url: https://github.com/ErikGraciano/qr_code_scanner.git
-  #     ref: fix/android-gradle-plugin-namespace
-  # file_picker: ^7.0.2
   http: ^1.1.0
   shared_preferences: ^2.2.2
   google_fonts: ^6.2.0
@@ -29,9 +23,10 @@ dependencies:
   carousel_slider: ^5.1.1
   flutter_local_notifications: ^19.4.0
   path_provider: ^2.1.5
-  media_store_plus: ^0.1.3
   permission_handler: ^12.0.1
   device_info_plus: ^9.0.3
+  image_gallery_saver_plus: ^4.0.1
+  share_plus: ^12.0.0
 
 dev_dependencies:
   flutter_test:
