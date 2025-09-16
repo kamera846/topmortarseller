@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:topmortarseller/model/invoice_model.dart';
 import 'package:topmortarseller/model/product_discount_modal.dart';
-import 'package:topmortarseller/screen/products/invoice_payment_screen.dart';
+import 'package:topmortarseller/screen/payment/invoice_payment_screen.dart';
+import 'package:topmortarseller/screen/payment/qr_payment_screen.dart';
 import 'package:topmortarseller/services/invoice_api.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/util/currency_format.dart';
@@ -123,15 +124,57 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
+                      /// --- Reminder Section ---
+                      generateReminderSection(context),
                       const SizedBox(height: 16),
+
+                      /// --- Card Invoice ---
                       _generateCardInvoice(),
                       const SizedBox(height: 16),
+
+                      /// --- Card Payment ---
                       _generateCardPayment(),
                       SizedBox(height: 16 + bottomInsets),
                     ],
                   ),
                 ),
               ),
+      ),
+    );
+  }
+
+  Widget generateReminderSection(BuildContext context) {
+    Color color = Colors.yellow[700]!.withAlpha(180);
+    Icon icon = const Icon(Icons.info_outline);
+    String title = 'Selesaikan pembayaran anda';
+
+    return Container(
+      padding: const EdgeInsets.all(24),
+      color: color,
+      width: double.infinity,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              icon,
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -638,6 +681,40 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
               },
               title: 'Buat Pembayaran',
               isFullWidth: true,
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () {
+                      Navigator.of(context)
+                          .push(
+                            MaterialPageRoute(
+                              builder: (context) => QrPaymentScreen(),
+                            ),
+                          )
+                          .then((value) {
+                            if (value is PopValue &&
+                                value == PopValue.needRefresh) {
+                              setState(() {
+                                popValue = value;
+                              });
+                              _onRefresh();
+                            }
+                          });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: cPrimary100,
+                      side: BorderSide(color: cPrimary100, width: 2),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 16,
+                        horizontal: 24,
+                      ),
+                    ),
+                    child: const Text("Lanjutkan Pembayaran"),
+                  ),
+                ),
+              ],
             ),
           ],
         ),

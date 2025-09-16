@@ -64,5 +64,7 @@
 	<string>We use your camera to scan QR to claim available promos.</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Aplikasi memerlukan akses untuk menyimpan Gambar (QR Code) ke galeri Anda.</string>
 </dict>
 </plist>
