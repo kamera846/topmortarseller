@@ -1,18 +1,47 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:topmortarseller/model/promo_banner_model.dart';
+import 'package:topmortarseller/services/promo_banner_api.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 
-class PromoSliderSection extends StatelessWidget {
+class PromoSliderSection extends StatefulWidget {
   const PromoSliderSection({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final List<String> promoItems = [
-      'https://google.com',
-      'https://google.com',
-      'https://google.com',
-    ];
+  State<PromoSliderSection> createState() => _PromoSliderSectionState();
+}
 
+class _PromoSliderSectionState extends State<PromoSliderSection> {
+  bool isLoading = true;
+  List<PromoBannerModel> listPromo = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _getList();
+  }
+
+  void onRefresh() {
+    setState(() {
+      isLoading = true;
+      listPromo = [];
+    });
+    _getList();
+  }
+
+  Future<void> _getList() async {
+    await PromoBannerApi().get(
+      onCompleted: (data) {
+        setState(() {
+          listPromo = data ?? [];
+          isLoading = false;
+        });
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -27,10 +56,10 @@ class PromoSliderSection extends StatelessWidget {
           ),
         ),
         CarouselSlider.builder(
-          options: CarouselOptions(aspectRatio: 3 / 1.2, autoPlay: true),
-          itemCount: promoItems.length,
+          options: CarouselOptions(aspectRatio: 2.5 / 1, autoPlay: true),
+          itemCount: listPromo.length,
           itemBuilder: (context, index, realIndex) {
-            final item = promoItems[index];
+            final item = listPromo[index];
             return Padding(
               padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 6),
               child: Material(
@@ -40,7 +69,7 @@ class PromoSliderSection extends StatelessWidget {
                 child: ClipRRect(
                   borderRadius: BorderRadiusGeometry.circular(16),
                   child: Image.network(
-                    item,
+                    item.imgPromoTopseller ?? 'https://google.com',
                     errorBuilder: (context, error, stackTrace) => SizedBox(
                       width: double.infinity,
                       height: double.infinity,
