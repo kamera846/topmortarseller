@@ -65,7 +65,8 @@ class _HomeDashboardState extends State<HomeDashboard>
     with WidgetsBindingObserver {
   late ContactModel _userData;
   final GlobalKey<ContentSectionState> contentKey = GlobalKey();
-  final GlobalKey<ContentSectionState> searchComponentKey = GlobalKey();
+  final GlobalKey<PromoSliderSectionState> contentPromoKey = GlobalKey();
+  final GlobalKey searchComponentKey = GlobalKey();
   double searchComponentOffset = 0;
   int navCurrentIndex = 0;
   int totalPoint = 0;
@@ -102,6 +103,7 @@ class _HomeDashboardState extends State<HomeDashboard>
     });
     _getUserData();
     contentKey.currentState?.onRefresh();
+    contentPromoKey.currentState?.onRefresh();
   }
 
   Future<void> _getUserData() async {
@@ -590,7 +592,7 @@ class _HomeDashboardState extends State<HomeDashboard>
                         ),
 
                         /// -- Promo Slider --
-                        const PromoSliderSection(),
+                        PromoSliderSection(key: contentPromoKey),
 
                         /// -- Socmed Content --
                         ContentSection(key: contentKey),

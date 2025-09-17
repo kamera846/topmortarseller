@@ -8,10 +8,10 @@ class PromoSliderSection extends StatefulWidget {
   const PromoSliderSection({super.key});
 
   @override
-  State<PromoSliderSection> createState() => _PromoSliderSectionState();
+  State<PromoSliderSection> createState() => PromoSliderSectionState();
 }
 
-class _PromoSliderSectionState extends State<PromoSliderSection> {
+class PromoSliderSectionState extends State<PromoSliderSection> {
   bool isLoading = true;
   List<PromoBannerModel> listPromo = [];
 
@@ -22,6 +22,7 @@ class _PromoSliderSectionState extends State<PromoSliderSection> {
   }
 
   void onRefresh() {
+    print("DEBUG on refresh promo");
     setState(() {
       isLoading = true;
       listPromo = [];
