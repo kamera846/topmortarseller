@@ -49,6 +49,7 @@ class _InvoiceScreenState extends State<InvoiceScreen>
       backgroundColor: cDark600,
       body: TabBarView(
         controller: _tabController,
+        physics: const NeverScrollableScrollPhysics(),
         children: _tabsData.map((item) {
           return item.body;
         }).toList(),
