@@ -10,6 +10,7 @@ import 'package:topmortarseller/services/cart_api.dart';
 import 'package:topmortarseller/services/product_api.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/util/currency_format.dart';
+import 'package:topmortarseller/util/enum.dart';
 import 'package:topmortarseller/widget/form/button/elevated_button.dart';
 import 'package:topmortarseller/widget/snackbar/show_snackbar.dart';
 
@@ -81,17 +82,17 @@ class _CatalogScreenState extends State<CatalogScreen> {
     _onRefresh();
   }
 
-  Future<void> _onRefresh() async {
+  Future<void> _onRefresh({PopValue popValue = PopValue.nothing}) async {
     setState(() {
       _isLoading = true;
       items = [];
       _showOverlay = false;
       _selectedItem = null;
     });
-    _getCart();
+    _getCart(popValue: popValue);
   }
 
-  void _getCart() async {
+  void _getCart({PopValue popValue = PopValue.nothing}) async {
     setState(() {
       checkoutedItems = [];
     });
@@ -101,6 +102,10 @@ class _CatalogScreenState extends State<CatalogScreen> {
         showSnackBar(context, e);
       },
       onCompleted: (data) async {
+        if (popValue == PopValue.isCheckouted) {
+          Navigator.of(context).pop(popValue);
+          return;
+        }
         if (items.isEmpty) {
           await _getList();
         }
@@ -356,9 +361,9 @@ class _CatalogScreenState extends State<CatalogScreen> {
                             ),
                           ).then((value) {
                             if (value != null &&
-                                value is String &&
-                                value == 'isCheckouted') {
-                              _onRefresh();
+                                value is PopValue &&
+                                value == PopValue.isCheckouted) {
+                              _onRefresh(popValue: value);
                             }
                           });
                         },

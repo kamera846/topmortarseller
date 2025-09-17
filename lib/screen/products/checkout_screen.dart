@@ -5,6 +5,7 @@ import 'package:topmortarseller/model/product_discount_modal.dart';
 import 'package:topmortarseller/services/cart_api.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/util/currency_format.dart';
+import 'package:topmortarseller/util/enum.dart';
 import 'package:topmortarseller/widget/form/button/elevated_button.dart';
 import 'package:topmortarseller/widget/modal/loading_modal.dart';
 import 'package:topmortarseller/widget/modal/modal_action.dart';
@@ -121,7 +122,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       },
       onCompleted: (status) {
         if (status) {
-          Navigator.pop(context, 'isCheckouted');
+          Navigator.pop(context, PopValue.isCheckouted);
         } else {
           setState(() {
             isLoading = false;

@@ -4,6 +4,7 @@ import 'package:topmortarseller/screen/products/catalog_screen.dart';
 import 'package:topmortarseller/screen/products/invoice_screen.dart';
 import 'package:topmortarseller/screen/products/order_screen.dart';
 import 'package:topmortarseller/util/colors/color.dart';
+import 'package:topmortarseller/util/enum.dart';
 import 'package:topmortarseller/widget/snackbar/show_snackbar.dart';
 
 class MenuSection extends StatelessWidget {
@@ -59,9 +60,24 @@ class MenuSection extends StatelessWidget {
               onTap: () {
                 final Widget Function(BuildContext)? route = item['route'];
                 if (route != null) {
-                  Navigator.of(context)
-                      .push(MaterialPageRoute(builder: route))
-                      .then((value) => onResumed());
+                  Navigator.of(
+                    context,
+                  ).push(MaterialPageRoute(builder: route)).then((value) {
+                    if (value != null &&
+                        value is PopValue &&
+                        value == PopValue.isCheckouted) {
+                      if (!context.mounted) return;
+                      Navigator.of(context)
+                          .push(
+                            MaterialPageRoute(
+                              builder: (context) => const OrderScreen(),
+                            ),
+                          )
+                          .then((value) => onResumed());
+                    } else {
+                      onResumed();
+                    }
+                  });
                 } else {
                   showSnackBar(context, 'Coming soon..');
                 }

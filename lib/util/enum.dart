@@ -27,4 +27,4 @@ enum AuthType { login, register, forgot, otp, resetPassword }
 
 enum StatusOrder { all, diproses, dikirim, paid, waiting, selesai }
 
-enum PopValue { nothing, needRefresh, isPaid }
+enum PopValue { nothing, needRefresh, isPaid, isCheckouted }
