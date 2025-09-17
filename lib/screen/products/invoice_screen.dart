@@ -349,8 +349,8 @@ class CardInvoice extends StatelessWidget {
                           width: 50,
                           height: 50,
                           child: Image.network(
-                            product.imgProduk.isNotEmpty
-                                ? product.imgProduk
+                            product.imageProduk.isNotEmpty
+                                ? product.imageProduk
                                 : 'https://google.com',
                             key: Key(product.idProduct),
                             fit: BoxFit.cover,

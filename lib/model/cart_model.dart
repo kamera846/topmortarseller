@@ -1,5 +1,4 @@
 import 'package:topmortarseller/model/product_model.dart';
-import 'package:topmortarseller/util/enum.dart';
 
 class CartModel {
   const CartModel({
@@ -75,7 +74,6 @@ class CartModel {
       totalDiscountApp: json['total_discount_app'] ?? '',
       details: json['details'] != null && json['details'] is List
           ? (json['details'] as List).map((item) {
-              item['img_produk'] = '$dummyMediaLink${item['img_produk']}';
               return ProductModel.fromJson(item);
             }).toList()
           : [],

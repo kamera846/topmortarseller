@@ -90,7 +90,7 @@ class ProductModel {
       idCity: json['id_city'] ?? '',
       hargaProduk: json['harga_produk'] ?? '',
       nameSatuan: json['name_satuan'] ?? '',
-      imageProduk: json['img_produk'] ?? '',
+      imageProduk: json['img_produk'] ?? json['img_master_produk'] ?? '',
       createdAt: json['created_at'] ?? '',
       updatedAt: json['updated_at'] ?? '',
     );

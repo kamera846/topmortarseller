@@ -104,7 +104,6 @@ class _CatalogScreenState extends State<CatalogScreen> {
         if (items.isEmpty) {
           await _getList();
         }
-
         if (data != null && data.details.isNotEmpty) {
           for (var product in data.details) {
             // var dummyObject = product.copyWith(imageProduk: dummyImageUrl);

@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:topmortarseller/model/product_model.dart';
 import 'package:topmortarseller/services/api.dart';
-import 'package:topmortarseller/util/enum.dart';
 
 class ProductApiService {
   Future<List<ProductModel>?> list({
@@ -25,7 +24,6 @@ class ProductApiService {
         if (apiResponse.code == 200) {
           if (apiResponse.listData != null) {
             data = apiResponse.listData!.map((item) {
-              item['img_produk'] = '$dummyMediaLink${item['img_produk']}';
               return ProductModel.fromJson(item);
             }).toList();
           }

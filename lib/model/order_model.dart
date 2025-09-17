@@ -1,5 +1,4 @@
 import 'package:topmortarseller/model/order_item_model.dart';
-import 'package:topmortarseller/util/enum.dart';
 
 class OrderModel {
   final String idAppOrder;
@@ -90,7 +89,6 @@ class OrderModel {
       deletedAt: json['deleted_at'] ?? '',
       items: json['items'] != null && json['items'] is List
           ? (json['items'] as List).map((item) {
-              item['img_produk'] = '$dummyMediaLink${item['img_produk']}';
               return OrderItemModel.fromJson(item);
             }).toList()
           : [],

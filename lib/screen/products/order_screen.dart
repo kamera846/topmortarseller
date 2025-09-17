@@ -368,8 +368,8 @@ class CardOrder extends StatelessWidget {
                           height: 50,
                           child: Image.network(
                             key: Key(product.idProduct),
-                            product.imgProduk.isNotEmpty
-                                ? product.imgProduk
+                            product.imageProduk.isNotEmpty
+                                ? product.imageProduk
                                 : 'https://google.com',
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) {

@@ -332,8 +332,8 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                         width: 90,
                         height: 90,
                         child: Image.network(
-                          product.imgProduk.isNotEmpty
-                              ? product.imgProduk
+                          product.imageProduk.isNotEmpty
+                              ? product.imageProduk
                               : 'https://google.com',
                           key: Key(product.idProduct),
                           fit: BoxFit.cover,
