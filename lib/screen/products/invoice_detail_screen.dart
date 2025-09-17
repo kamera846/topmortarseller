@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:topmortarseller/model/invoice_model.dart';
 import 'package:topmortarseller/model/product_discount_modal.dart';
+import 'package:topmortarseller/model/qris_model.dart';
 import 'package:topmortarseller/screen/payment/invoice_payment_screen.dart';
 import 'package:topmortarseller/screen/payment/qr_payment_screen.dart';
 import 'package:topmortarseller/services/invoice_api.dart';
+import 'package:topmortarseller/services/notification_service.dart';
+import 'package:topmortarseller/services/qris_api.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/util/currency_format.dart';
 import 'package:topmortarseller/util/date_format.dart';
@@ -30,29 +33,56 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
   double totalInvoice = 0.0;
   double remainingInvoice = 0.0;
   double totalPayment = 0.0;
+  double amountQrisPayment = 0.0;
+  late QrisModel qrisData;
+
   bool isLoading = true;
+  bool isAvailablePayment = false;
 
   @override
   void initState() {
     super.initState();
-    _onRefresh();
+    _getDetail();
   }
 
   Future<void> _onRefresh() async {
     setState(() {
       isLoading = true;
+      isAvailablePayment = false;
     });
-    _getList();
+    _getDetail();
   }
 
-  void _getList() async {
+  void _getDetail() async {
     await InvoiceApi().detail(
       idInvoice: widget.idInvoice,
       onError: (e) => showSnackBar(context, e),
       onCompleted: (data) {
+        if (data != null) {
+          _checkQris(data);
+        } else {
+          setState(() {
+            discounts.clear();
+            invoice = InvoiceModel();
+            subTotalInvoice = 0.0;
+            totalInvoice = 0.0;
+            remainingInvoice = 0.0;
+            totalPayment = 0.0;
+            discountAppInvoice = 0.0;
+            isLoading = false;
+          });
+        }
+      },
+    );
+  }
+
+  void _checkQris(InvoiceModel dataInvoice) async {
+    await QrisApi().check(
+      idInvoice: dataInvoice.idInvoice,
+      onCompleted: (checkQrisData) {
         setState(() {
           discounts.clear();
-          invoice = data ?? InvoiceModel();
+          invoice = dataInvoice;
           subTotalInvoice = double.tryParse(invoice.subTotalInvoice) != null
               ? double.parse(invoice.subTotalInvoice)
               : 0.0;
@@ -65,11 +95,11 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
           totalPayment = double.tryParse(invoice.totalPayment) != null
               ? double.parse(invoice.totalPayment)
               : 0.0;
-
           discountAppInvoice =
               double.tryParse(invoice.discountAppInvoice) == null
               ? 0.0
               : double.parse(invoice.discountAppInvoice);
+
           if (discountAppInvoice > 0.0) {
             discounts.add(
               ProductDiscountModel(
@@ -78,9 +108,28 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
               ),
             );
           }
+
+          if (checkQrisData != null) {
+            qrisData = checkQrisData;
+            isAvailablePayment = true;
+
+            amountQrisPayment =
+                double.tryParse(qrisData.amountQrisPayment) != null
+                ? double.parse(qrisData.amountQrisPayment)
+                : 0.0;
+          }
+
           isLoading = false;
         });
       },
+    );
+  }
+
+  void _showNotificationPoint() {
+    NotificationService().show(
+      title: "Kamu Keren! 😎",
+      body: "Poin dari transaksi kali ini berhasil ditambahkan ke akunmu.",
+      payload: GlobalEnum.showModalPoint.name,
     );
   }
 
@@ -119,25 +168,30 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
             : const SizedBox.shrink(),
         body: isLoading
             ? Center(child: CircularProgressIndicator.adaptive())
-            : RefreshIndicator.adaptive(
-                onRefresh: () => _onRefresh(),
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      /// --- Reminder Section ---
-                      generateReminderSection(context),
-                      const SizedBox(height: 16),
+            : Column(
+                children: [
+                  /// --- Reminder Section ---
+                  if (isAvailablePayment) generateReminderSection(context),
+                  Expanded(
+                    child: RefreshIndicator.adaptive(
+                      onRefresh: () => _onRefresh(),
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            /// --- Card Invoice ---
+                            const SizedBox(height: 16),
+                            _generateCardInvoice(),
+                            const SizedBox(height: 16),
 
-                      /// --- Card Invoice ---
-                      _generateCardInvoice(),
-                      const SizedBox(height: 16),
-
-                      /// --- Card Payment ---
-                      _generateCardPayment(),
-                      SizedBox(height: 16 + bottomInsets),
-                    ],
+                            /// --- Card Payment ---
+                            _generateCardPayment(),
+                            SizedBox(height: 16 + bottomInsets),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
       ),
     );
@@ -147,6 +201,8 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
     Color color = Colors.yellow[700]!.withAlpha(180);
     Icon icon = const Icon(Icons.info_outline);
     String title = 'Selesaikan pembayaran anda';
+    String description =
+        'Terdapat pembayaran yang belum diselesaikan sebesar ${CurrencyFormat().format(amount: amountQrisPayment)}';
 
     return Container(
       padding: const EdgeInsets.all(24),
@@ -174,6 +230,8 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
               ),
             ],
           ),
+          const SizedBox(height: 8),
+          Text(description, maxLines: 2, overflow: TextOverflow.ellipsis),
         ],
       ),
     );
@@ -661,61 +719,103 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            MElevatedButton(
-              onPressed: () {
-                Navigator.of(context)
-                    .push(
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            InvoicePaymentScreen(invoice: invoice),
+            isAvailablePayment
+                ? Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () {
+                            final willGetPoint =
+                                invoice.payments.isEmpty &&
+                                subTotalInvoice == amountQrisPayment;
+
+                            Navigator.of(context)
+                                .push(
+                                  MaterialPageRoute(
+                                    builder: (context) => QrPaymentScreen(
+                                      idQrisPayment: qrisData.idQrisPayment,
+                                    ),
+                                  ),
+                                )
+                                .then((value) {
+                                  if (value is Map<String, dynamic>) {
+                                    final mapValue = value;
+                                    final PopValue pop =
+                                        mapValue['popValue'] as PopValue;
+
+                                    if (pop == PopValue.isPaid ||
+                                        pop == PopValue.needRefresh) {
+                                      if (pop == PopValue.isPaid &&
+                                          willGetPoint) {
+                                        _showNotificationPoint();
+                                      }
+
+                                      setState(() {
+                                        isLoading = true;
+                                        popValue = pop;
+                                      });
+
+                                      Future.delayed(Duration(seconds: 3), () {
+                                        _onRefresh();
+                                      });
+                                    }
+                                  }
+                                });
+                          },
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: cPrimary100,
+                            side: BorderSide(color: cPrimary100, width: 1),
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 16,
+                              horizontal: 24,
+                            ),
+                          ),
+                          child: const Text(
+                            "Lanjutkan Pembayaran",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
                       ),
-                    )
-                    .then((value) {
-                      if (value is PopValue && value == PopValue.isPaid) {
-                        setState(() {
-                          popValue = value;
-                        });
-                        _onRefresh();
-                      }
-                    });
-              },
-              title: 'Buat Pembayaran',
-              isFullWidth: true,
-            ),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
+                    ],
+                  )
+                : MElevatedButton(
                     onPressed: () {
                       Navigator.of(context)
                           .push(
                             MaterialPageRoute(
-                              builder: (context) => QrPaymentScreen(),
+                              builder: (context) =>
+                                  InvoicePaymentScreen(invoice: invoice),
                             ),
                           )
                           .then((value) {
-                            if (value is PopValue &&
-                                value == PopValue.needRefresh) {
-                              setState(() {
-                                popValue = value;
-                              });
-                              _onRefresh();
+                            if (value is Map<String, dynamic>) {
+                              final mapValue = value;
+                              final PopValue pop =
+                                  mapValue['popValue'] as PopValue;
+                              final bool willGetPoint =
+                                  mapValue['willGetPoint'] as bool;
+
+                              if (pop == PopValue.isPaid ||
+                                  pop == PopValue.needRefresh) {
+                                if (pop == PopValue.isPaid && willGetPoint) {
+                                  _showNotificationPoint();
+                                }
+
+                                setState(() {
+                                  isLoading = true;
+                                  popValue = pop;
+                                });
+
+                                Future.delayed(Duration(seconds: 3), () {
+                                  _onRefresh();
+                                });
+                              }
                             }
                           });
                     },
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: cPrimary100,
-                      side: BorderSide(color: cPrimary100, width: 2),
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 16,
-                        horizontal: 24,
-                      ),
-                    ),
-                    child: const Text("Lanjutkan Pembayaran"),
+                    title: 'Buat Pembayaran',
+                    isFullWidth: true,
                   ),
-                ),
-              ],
-            ),
           ],
         ),
       ),

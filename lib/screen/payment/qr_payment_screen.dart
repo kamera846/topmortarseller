@@ -9,65 +9,123 @@ import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:topmortarseller/model/qris_model.dart';
+import 'package:topmortarseller/services/qris_api.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/util/enum.dart';
 import 'package:topmortarseller/widget/modal/modal_action.dart';
 
 class QrPaymentScreen extends StatefulWidget {
-  const QrPaymentScreen({super.key});
+  final String idQrisPayment;
+  final bool isWillGetPoint;
+  const QrPaymentScreen({
+    super.key,
+    required this.idQrisPayment,
+    this.isWillGetPoint = false,
+  });
 
   @override
   State<QrPaymentScreen> createState() => _QrPaymentScreenState();
 }
 
-class _QrPaymentScreenState extends State<QrPaymentScreen> {
+class _QrPaymentScreenState extends State<QrPaymentScreen>
+    with WidgetsBindingObserver {
   final GlobalKey _qrisWrapper = GlobalKey();
-  final String qrImageUrl =
-      'https://dev-seller.topmortarindonesia.com/assets/img/qris_img/qris_11720_1757671472.png';
 
-  // Contoh waktu kadaluarsa dalam detik (5 menit)
-  final int _expiryDuration = 120;
-  late int _remainingSeconds;
+  final int _expiryDurationInMinute = 30;
+  int _remainingSeconds = 1800;
   Timer? _timer;
+  Timer? _timerRefresh;
 
+  late QrisModel qrisData;
   bool isStartLoadQris = false;
 
   @override
   void initState() {
     super.initState();
-    _onReload();
+    _getQrisPayment();
   }
 
   @override
   void dispose() {
-    _timer?.cancel();
+    _resetTimer();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) {
+      await Future.delayed(Duration(milliseconds: 500));
+      if (mounted) {
+        _onReload();
+      }
+    }
   }
 
   void _onReload() {
     setState(() {
       isStartLoadQris = false;
     });
+    _resetTimer();
+    _getQrisPayment();
+  }
+
+  void _resetTimer() {
     _timer?.cancel();
-    _remainingSeconds = _expiryDuration;
-    _startTimer();
-    Future.delayed(Duration(milliseconds: 500), () {
-      setState(() {
-        isStartLoadQris = true;
-      });
-    });
+    _timerRefresh?.cancel();
+  }
+
+  void _getQrisPayment() async {
+    await QrisApi().payment(
+      idQrisPayment: widget.idQrisPayment,
+      onError: (e) => _showErrordDialog(e),
+      onCompleted: (data) {
+        _resetTimer();
+        if (data != null) {
+          if (data.statusQrisPayment == 'unpaid') {
+            setState(() {
+              qrisData = data;
+            });
+            _startTimer();
+          } else if (data.statusQrisPayment == 'paid') {
+            _showIsPaidDialog();
+          }
+        }
+      },
+    );
   }
 
   void _startTimer() {
+    String initialTimeString = qrisData.dateQrisPayment;
+    DateTime initialTime = DateTime.parse(initialTimeString);
+    DateTime endTime = initialTime.add(
+      Duration(minutes: _expiryDurationInMinute),
+    );
+    DateTime currentTime = DateTime.now();
+    Duration difference = endTime.difference(currentTime);
+
+    // Countdown Interval
+    _remainingSeconds = difference.inSeconds;
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_remainingSeconds > 0) {
         setState(() {
           _remainingSeconds--;
         });
       } else {
-        _timer?.cancel();
+        _resetTimer();
         _showExpiredDialog();
       }
+    });
+    // Auto Refresh Interval
+    _timerRefresh = Timer.periodic(const Duration(seconds: 30), (timer) {
+      _getQrisPayment();
+    });
+
+    Future.delayed(Duration(milliseconds: 250), () {
+      setState(() {
+        isStartLoadQris = true;
+      });
     });
   }
 
@@ -89,7 +147,57 @@ class _QrPaymentScreenState extends State<QrPaymentScreen> {
       ),
     ).then((value) {
       if (!mounted) return;
-      Navigator.of(context).pop(PopValue.needRefresh);
+      _onReload();
+    });
+  }
+
+  void _showIsPaidDialog() {
+    showAdaptiveDialog(
+      context: context,
+      builder: (context) => AlertDialog.adaptive(
+        title: const Text('Pembayaran Berhasil!'),
+        content: const Text(
+          'Terimakasih, pembayaran anda telah berhasil diselesaikan.',
+        ),
+        actions: [
+          ModalAction.adaptiveAction(
+            context: context,
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    ).then((value) {
+      if (!mounted) return;
+      final Map<String, dynamic> popValue = {
+        'popValue': PopValue.isPaid,
+        'willGetPoint': widget.isWillGetPoint,
+      };
+      Navigator.of(context).pop(popValue);
+    });
+  }
+
+  void _showErrordDialog(String error) {
+    showAdaptiveDialog(
+      context: context,
+      builder: (context) => AlertDialog.adaptive(
+        title: const Text('Terjadi Kesalahan!'),
+        content: Text(error),
+        actions: [
+          ModalAction.adaptiveAction(
+            context: context,
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    ).then((value) {
+      if (!mounted) return;
+      final Map<String, dynamic> popValue = {
+        'popValue': PopValue.needRefresh,
+        'willGetPoint': widget.isWillGetPoint,
+      };
+      Navigator.of(context).pop(popValue);
     });
   }
 
@@ -237,7 +345,7 @@ class _QrPaymentScreenState extends State<QrPaymentScreen> {
               children: [
                 /// --- Timeout Section ---
                 const Text(
-                  'Scan QR Code di bawah ini untuk menyelesaikan pembayaran sebelum',
+                  'Scan QRIS di bawah ini untuk menyelesaikan pembayaran sebelum kode kadaluarsa dalam:',
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 14, color: cDark100),
                 ),
@@ -247,7 +355,7 @@ class _QrPaymentScreenState extends State<QrPaymentScreen> {
                   style: TextStyle(
                     fontSize: 48,
                     fontWeight: FontWeight.bold,
-                    color: _remainingSeconds < 60 ? cPrimary100 : cDark100,
+                    color: _remainingSeconds < 300 ? cPrimary100 : cDark100,
                   ),
                 ),
 
@@ -329,8 +437,8 @@ class _QrPaymentScreenState extends State<QrPaymentScreen> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const Text(
-                    "Invoice: 123456",
+                  Text(
+                    "Invoice: ${qrisData.invQrisPayment}",
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 18, color: cDark100),
                   ),
@@ -350,7 +458,7 @@ class _QrPaymentScreenState extends State<QrPaymentScreen> {
                       ],
                     ),
                     child: Image.network(
-                      qrImageUrl,
+                      qrisData.imgQrisPayment,
                       errorBuilder: (context, error, stackTrace) => const Column(
                         children: [
                           Icon(Icons.error, size: 40, color: Colors.grey),

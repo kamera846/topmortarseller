@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:topmortarseller/model/invoice_model.dart';
-import 'package:topmortarseller/services/invoice_api.dart';
-import 'package:topmortarseller/services/notification_service.dart';
+import 'package:topmortarseller/screen/payment/qr_payment_screen.dart';
+import 'package:topmortarseller/services/qris_api.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/util/currency_format.dart';
-import 'package:topmortarseller/util/enum.dart';
 import 'package:topmortarseller/widget/form/button/elevated_button.dart';
 import 'package:topmortarseller/widget/form/textfield/text_field.dart';
 import 'package:topmortarseller/widget/modal/loading_modal.dart';
@@ -117,7 +116,8 @@ class _InvoicePaymentScreenState extends State<InvoicePaymentScreen> {
               context: context,
               onPressed: () {
                 Navigator.pop(context);
-                _submitPaid(paymentAmount);
+                // _submitPaid(paymentAmount);
+                _requestQris(paymentAmount);
               },
               child: const Text('Ya'),
             ),
@@ -138,30 +138,63 @@ class _InvoicePaymentScreenState extends State<InvoicePaymentScreen> {
     // );
   }
 
-  Future<void> _submitPaid(double paymentAmount) async {
+  // Future<void> _submitPaid(double paymentAmount) async {
+  //   setState(() {
+  //     isLoading = true;
+  //   });
+  //   await InvoiceApi().payment(
+  //     idInvoice: widget.invoice.idInvoice,
+  //     amount: paymentAmount.toString(),
+  //     onError: (e) {
+  //       showSnackBar(context, e);
+  //       setState(() => isLoading = false);
+  //     },
+  //     onSuccess: (e) {
+  //       showSnackBar(context, e);
+  //       Navigator.pop(context, PopValue.isPaid);
+  //     },
+  //     onCompleted: () {
+  //       if (isAvailablePoin && _selectedPaymentType == PaymentType.full) {
+  //         NotificationService().show(
+  //           title: "Kamu Keren! 😎",
+  //           body:
+  //               "Poin dari transaksi kali ini berhasil ditambahkan ke akunmu.",
+  //           payload: GlobalEnum.showModalPoint.name,
+  //         );
+  //       }
+  //     },
+  //   );
+  // }
+
+  Future<void> _requestQris(double paymentAmount) async {
     setState(() {
       isLoading = true;
     });
-    await InvoiceApi().payment(
+    await QrisApi().request(
       idInvoice: widget.invoice.idInvoice,
-      amount: paymentAmount.toString(),
+      amountPayment: paymentAmount.toString(),
       onError: (e) {
         showSnackBar(context, e);
-        setState(() => isLoading = false);
       },
-      onSuccess: (e) {
-        showSnackBar(context, e);
-        Navigator.pop(context, PopValue.isPaid);
-      },
-      onCompleted: () {
-        if (isAvailablePoin && _selectedPaymentType == PaymentType.full) {
-          NotificationService().show(
-            title: "Kamu Keren! 😎",
-            body:
-                "Poin dari transaksi kali ini berhasil ditambahkan ke akunmu.",
-            payload: GlobalEnum.showModalPoint.name,
-          );
+      onCompleted: (qrisData) {
+        if (qrisData != null) {
+          final willGetPoint =
+              isAvailablePoin && _selectedPaymentType == PaymentType.full;
+          Navigator.of(context)
+              .push(
+                MaterialPageRoute(
+                  builder: (context) => QrPaymentScreen(
+                    idQrisPayment: qrisData.idQrisPayment,
+                    isWillGetPoint: willGetPoint,
+                  ),
+                ),
+              )
+              .then((value) {
+                if (!mounted) return;
+                Navigator.of(context).pop(value);
+              });
         }
+        setState(() => isLoading = false);
       },
     );
   }

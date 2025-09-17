@@ -22,7 +22,6 @@ class PromoSliderSectionState extends State<PromoSliderSection> {
   }
 
   void onRefresh() {
-    print("DEBUG on refresh promo");
     setState(() {
       isLoading = true;
       listPromo = [];
