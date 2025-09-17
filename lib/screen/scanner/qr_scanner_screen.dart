@@ -194,13 +194,24 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
                     context,
                   ).textTheme.titleMedium!.copyWith(color: cWhite),
                 ),
+                // Semantics(
+                //   label: '${TagHero.faviconAuth}',
+                //   child: Hero(
+                //     tag: TagHero.faviconAuth,
+                //     child: Image.asset(
+                //       'assets/favicon/favicon_white.png',
+                //       width: 32,
+                //     ),
+                //   ),
+                // ),
                 Hero(
                   tag: TagHero.faviconAuth,
-                  child: Semantics(
-                    label: '${TagHero.faviconAuth}',
-                    child: Image.asset(
-                      'assets/favicon/favicon_circle.png',
-                      width: 32,
+                  child: ClipRRect(
+                    borderRadius: BorderRadiusGeometry.circular(100),
+                    child: SizedBox(
+                      width: 35,
+                      height: 35,
+                      child: Image.asset('assets/favicon/favicon_white.png'),
                     ),
                   ),
                 ),

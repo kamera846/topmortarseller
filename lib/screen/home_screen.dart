@@ -619,12 +619,15 @@ class _HomeDashboardState extends State<HomeDashboard>
         //     fontWeight: FontWeight.bold,
         //   ),
         // ),
-        ClipRRect(
-          borderRadius: BorderRadiusGeometry.circular(100),
-          child: SizedBox(
-            width: 35,
-            height: 35,
-            child: Image.asset('assets/favicon/favicon_white.png'),
+        Hero(
+          tag: TagHero.faviconAuth,
+          child: ClipRRect(
+            borderRadius: BorderRadiusGeometry.circular(100),
+            child: SizedBox(
+              width: 35,
+              height: 35,
+              child: Image.asset('assets/favicon/favicon_white.png'),
+            ),
           ),
         ),
         // const SizedBox(width: 12),
