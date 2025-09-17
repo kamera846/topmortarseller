@@ -8,8 +8,13 @@ import 'package:topmortarseller/util/enum.dart';
 import 'package:topmortarseller/widget/snackbar/show_snackbar.dart';
 
 class MenuSection extends StatelessWidget {
+  final Map<String, int> badgeCounters;
   final void Function() onResumed;
-  const MenuSection({super.key, required this.onResumed});
+  const MenuSection({
+    super.key,
+    this.badgeCounters = const {},
+    required this.onResumed,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -17,16 +22,19 @@ class MenuSection extends StatelessWidget {
       {
         'icon': Icons.shopping_bag,
         'title': 'Produk',
+        'badge': badgeCounters['cart'] ?? 0,
         'route': (context) => const CatalogScreen(),
       },
       {
         'icon': CupertinoIcons.cube_box_fill,
         'title': 'Pesanan',
+        'badge': badgeCounters['order'] ?? 0,
         'route': (context) => const OrderScreen(),
       },
       {
         'icon': Icons.receipt_long,
         'title': 'Invoice',
+        'badge': badgeCounters['invoice'] ?? 0,
         'route': (context) => const InvoiceScreen(),
       },
       {'icon': Icons.local_offer, 'title': 'Voucher', 'route': null},
@@ -56,6 +64,7 @@ class MenuSection extends StatelessWidget {
           ),
           itemBuilder: (context, index) {
             final item = menuItems[index];
+            final badge = item['badge'] is int ? item['badge'] as int : 0;
             return InkWell(
               onTap: () {
                 final Widget Function(BuildContext)? route = item['route'];
@@ -89,10 +98,17 @@ class MenuSection extends StatelessWidget {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(
-                        item['icon'] as IconData,
-                        size: 40,
-                        color: cPrimary100,
+                      Badge(
+                        label: Text(badge < 100 ? "$badge" : "99+"),
+                        isLabelVisible: badge != 0,
+                        backgroundColor: Colors.orange,
+                        textStyle: TextStyle(fontWeight: FontWeight.bold),
+                        padding: EdgeInsets.all(2),
+                        child: Icon(
+                          item['icon'] as IconData,
+                          size: 40,
+                          color: cPrimary100,
+                        ),
                       ),
                       const SizedBox(height: 8),
                       Text(

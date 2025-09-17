@@ -11,8 +11,11 @@ import 'package:topmortarseller/screen/products/catalog_screen.dart';
 import 'package:topmortarseller/screen/profile/detail_profile_screen.dart';
 import 'package:topmortarseller/screen/profile/new_rekening_screen.dart';
 import 'package:topmortarseller/screen/scanner/qr_scanner_screen.dart';
+import 'package:topmortarseller/services/app_order_api.dart';
 import 'package:topmortarseller/services/auth_api.dart';
+import 'package:topmortarseller/services/cart_api.dart';
 import 'package:topmortarseller/services/customer_bank_api.dart';
+import 'package:topmortarseller/services/invoice_api.dart';
 import 'package:topmortarseller/services/notification_service.dart';
 import 'package:topmortarseller/services/point_api.dart';
 import 'package:topmortarseller/util/auth_settings.dart';
@@ -72,6 +75,8 @@ class _HomeDashboardState extends State<HomeDashboard>
   int totalPoint = 0;
   bool isLoadPoint = true;
   bool isLoading = true;
+
+  Map<String, int> badgeCounters = {};
 
   @override
   void initState() {
@@ -190,7 +195,36 @@ class _HomeDashboardState extends State<HomeDashboard>
         totalPoint = currentPoint;
         isLoadPoint = false;
       });
+      _getCounterBadge();
     }
+  }
+
+  void _getCounterBadge() async {
+    final idContact = _userData.idContact ?? "-1";
+    final cart = await CartApiService().get(
+      idContact: idContact,
+      onCompleted: (data) => {},
+    );
+    final order = await AppOrderApi().get(
+      idContact: idContact,
+      onCompleted: (data) => {},
+    );
+    final doneOrder = StatusOrder.selesai.name.toUpperCase();
+    final ongoingOrder = order
+        ?.where((element) => element.statusAppOrder != doneOrder)
+        .toList();
+    final waitingInvoice = StatusOrder.waiting.name.toUpperCase();
+    final invoice = await InvoiceApi().get(
+      idContact: idContact,
+      statusInvoice: waitingInvoice,
+      onCompleted: (data) => {},
+    );
+
+    setState(() {
+      badgeCounters['cart'] = cart?.details.length ?? 0;
+      badgeCounters['order'] = ongoingOrder?.length ?? 0;
+      badgeCounters['invoice'] = invoice?.length ?? 0;
+    });
   }
 
   void showPointRewardDialog(
@@ -582,6 +616,7 @@ class _HomeDashboardState extends State<HomeDashboard>
                             bottom: 6,
                           ),
                           child: MenuSection(
+                            badgeCounters: badgeCounters,
                             onResumed: () async {
                               await Future.delayed(Duration(milliseconds: 500));
                               if (mounted) {
