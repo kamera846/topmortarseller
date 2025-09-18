@@ -230,7 +230,7 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
         width: double.infinity,
         padding: const EdgeInsets.all(12),
         child: Text(
-          'Informasi Penukaran ($availableQuota kuota tersisa)',
+          'Penukaran Voucher ($availableQuota kuota tersisa)',
           style: Theme.of(
             context,
           ).textTheme.titleSmall!.copyWith(fontWeight: FontWeight.bold),
