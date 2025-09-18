@@ -79,16 +79,27 @@ class _InvoicePaymentScreenState extends State<InvoicePaymentScreen> {
           });
           return;
         }
-        final amount = double.tryParse(_amountController.text);
-        if (amount == null || amount <= 0) {
+        final amount = double.tryParse(_amountController.text) == null
+            ? 0
+            : double.parse(_amountController.text);
+        if (amount < 500) {
           setState(() {
-            _amountErrorText = 'Nominal harus lebih dari nol';
+            _amountErrorText = 'Minimal pembayaran Rp. 500';
           });
           return;
         }
         if (amount > _remainingPaidAmount) {
           setState(() {
-            _amountErrorText = 'Nominal tidak boleh melebihi sisa tagihan';
+            _amountErrorText =
+                'Nominal tidak bisa melebihi sisa tagihan saat ini';
+          });
+          return;
+        }
+        final nextRemaining = _remainingPaidAmount - amount;
+        if (nextRemaining < 500) {
+          setState(() {
+            _amountErrorText =
+                'Minimal pembayaran Rp. 500, pembayaran nominal saat ini akan menyisakan tagihan sebesar Rp. ${nextRemaining.toStringAsFixed(0)} dan tidak bisa di proses di tagihan berikutnya';
           });
           return;
         }
@@ -125,46 +136,7 @@ class _InvoicePaymentScreenState extends State<InvoicePaymentScreen> {
         );
       },
     );
-
-    // Tampilkan QRIS dengan nominal yang sudah ditentukan
-    // showModalBottomSheet(
-    //   context: context,
-    //   isScrollControlled: true,
-    //   backgroundColor: Colors.transparent,
-    //   builder: (context) => QrisBottomSheet(
-    //     paymentAmount: paymentAmount,
-    //     invoiceId: widget.invoice.idInvoice,
-    //   ),
-    // );
   }
-
-  // Future<void> _submitPaid(double paymentAmount) async {
-  //   setState(() {
-  //     isLoading = true;
-  //   });
-  //   await InvoiceApi().payment(
-  //     idInvoice: widget.invoice.idInvoice,
-  //     amount: paymentAmount.toString(),
-  //     onError: (e) {
-  //       showSnackBar(context, e);
-  //       setState(() => isLoading = false);
-  //     },
-  //     onSuccess: (e) {
-  //       showSnackBar(context, e);
-  //       Navigator.pop(context, PopValue.isPaid);
-  //     },
-  //     onCompleted: () {
-  //       if (isAvailablePoin && _selectedPaymentType == PaymentType.full) {
-  //         NotificationService().show(
-  //           title: "Kamu Keren! 😎",
-  //           body:
-  //               "Poin dari transaksi kali ini berhasil ditambahkan ke akunmu.",
-  //           payload: GlobalEnum.showModalPoint.name,
-  //         );
-  //       }
-  //     },
-  //   );
-  // }
 
   Future<void> _requestQris(double paymentAmount) async {
     setState(() {

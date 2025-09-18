@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:topmortarseller/model/discount_extra_model.dart';
 import 'package:topmortarseller/model/invoice_model.dart';
 import 'package:topmortarseller/model/product_discount_modal.dart';
 import 'package:topmortarseller/model/qris_model.dart';
@@ -34,6 +35,8 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
   double remainingInvoice = 0.0;
   double totalPayment = 0.0;
   double amountQrisPayment = 0.0;
+  DiscountExtra? discountExtra;
+  double amountDiscountExtra = 0.0;
   late QrisModel qrisData;
 
   bool isLoading = true;
@@ -92,14 +95,12 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
           remainingInvoice = double.tryParse(invoice.sisaInvoice) != null
               ? double.parse(invoice.sisaInvoice)
               : 0.0;
-          totalPayment = double.tryParse(invoice.totalPayment) != null
-              ? double.parse(invoice.totalPayment)
-              : 0.0;
+
+          // Set Discount App
           discountAppInvoice =
               double.tryParse(invoice.discountAppInvoice) == null
               ? 0.0
               : double.parse(invoice.discountAppInvoice);
-
           if (discountAppInvoice > 0.0) {
             discounts.add(
               ProductDiscountModel(
@@ -109,6 +110,36 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
             );
           }
 
+          // Set Discount Extra
+          discountExtra = invoice.discountExtra;
+
+          // If invoice paid, get value discount extra from invoice model ..
+          if (invoice.statusInvoice.toLowerCase() == StatusOrder.paid.name) {
+            discountExtra = DiscountExtra(
+              discountName: invoice.discountExtraName,
+              discountValue: invoice.discountExtraAmount,
+            );
+          }
+
+          final discExt = discountExtra;
+
+          if (discExt != null) {
+            final discExtName = discExt.discountName;
+            amountDiscountExtra = double.tryParse(discExt.discountValue) == null
+                ? 0.0
+                : double.parse(discExt.discountValue);
+
+            if (discExtName != null && amountDiscountExtra > 0) {
+              discounts.add(
+                ProductDiscountModel(
+                  title: discExtName,
+                  discount: amountDiscountExtra,
+                ),
+              );
+            }
+          }
+
+          // Set Qris Data
           if (checkQrisData != null) {
             qrisData = checkQrisData;
             isAvailablePayment = true;
@@ -118,6 +149,11 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                 ? double.parse(qrisData.amountQrisPayment)
                 : 0.0;
           }
+
+          // Set Total Payment
+          totalPayment = double.tryParse(invoice.totalPayment) != null
+              ? double.parse(invoice.totalPayment)
+              : 0.0;
 
           isLoading = false;
         });
@@ -170,8 +206,14 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
             ? Center(child: CircularProgressIndicator.adaptive())
             : Column(
                 children: [
+                  /// --- Reminder Discount Extra Section ---
+                  if (discountExtra != null &&
+                      invoice.statusInvoice.toLowerCase() ==
+                          StatusOrder.waiting.name)
+                    generateDiscounExtraReminderSection(),
+
                   /// --- Reminder Section ---
-                  if (isAvailablePayment) generateReminderSection(context),
+                  if (isAvailablePayment) generateReminderSection(),
                   Expanded(
                     child: RefreshIndicator.adaptive(
                       onRefresh: () => _onRefresh(),
@@ -197,42 +239,81 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
     );
   }
 
-  Widget generateReminderSection(BuildContext context) {
-    Color color = Colors.yellow[700]!.withAlpha(180);
-    Icon icon = const Icon(Icons.info_outline);
-    String title = 'Selesaikan pembayaran anda';
-    String description =
-        'Terdapat pembayaran yang belum diselesaikan sebesar ${CurrencyFormat().format(amount: amountQrisPayment)}';
+  Widget generateDiscounExtraReminderSection() {
+    final discount = discountExtra;
+    if (discount == null) return SizedBox.shrink();
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+      color: Colors.green.shade100,
+      width: double.infinity,
+      child: RichText(
+        text: TextSpan(
+          style: TextStyle(color: Colors.black),
+          children: [
+            TextSpan(text: '🎉 '),
+            TextSpan(text: 'Dapatkan '),
+            TextSpan(
+              text: '${discount.discountName} ',
+              style: TextStyle(
+                fontStyle: FontStyle.italic,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            TextSpan(text: 'dengan '),
+            TextSpan(
+              text: 'melunasi ',
+              style: TextStyle(
+                fontStyle: FontStyle.italic,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            TextSpan(text: 'pembayaran sebelum atau pada '),
+            TextSpan(
+              text: '${MyDateFormat.formatDate(discount.discountMaxDate)}.',
+              style: TextStyle(
+                fontStyle: FontStyle.italic,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget generateReminderSection() {
+    // Calculate qris expired at
+    String initialTimeString = qrisData.dateQrisPayment;
+    DateTime initialTime = DateTime.parse(initialTimeString);
+    DateTime endTime = initialTime.add(Duration(minutes: 30));
+    String qrisExpiredAt = MyDateFormat.formatDateTime(endTime.toString());
 
     return Container(
-      padding: const EdgeInsets.all(24),
-      color: color,
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+      color: Colors.yellow.shade700.withAlpha(180),
       width: double.infinity,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              icon,
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
+      child: RichText(
+        text: TextSpan(
+          style: TextStyle(color: Colors.black),
+          children: [
+            TextSpan(text: 'Selesaikan pembayaran sebesar '),
+            TextSpan(
+              text: '${CurrencyFormat().format(amount: amountQrisPayment)} ',
+              style: TextStyle(
+                fontStyle: FontStyle.italic,
+                fontWeight: FontWeight.bold,
               ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(description, maxLines: 2, overflow: TextOverflow.ellipsis),
-        ],
+            ),
+            TextSpan(text: 'sebelum kadaluarsa pada '),
+            TextSpan(
+              text: qrisExpiredAt,
+              style: TextStyle(
+                fontStyle: FontStyle.italic,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -341,13 +422,31 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Diterbitkan ${MyDateFormat.formatDateTime(invoice.dateInvoice)}',
+            'Jatuh Tempo ${MyDateFormat.formatDate(invoice.dateJatem)}',
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           Container(
             margin: const EdgeInsets.symmetric(vertical: 12),
             child: const Divider(height: 1, color: cDark500),
           ),
+          Row(
+            children: [
+              Text(
+                'Diterbitkan: ',
+                style: TextStyle(color: cDark200, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  MyDateFormat.formatDate(invoice.dateInvoice),
+                  textAlign: TextAlign.end,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
           Row(
             children: [
               Text(
@@ -755,7 +854,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                                         popValue = pop;
                                       });
 
-                                      Future.delayed(Duration(seconds: 3), () {
+                                      Future.delayed(Duration(seconds: 2), () {
                                         _onRefresh();
                                       });
                                     }

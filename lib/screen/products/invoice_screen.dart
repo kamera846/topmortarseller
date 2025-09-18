@@ -310,7 +310,7 @@ class CardInvoice extends StatelessWidget {
                     Text(
                       MyDateFormat.formatDate(
                         item.dateInvoice,
-                        outputFormat: 'dd MMMM yyyy, HH:mm',
+                        outputFormat: 'dd MMMM yyyy',
                       ),
                       style: const TextStyle(color: cDark200),
                     ),

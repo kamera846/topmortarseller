@@ -39,6 +39,7 @@ class _QrPaymentScreenState extends State<QrPaymentScreen>
 
   late QrisModel qrisData;
   bool isStartLoadQris = false;
+  bool _canPop = false;
 
   @override
   void initState() {
@@ -60,6 +61,8 @@ class _QrPaymentScreenState extends State<QrPaymentScreen>
       if (mounted) {
         _onReload();
       }
+    } else {
+      _resetTimer();
     }
   }
 
@@ -114,7 +117,10 @@ class _QrPaymentScreenState extends State<QrPaymentScreen>
         });
       } else {
         _resetTimer();
-        _showExpiredDialog();
+        // _showExpiredDialog();
+        Future.delayed(Duration(seconds: 1), () {
+          _onReload();
+        });
       }
     });
     // Auto Refresh Interval
@@ -129,27 +135,27 @@ class _QrPaymentScreenState extends State<QrPaymentScreen>
     });
   }
 
-  void _showExpiredDialog() {
-    showAdaptiveDialog(
-      context: context,
-      builder: (context) => AlertDialog.adaptive(
-        title: const Text('QR Code Kadaluarsa'),
-        content: const Text(
-          'Silakan buat pembayaran baru untuk mendapatkan QR Code baru dan lanjutkan pembayaran anda kembali.',
-        ),
-        actions: [
-          ModalAction.adaptiveAction(
-            context: context,
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('OK'),
-          ),
-        ],
-      ),
-    ).then((value) {
-      if (!mounted) return;
-      _onReload();
-    });
-  }
+  // void _showExpiredDialog() {
+  //   showAdaptiveDialog(
+  //     context: context,
+  //     builder: (context) => AlertDialog.adaptive(
+  //       title: const Text('QR Code Kadaluarsa'),
+  //       content: const Text(
+  //         'Silakan buat pembayaran baru untuk mendapatkan QR Code baru dan lanjutkan pembayaran anda kembali.',
+  //       ),
+  //       actions: [
+  //         ModalAction.adaptiveAction(
+  //           context: context,
+  //           onPressed: () => Navigator.of(context).pop(),
+  //           child: const Text('OK'),
+  //         ),
+  //       ],
+  //     ),
+  //   ).then((value) {
+  //     if (!mounted) return;
+  //     _onReload();
+  //   });
+  // }
 
   void _showIsPaidDialog() {
     showAdaptiveDialog(
@@ -169,11 +175,7 @@ class _QrPaymentScreenState extends State<QrPaymentScreen>
       ),
     ).then((value) {
       if (!mounted) return;
-      final Map<String, dynamic> popValue = {
-        'popValue': PopValue.isPaid,
-        'willGetPoint': widget.isWillGetPoint,
-      };
-      Navigator.of(context).pop(popValue);
+      _onPopPaid();
     });
   }
 
@@ -193,12 +195,24 @@ class _QrPaymentScreenState extends State<QrPaymentScreen>
       ),
     ).then((value) {
       if (!mounted) return;
-      final Map<String, dynamic> popValue = {
-        'popValue': PopValue.needRefresh,
-        'willGetPoint': widget.isWillGetPoint,
-      };
-      Navigator.of(context).pop(popValue);
+      _onPopRefresh();
     });
+  }
+
+  void _onPopRefresh() {
+    final Map<String, dynamic> popValue = {
+      'popValue': PopValue.needRefresh,
+      'willGetPoint': widget.isWillGetPoint,
+    };
+    Navigator.of(context).pop(popValue);
+  }
+
+  void _onPopPaid() {
+    final Map<String, dynamic> popValue = {
+      'popValue': PopValue.isPaid,
+      'willGetPoint': widget.isWillGetPoint,
+    };
+    Navigator.of(context).pop(popValue);
   }
 
   void _downloadQrCode() async {
@@ -234,7 +248,7 @@ class _QrPaymentScreenState extends State<QrPaymentScreen>
       // Simpan byte ke file sementara
       final tempDir = await getTemporaryDirectory();
       final filename =
-          "qrmytopsellerinvoice123456${DateTime.now().millisecondsSinceEpoch}";
+          "QRISMYTOPSELLER${qrisData.invQrisPayment}${DateTime.now().millisecondsSinceEpoch}";
       final tempFilePath = '${tempDir.path}/$filename.jpg';
       final tempFile = File(tempFilePath);
       await tempFile.writeAsBytes(pngBytes);
@@ -321,61 +335,87 @@ class _QrPaymentScreenState extends State<QrPaymentScreen>
   @override
   Widget build(BuildContext context) {
     String formattedTime = _formatTime(_remainingSeconds);
-    return Scaffold(
-      backgroundColor: cDark600,
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop(),
+    return PopScope(
+      canPop: _canPop,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        setState(() {
+          _canPop = true;
+        });
+        _onPopRefresh();
+      },
+      child: Scaffold(
+        backgroundColor: cDark600,
+        appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => _onPopRefresh(),
+          ),
+          title: const Text('Pembayaran QRIS'),
+          centerTitle: false,
+          backgroundColor: cWhite,
+          foregroundColor: cDark100,
+          scrolledUnderElevation: 0,
+          shape: Border(bottom: BorderSide(color: cDark500)),
         ),
-        title: const Text('Pembayaran QRIS'),
-        centerTitle: false,
-        backgroundColor: cWhite,
-        foregroundColor: cDark100,
-        scrolledUnderElevation: 0,
-        shape: Border(bottom: BorderSide(color: cDark500)),
-      ),
-      body: SafeArea(
-        child: RefreshIndicator.adaptive(
-          onRefresh: () async => _onReload(),
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                /// --- Timeout Section ---
-                const Text(
-                  'Scan QRIS di bawah ini untuk menyelesaikan pembayaran sebelum kode kadaluarsa dalam:',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 14, color: cDark100),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  formattedTime,
-                  style: TextStyle(
-                    fontSize: 48,
-                    fontWeight: FontWeight.bold,
-                    color: _remainingSeconds < 300 ? cPrimary100 : cDark100,
+        body: SafeArea(
+          child: RefreshIndicator.adaptive(
+            onRefresh: () async => _onReload(),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  /// --- Timeout Section ---
+                  const Text(
+                    'Scan QRIS di bawah ini untuk menyelesaikan pembayaran sebelum kode kadaluarsa dalam:',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 14, color: cDark100),
                   ),
-                ),
+                  const SizedBox(height: 8),
+                  Text(
+                    formattedTime,
+                    style: TextStyle(
+                      fontSize: 48,
+                      fontWeight: FontWeight.bold,
+                      color: _remainingSeconds < 300 ? cPrimary100 : cDark100,
+                    ),
+                  ),
 
-                /// --- Qris Wrapper Section ---
-                const SizedBox(height: 24),
-                isStartLoadQris ? _buildQris() : SizedBox.shrink(),
+                  /// --- Qris Wrapper Section ---
+                  const SizedBox(height: 24),
+                  isStartLoadQris ? _buildQris() : SizedBox.shrink(),
 
-                /// --- Button Action Section ---
-                const SizedBox(height: 24),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    if (Platform.isAndroid || Platform.isIOS)
+                  /// --- Button Action Section ---
+                  const SizedBox(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (Platform.isAndroid || Platform.isIOS)
+                        ElevatedButton.icon(
+                          onPressed: _downloadQrCode,
+                          icon: const Icon(Icons.file_download),
+                          label: Text(Platform.isAndroid ? 'Unduh' : 'Save'),
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            backgroundColor: Colors.blueAccent,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 32,
+                              vertical: 12,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                          ),
+                        ),
+                      const SizedBox(width: 24),
                       ElevatedButton.icon(
-                        onPressed: _downloadQrCode,
-                        icon: const Icon(Icons.file_download),
-                        label: Text(Platform.isAndroid ? 'Unduh' : 'Save'),
+                        onPressed: _onReload,
+                        icon: const Icon(Icons.refresh),
+                        label: const Text('Refresh'),
                         style: ElevatedButton.styleFrom(
                           foregroundColor: Colors.white,
-                          backgroundColor: Colors.blueAccent,
+                          backgroundColor: Colors.orangeAccent,
                           padding: const EdgeInsets.symmetric(
                             horizontal: 32,
                             vertical: 12,
@@ -385,30 +425,14 @@ class _QrPaymentScreenState extends State<QrPaymentScreen>
                           ),
                         ),
                       ),
-                    const SizedBox(width: 24),
-                    ElevatedButton.icon(
-                      onPressed: _onReload,
-                      icon: const Icon(Icons.refresh),
-                      label: const Text('Refresh'),
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        backgroundColor: Colors.orangeAccent,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 32,
-                          vertical: 12,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
 
-                /// --- Instruction Section ---
-                const SizedBox(height: 24),
-                _buildInstructions(),
-              ],
+                  /// --- Instruction Section ---
+                  const SizedBox(height: 24),
+                  _buildInstructions(),
+                ],
+              ),
             ),
           ),
         ),
@@ -438,7 +462,7 @@ class _QrPaymentScreenState extends State<QrPaymentScreen>
                     ),
                   ),
                   Text(
-                    "Invoice: ${qrisData.invQrisPayment}",
+                    "INVOICE QRIS: ${qrisData.invQrisPayment}",
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 18, color: cDark100),
                   ),
