@@ -32,13 +32,14 @@ class _QrPaymentScreenState extends State<QrPaymentScreen>
     with WidgetsBindingObserver {
   final GlobalKey _qrisWrapper = GlobalKey();
 
-  final int _expiryDurationInMinute = 30;
-  int _remainingSeconds = 1800;
+  final int _expiryDurationInSecond = 1800;
+  int _remainingSeconds = 0;
   Timer? _timer;
   Timer? _timerRefresh;
 
   QrisModel? qrisData;
   bool _canPop = false;
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -77,6 +78,9 @@ class _QrPaymentScreenState extends State<QrPaymentScreen>
   }
 
   void _getQrisPayment() async {
+    setState(() {
+      isLoading = true;
+    });
     await QrisApi().payment(
       idQrisPayment: widget.idQrisPayment,
       onError: (e) => _showErrordDialog(e),
@@ -92,6 +96,9 @@ class _QrPaymentScreenState extends State<QrPaymentScreen>
             _showIsPaidDialog();
           }
         }
+        setState(() {
+          isLoading = false;
+        });
       },
     );
   }
@@ -102,7 +109,7 @@ class _QrPaymentScreenState extends State<QrPaymentScreen>
     String initialTimeString = qrisData!.dateQrisPayment;
     DateTime initialTime = DateTime.parse(initialTimeString);
     DateTime endTime = initialTime.add(
-      Duration(minutes: _expiryDurationInMinute),
+      Duration(seconds: _expiryDurationInSecond),
     );
     DateTime currentTime = DateTime.now();
     Duration difference = endTime.difference(currentTime);
@@ -122,7 +129,7 @@ class _QrPaymentScreenState extends State<QrPaymentScreen>
       }
     });
     // Auto Refresh Interval
-    _timerRefresh = Timer.periodic(const Duration(seconds: 5), (timer) {
+    _timerRefresh = Timer.periodic(const Duration(seconds: 30), (timer) {
       _getQrisPayment();
     });
   }
@@ -327,6 +334,12 @@ class _QrPaymentScreenState extends State<QrPaymentScreen>
           foregroundColor: cDark100,
           scrolledUnderElevation: 0,
           shape: Border(bottom: BorderSide(color: cDark500)),
+          bottom: PreferredSize(
+            preferredSize: Size(double.infinity, 4),
+            child: isLoading
+                ? LinearProgressIndicator(minHeight: 4)
+                : SizedBox.shrink(),
+          ),
         ),
         body: SafeArea(
           child: RefreshIndicator.adaptive(
