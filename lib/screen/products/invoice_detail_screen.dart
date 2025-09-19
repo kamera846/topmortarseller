@@ -42,6 +42,8 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
   bool isLoading = true;
   bool isAvailablePayment = false;
 
+  int _checkPaymentAttempt = 1;
+
   @override
   void initState() {
     super.initState();
@@ -52,6 +54,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
     setState(() {
       isLoading = true;
       isAvailablePayment = false;
+      _checkPaymentAttempt = 1;
     });
     _getDetail();
   }
@@ -83,82 +86,117 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
     await QrisApi().check(
       idInvoice: dataInvoice.idInvoice,
       onCompleted: (checkQrisData) {
-        setState(() {
-          discounts.clear();
-          invoice = dataInvoice;
-          subTotalInvoice = double.tryParse(invoice.subTotalInvoice) != null
-              ? double.parse(invoice.subTotalInvoice)
-              : 0.0;
-          totalInvoice = double.tryParse(invoice.totalInvoice) != null
-              ? double.parse(invoice.totalInvoice)
-              : 0.0;
-          remainingInvoice = double.tryParse(invoice.sisaInvoice) != null
-              ? double.parse(invoice.sisaInvoice)
-              : 0.0;
-
-          // Set Discount App
-          discountAppInvoice =
-              double.tryParse(invoice.discountAppInvoice) == null
-              ? 0.0
-              : double.parse(invoice.discountAppInvoice);
-          if (discountAppInvoice > 0.0) {
-            discounts.add(
-              ProductDiscountModel(
-                title: 'Diskon Aplikasi',
-                discount: discountAppInvoice,
-              ),
-            );
-          }
-
-          // Set Discount Extra
-          discountExtra = invoice.discountExtra;
-
-          // If invoice paid, get value discount extra from invoice model ..
-          if (invoice.statusInvoice.toLowerCase() == StatusOrder.paid.name) {
-            discountExtra = DiscountExtra(
-              discountName: invoice.discountExtraName,
-              discountValue: invoice.discountExtraAmount,
-            );
-          }
-
-          final discExt = discountExtra;
-
-          if (discExt != null) {
-            final discExtName = discExt.discountName;
-            amountDiscountExtra = double.tryParse(discExt.discountValue) == null
-                ? 0.0
-                : double.parse(discExt.discountValue);
-
-            if (discExtName != null && amountDiscountExtra > 0) {
-              discounts.add(
-                ProductDiscountModel(
-                  title: discExtName,
-                  discount: amountDiscountExtra,
-                ),
-              );
-            }
-          }
-
-          // Set Qris Data
-          if (checkQrisData != null) {
-            qrisData = checkQrisData;
-            isAvailablePayment = true;
-
-            amountQrisPayment =
-                double.tryParse(qrisData.amountQrisPayment) != null
-                ? double.parse(qrisData.amountQrisPayment)
-                : 0.0;
-          }
-
-          // Set Total Payment
-          totalPayment = double.tryParse(invoice.totalPayment) != null
-              ? double.parse(invoice.totalPayment)
-              : 0.0;
-
-          isLoading = false;
-        });
+        _checkQrisPayment(dataInvoice, checkQrisData);
       },
     );
+  }
+
+  void _checkQrisPayment(
+    InvoiceModel dataInvoice,
+    QrisModel? checkQrisData,
+  ) async {
+    /// Jika tidak ada pembayaran yang belum lunas
+    /// -> Langsung setup data
+    if (checkQrisData == null) {
+      _setDataDetail(dataInvoice, checkQrisData);
+      return;
+    }
+
+    /// Jika ada pembayaran yang belum lunas
+    /// -> Cek dulu apakah masih ada kesempatan untuk cek status pembayaran
+    if (_checkPaymentAttempt > 0) {
+      /// -> Jika masih ada kesempatan
+      /// -> Cek status pembayarannya terlebih dahulu
+      /// -> Setelah itu, ulangi ke proses cek pembayaran yang belum lunas
+      await QrisApi().payment(
+        idQrisPayment: checkQrisData.idQrisPayment,
+        onCompleted: (_) {
+          _checkQris(dataInvoice);
+
+          /// -> Kurangi kesempatan yang sudah terpakai
+          setState(() {
+            _checkPaymentAttempt--;
+          });
+        },
+      );
+    } else {
+      _setDataDetail(dataInvoice, checkQrisData);
+    }
+  }
+
+  void _setDataDetail(InvoiceModel dataInvoice, QrisModel? checkQrisData) {
+    setState(() {
+      discounts.clear();
+      invoice = dataInvoice;
+      subTotalInvoice = double.tryParse(invoice.subTotalInvoice) != null
+          ? double.parse(invoice.subTotalInvoice)
+          : 0.0;
+      totalInvoice = double.tryParse(invoice.totalInvoice) != null
+          ? double.parse(invoice.totalInvoice)
+          : 0.0;
+      remainingInvoice = double.tryParse(invoice.sisaInvoice) != null
+          ? double.parse(invoice.sisaInvoice)
+          : 0.0;
+
+      // Set Discount App
+      discountAppInvoice = double.tryParse(invoice.discountAppInvoice) == null
+          ? 0.0
+          : double.parse(invoice.discountAppInvoice);
+      if (discountAppInvoice > 0.0) {
+        discounts.add(
+          ProductDiscountModel(
+            title: 'Diskon Aplikasi',
+            discount: discountAppInvoice,
+          ),
+        );
+      }
+
+      // Set Discount Extra
+      discountExtra = invoice.discountExtra;
+
+      // If invoice paid, get value discount extra from invoice model ..
+      if (invoice.statusInvoice.toLowerCase() == StatusOrder.paid.name) {
+        discountExtra = DiscountExtra(
+          discountName: invoice.discountExtraName,
+          discountValue: invoice.discountExtraAmount,
+        );
+      }
+
+      final discExt = discountExtra;
+
+      if (discExt != null) {
+        final discExtName = discExt.discountName;
+        amountDiscountExtra = double.tryParse(discExt.discountValue) == null
+            ? 0.0
+            : double.parse(discExt.discountValue);
+
+        if (discExtName != null && amountDiscountExtra > 0) {
+          discounts.add(
+            ProductDiscountModel(
+              title: discExtName,
+              discount: amountDiscountExtra,
+            ),
+          );
+        }
+      }
+
+      // Set Qris Data
+      if (checkQrisData != null) {
+        qrisData = checkQrisData;
+        isAvailablePayment = true;
+
+        amountQrisPayment = double.tryParse(qrisData.amountQrisPayment) != null
+            ? double.parse(qrisData.amountQrisPayment)
+            : 0.0;
+      }
+
+      // Set Total Payment
+      totalPayment = double.tryParse(invoice.totalPayment) != null
+          ? double.parse(invoice.totalPayment)
+          : 0.0;
+
+      isLoading = false;
+    });
   }
 
   void _showNotificationPoint() {
@@ -854,7 +892,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                                         popValue = pop;
                                       });
 
-                                      Future.delayed(Duration(seconds: 2), () {
+                                      Future.delayed(Duration(seconds: 1), () {
                                         _onRefresh();
                                       });
                                     }
