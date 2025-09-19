@@ -37,19 +37,20 @@ class _QrPaymentScreenState extends State<QrPaymentScreen>
   Timer? _timer;
   Timer? _timerRefresh;
 
-  late QrisModel qrisData;
-  bool isStartLoadQris = false;
+  QrisModel? qrisData;
   bool _canPop = false;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _getQrisPayment();
   }
 
   @override
   void dispose() {
     _resetTimer();
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
@@ -57,19 +58,15 @@ class _QrPaymentScreenState extends State<QrPaymentScreen>
   void didChangeAppLifecycleState(AppLifecycleState state) async {
     super.didChangeAppLifecycleState(state);
     if (state == AppLifecycleState.resumed) {
-      await Future.delayed(Duration(milliseconds: 500));
-      if (mounted) {
-        _onReload();
-      }
+      await Future.delayed(Duration(milliseconds: 250));
+      if (!mounted) return;
+      _onReload();
     } else {
       _resetTimer();
     }
   }
 
   void _onReload() {
-    setState(() {
-      isStartLoadQris = false;
-    });
     _resetTimer();
     _getQrisPayment();
   }
@@ -100,7 +97,9 @@ class _QrPaymentScreenState extends State<QrPaymentScreen>
   }
 
   void _startTimer() {
-    String initialTimeString = qrisData.dateQrisPayment;
+    if (qrisData == null) return;
+
+    String initialTimeString = qrisData!.dateQrisPayment;
     DateTime initialTime = DateTime.parse(initialTimeString);
     DateTime endTime = initialTime.add(
       Duration(minutes: _expiryDurationInMinute),
@@ -117,45 +116,16 @@ class _QrPaymentScreenState extends State<QrPaymentScreen>
         });
       } else {
         _resetTimer();
-        // _showExpiredDialog();
         Future.delayed(Duration(seconds: 1), () {
           _onReload();
         });
       }
     });
     // Auto Refresh Interval
-    _timerRefresh = Timer.periodic(const Duration(seconds: 30), (timer) {
+    _timerRefresh = Timer.periodic(const Duration(seconds: 5), (timer) {
       _getQrisPayment();
     });
-
-    Future.delayed(Duration(milliseconds: 250), () {
-      setState(() {
-        isStartLoadQris = true;
-      });
-    });
   }
-
-  // void _showExpiredDialog() {
-  //   showAdaptiveDialog(
-  //     context: context,
-  //     builder: (context) => AlertDialog.adaptive(
-  //       title: const Text('QR Code Kadaluarsa'),
-  //       content: const Text(
-  //         'Silakan buat pembayaran baru untuk mendapatkan QR Code baru dan lanjutkan pembayaran anda kembali.',
-  //       ),
-  //       actions: [
-  //         ModalAction.adaptiveAction(
-  //           context: context,
-  //           onPressed: () => Navigator.of(context).pop(),
-  //           child: const Text('OK'),
-  //         ),
-  //       ],
-  //     ),
-  //   ).then((value) {
-  //     if (!mounted) return;
-  //     _onReload();
-  //   });
-  // }
 
   void _showIsPaidDialog() {
     showAdaptiveDialog(
@@ -248,7 +218,7 @@ class _QrPaymentScreenState extends State<QrPaymentScreen>
       // Simpan byte ke file sementara
       final tempDir = await getTemporaryDirectory();
       final filename =
-          "QRISMYTOPSELLER${qrisData.invQrisPayment}${DateTime.now().millisecondsSinceEpoch}";
+          "QRISMYTOPSELLER${qrisData?.invQrisPayment}${DateTime.now().millisecondsSinceEpoch}";
       final tempFilePath = '${tempDir.path}/$filename.jpg';
       final tempFile = File(tempFilePath);
       await tempFile.writeAsBytes(pngBytes);
@@ -384,7 +354,7 @@ class _QrPaymentScreenState extends State<QrPaymentScreen>
 
                   /// --- Qris Wrapper Section ---
                   const SizedBox(height: 24),
-                  isStartLoadQris ? _buildQris() : SizedBox.shrink(),
+                  _buildQris(),
 
                   /// --- Button Action Section ---
                   const SizedBox(height: 24),
@@ -442,7 +412,7 @@ class _QrPaymentScreenState extends State<QrPaymentScreen>
 
   Widget _buildQris() {
     return ClipRRect(
-      borderRadius: BorderRadiusGeometry.circular(8),
+      borderRadius: BorderRadius.circular(8),
       child: RepaintBoundary(
         key: _qrisWrapper,
         child: Stack(
@@ -462,7 +432,7 @@ class _QrPaymentScreenState extends State<QrPaymentScreen>
                     ),
                   ),
                   Text(
-                    "INVOICE QRIS: ${qrisData.invQrisPayment}",
+                    "INVOICE QRIS: ${qrisData?.invQrisPayment ?? '-'}",
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 18, color: cDark100),
                   ),
@@ -482,20 +452,23 @@ class _QrPaymentScreenState extends State<QrPaymentScreen>
                       ],
                     ),
                     child: Image.network(
-                      qrisData.imgQrisPayment,
-                      errorBuilder: (context, error, stackTrace) => const Column(
-                        children: [
-                          Icon(Icons.error, size: 40, color: Colors.grey),
-                          SizedBox(height: 8),
-                          Text(
-                            'Gagal memuat QR Code, cobalah beberapa saat lagi.',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.black45,
+                      "${qrisData?.imgQrisPayment}",
+                      errorBuilder: (context, error, stackTrace) => Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: const Column(
+                          children: [
+                            Icon(Icons.error, size: 40, color: Colors.grey),
+                            SizedBox(height: 8),
+                            Text(
+                              'Gagal memuat QR Code, cobalah beberapa saat lagi.',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.black45,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
