@@ -26,9 +26,9 @@ class _InvoiceScreenState extends State<InvoiceScreen>
   late final TabController _tabController;
   final List<String> _tabsBadge = ['0', '0', '0'];
   final List<String> _tabsTitle = [
-    'Invoice Saya',
-    'Invoice Belum Lunas',
-    'Invoice Lunas',
+    'Pembayaran Saya',
+    'Pembayaran Belum Lunas',
+    'Pembayaran Lunas',
   ];
   List<OrderTabsModel> _tabsData = [];
 

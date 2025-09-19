@@ -33,7 +33,7 @@ class MenuSection extends StatelessWidget {
       },
       {
         'icon': Icons.receipt_long,
-        'title': 'Invoice',
+        'title': 'Pembayaran',
         'badge': badgeCounters['invoice'] ?? 0,
         'route': (context) => const InvoiceScreen(),
       },
