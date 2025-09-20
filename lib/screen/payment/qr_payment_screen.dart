@@ -264,6 +264,8 @@ class _QrPaymentScreenState extends State<QrPaymentScreen>
           ShareParams(
             files: [XFile(tempFile.path, name: "$filename.jpg")],
             title: "$filename.jpg",
+            sharePositionOrigin:
+                renderObject.localToGlobal(Offset.zero) & renderObject.size,
           ),
         );
 

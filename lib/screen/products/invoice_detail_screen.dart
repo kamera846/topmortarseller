@@ -220,7 +220,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) async {
-        if (didPop) return;
+        if (didPop || isLoading) return;
         Navigator.of(context).pop(popValue);
       },
       child: Scaffold(
@@ -228,7 +228,9 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
         appBar: AppBar(
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
-            onPressed: () => Navigator.of(context).pop(popValue),
+            onPressed: isLoading
+                ? null
+                : () => Navigator.of(context).pop(popValue),
           ),
           title: const Text('Tagihan Saya'),
           centerTitle: false,

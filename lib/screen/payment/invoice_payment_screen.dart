@@ -211,26 +211,39 @@ class _InvoicePaymentScreenState extends State<InvoicePaymentScreen> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(height: 16),
-                      // Opsi Pembayaran Penuh
-                      _buildPaymentOptionCard(
-                        title:
-                            'Bayar Lunas ${isAvailablePoin ? '(+poin)' : ''}',
-                        subtitle:
-                            'Bayar sisa tagihan sebesar ${CurrencyFormat().format(amount: _remainingPaidAmount)}',
-                        value: PaymentType.full,
-                        isSelected: _selectedPaymentType == PaymentType.full,
-                        onTap: () => _onPaymentTypeChanged(PaymentType.full),
-                      ),
-                      const SizedBox(height: 16),
-                      // Opsi Pembayaran Sebagian
-                      _buildPaymentOptionCard(
-                        title: 'Bayar Sebagian (Cicilan)',
-                        subtitle:
-                            'Masukkan nominal pembayaran sesuai keinginan',
-                        value: PaymentType.partial,
-                        isSelected: _selectedPaymentType == PaymentType.partial,
-                        onTap: () => _onPaymentTypeChanged(PaymentType.partial),
+                      RadioGroup<PaymentType>(
+                        groupValue: _selectedPaymentType,
+                        onChanged: (value) =>
+                            _onPaymentTypeChanged(value ?? PaymentType.full),
+                        child: Column(
+                          children: [
+                            const SizedBox(height: 16),
+                            // Opsi Pembayaran Penuh
+                            _buildPaymentOptionCard(
+                              title:
+                                  'Bayar Lunas ${isAvailablePoin ? '(+poin)' : ''}',
+                              subtitle:
+                                  'Bayar sisa tagihan sebesar ${CurrencyFormat().format(amount: _remainingPaidAmount)}',
+                              value: PaymentType.full,
+                              isSelected:
+                                  _selectedPaymentType == PaymentType.full,
+                              onTap: () =>
+                                  _onPaymentTypeChanged(PaymentType.full),
+                            ),
+                            const SizedBox(height: 16),
+                            // Opsi Pembayaran Sebagian
+                            _buildPaymentOptionCard(
+                              title: 'Bayar Sebagian (Cicilan)',
+                              subtitle:
+                                  'Masukkan nominal pembayaran sesuai keinginan',
+                              value: PaymentType.partial,
+                              isSelected:
+                                  _selectedPaymentType == PaymentType.partial,
+                              onTap: () =>
+                                  _onPaymentTypeChanged(PaymentType.partial),
+                            ),
+                          ],
+                        ),
                       ),
                       const SizedBox(height: 16),
                       _buildSelectedOptionDetail(),
@@ -367,12 +380,7 @@ class _InvoicePaymentScreenState extends State<InvoicePaymentScreen> {
           padding: const EdgeInsets.all(16.0),
           child: Row(
             children: [
-              Radio<PaymentType>(
-                value: value,
-                groupValue: _selectedPaymentType,
-                onChanged: (PaymentType? value) => onTap(),
-                activeColor: cPrimary200,
-              ),
+              Radio<PaymentType>(value: value, activeColor: cPrimary200),
               const SizedBox(width: 8),
               Expanded(
                 child: Column(

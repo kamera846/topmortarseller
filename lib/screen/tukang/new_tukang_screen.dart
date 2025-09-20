@@ -433,7 +433,7 @@ class _SelectBankFieldState extends State<SelectBankField> {
                           border: InputBorder.none,
                         ),
                         dropdownColor: cWhite,
-                        value: widget.selectedBank,
+                        initialValue: widget.selectedBank,
                         onChanged: (BankModel? value) {
                           widget.onChange(value!);
                         },
