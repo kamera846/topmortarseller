@@ -1,6 +1,6 @@
 {
-    "name": "topmortarseller",
-    "short_name": "topmortarseller",
+    "name": "mytopseller",
+    "short_name": "mytopseller",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
