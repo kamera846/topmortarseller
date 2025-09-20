@@ -34,6 +34,7 @@ class MenuSection extends StatelessWidget {
       {
         'icon': Icons.receipt_long,
         'title': 'Pembayaran',
+        'style': Theme.of(context).textTheme.bodySmall,
         'badge': badgeCounters['invoice'] ?? 0,
         'route': (context) => const InvoiceScreen(),
       },
@@ -113,7 +114,10 @@ class MenuSection extends StatelessWidget {
                       const SizedBox(height: 8),
                       Text(
                         item['title'] as String,
-                        style: Theme.of(context).textTheme.bodyMedium,
+                        textAlign: TextAlign.center,
+                        style:
+                            item['style'] ??
+                            Theme.of(context).textTheme.bodyMedium,
                       ),
                     ],
                   ),
