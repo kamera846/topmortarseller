@@ -866,7 +866,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                           onPressed: () {
                             final willGetPoint =
                                 invoice.payments.isEmpty &&
-                                subTotalInvoice == amountQrisPayment;
+                                totalInvoice == amountQrisPayment;
 
                             Navigator.of(context)
                                 .push(

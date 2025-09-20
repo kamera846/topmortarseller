@@ -315,9 +315,9 @@ class _QrPaymentScreenState extends State<QrPaymentScreen>
   Widget build(BuildContext context) {
     String formattedTime = _formatTime(_remainingSeconds);
     return PopScope(
-      canPop: _canPop,
+      canPop: _canPop && !isLoading,
       onPopInvokedWithResult: (didPop, result) {
-        if (didPop) return;
+        if (didPop || isLoading) return;
         setState(() {
           _canPop = true;
         });
@@ -328,7 +328,7 @@ class _QrPaymentScreenState extends State<QrPaymentScreen>
         appBar: AppBar(
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
-            onPressed: () => _onPopRefresh(),
+            onPressed: isLoading ? null : () => _onPopRefresh(),
           ),
           title: const Text('Pembayaran QRIS'),
           centerTitle: false,
