@@ -76,7 +76,8 @@ Future<String> getLoginPassword() async {
 
 Future<void> removeLoginState() async {
   final prefs = await SharedPreferences.getInstance();
-  await prefs.remove(GlobalEnum.isLoggedIn.toString());
-  await prefs.remove(GlobalEnum.loggedInPhone.toString());
-  await prefs.remove(GlobalEnum.loggedInPassword.toString());
+  // await prefs.remove(GlobalEnum.isLoggedIn.toString());
+  // await prefs.remove(GlobalEnum.loggedInPhone.toString());
+  // await prefs.remove(GlobalEnum.loggedInPassword.toString());
+  await prefs.clear();
 }

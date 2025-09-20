@@ -17,12 +17,11 @@ class MTextField extends StatefulWidget {
     this.onSubmitted,
     this.obscure = false,
     this.enabled = true,
+    this.prefixText,
     this.prefixIcon,
     this.suffixIcon,
     this.keyboardType = TextInputType.text,
-    this.margin = const EdgeInsets.only(
-      bottom: 12,
-    ),
+    this.margin = const EdgeInsets.only(bottom: 12),
     this.inputAction,
     this.rightContent,
     this.controller,
@@ -38,6 +37,7 @@ class MTextField extends StatefulWidget {
   final bool enabled;
   final int? maxLength;
   final int? maxLines;
+  final String? prefixText;
   final IconData? prefixIcon;
   final IconData? suffixIcon;
   final Function(String) onChanged;
@@ -73,7 +73,7 @@ class _MTextFieldState extends State<MTextField> {
     super.dispose();
   }
 
-  focus() {
+  void focus() {
     focusNode.requestFocus();
   }
 
@@ -97,9 +97,7 @@ class _MTextFieldState extends State<MTextField> {
           color: widget.enabled == false
               ? cDark500
               : Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: const BorderRadius.all(
-            Radius.circular(8),
-          ),
+          borderRadius: const BorderRadius.all(Radius.circular(8)),
           border: Border.all(
             color: _isFocused ? cPrimary100 : cDark400,
             width: _isFocused ? 2 : 1,
@@ -123,19 +121,17 @@ class _MTextFieldState extends State<MTextField> {
                   style: const TextStyle(color: cDark200),
                   decoration: InputDecoration(
                     labelText: widget.label,
-                    labelStyle:
-                        TextStyle(color: _isFocused ? cPrimary100 : cDark300),
+                    labelStyle: TextStyle(
+                      color: _isFocused ? cPrimary100 : cDark300,
+                    ),
+                    prefixText: widget.prefixText,
                     prefixIcon: widget.prefixIcon == null
                         ? null
-                        : Icon(
-                            widget.prefixIcon,
-                          ),
+                        : Icon(widget.prefixIcon),
                     prefixIconColor: _isFocused ? cPrimary100 : cDark300,
                     suffixIcon: widget.suffixIcon == null
                         ? null
-                        : Icon(
-                            widget.suffixIcon,
-                          ),
+                        : Icon(widget.suffixIcon),
                     suffixIconColor: _isFocused ? cPrimary100 : cDark300,
                     hintText: widget.hint,
                     enabledBorder: InputBorder.none,
@@ -162,10 +158,9 @@ class _MTextFieldState extends State<MTextField> {
           padding: const EdgeInsets.only(top: 2),
           child: Text(
             widget.errorText ?? '',
-            style: Theme.of(context)
-                .textTheme
-                .bodySmall!
-                .copyWith(color: cPrimary100),
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall!.copyWith(color: cPrimary100),
           ),
         ),
       );
@@ -177,10 +172,9 @@ class _MTextFieldState extends State<MTextField> {
           padding: const EdgeInsets.only(top: 2),
           child: Text(
             widget.helper ?? '',
-            style: Theme.of(context)
-                .textTheme
-                .bodySmall!
-                .copyWith(color: cDark200),
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall!.copyWith(color: cDark200),
           ),
         ),
       );

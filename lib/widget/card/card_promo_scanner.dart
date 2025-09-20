@@ -4,10 +4,7 @@ import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/screen/scanner/qr_scanner_screen.dart';
 
 class CardPromoScanner extends StatefulWidget {
-  const CardPromoScanner({
-    super.key,
-    this.userData,
-  });
+  const CardPromoScanner({super.key, this.userData});
 
   final ContactModel? userData;
 
@@ -63,24 +60,20 @@ class _CardPromoScannerState extends State<CardPromoScanner> {
               padding: const EdgeInsets.all(8),
               decoration: const BoxDecoration(
                 color: cPrimary100,
-                borderRadius: BorderRadius.all(
-                  Radius.circular(80),
-                ),
+                borderRadius: BorderRadius.all(Radius.circular(80)),
                 boxShadow: [
                   BoxShadow(
                     color: cPrimary200, // Warna bayangan dengan transparansi
                     spreadRadius: 1, // Jarak penyebaran bayangan
                     blurRadius: 2, // Jarak kabur bayangan
                     offset: Offset(
-                        1, 1.5), // Posisi bayangan (horizontal, vertikal)
+                      1,
+                      1.5,
+                    ), // Posisi bayangan (horizontal, vertikal)
                   ),
                 ],
               ),
-              child: const Icon(
-                Icons.qr_code_rounded,
-                color: cWhite,
-                size: 75,
-              ),
+              child: const Icon(Icons.qr_code_rounded, color: cWhite, size: 75),
             ),
             const SizedBox(width: 24),
             Expanded(
@@ -90,22 +83,22 @@ class _CardPromoScannerState extends State<CardPromoScanner> {
                 children: [
                   Text(
                     'Promo tersedia',
-                    style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                          color: cDark400,
-                        ),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodySmall!.copyWith(color: cDark400),
                   ),
                   Text(
                     'Ambil Cashback!',
-                    style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                          color: cWhite,
-                        ),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.titleLarge!.copyWith(color: cWhite),
                   ),
                   const SizedBox(height: 12),
                   SizedBox(
                     width: double.maxFinite,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: cPrimary600.withOpacity(0.5),
+                        backgroundColor: cPrimary600.withValues(alpha: 0.5),
                         foregroundColor: Colors.white,
                         shape: ContinuousRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
@@ -115,9 +108,8 @@ class _CardPromoScannerState extends State<CardPromoScanner> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (ctx) => QRScannerScreen(
-                              userData: _userData,
-                            ),
+                            builder: (ctx) =>
+                                QRScannerScreen(userData: _userData),
                           ),
                         );
                       },

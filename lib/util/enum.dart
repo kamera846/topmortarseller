@@ -19,19 +19,12 @@ enum GlobalEnum {
   loggedInPassword,
   contactModel,
   skipCreateBank,
+  savedTotalPoint,
+  showModalPoint,
 }
 
-enum AuthType {
-  login,
-  register,
-  forgot,
-  otp,
-  resetPassword,
-}
+enum AuthType { login, register, forgot, otp, resetPassword }
 
-enum StatusOrder {
-  diproses,
-  dikirim,
-  invoice,
-  selesai,
-}
+enum StatusOrder { all, diproses, dikirim, paid, waiting, selesai }
+
+enum PopValue { nothing, needRefresh, isPaid, isCheckouted }

@@ -22,9 +22,9 @@ class _MOutlinedButtonState extends State<MOutlinedButton> {
   Widget build(BuildContext context) {
     Widget textWidget = Text(
       widget.title,
-      style: Theme.of(context).textTheme.bodySmall!.copyWith(
-            color: cPrimary100,
-          ),
+      style: Theme.of(
+        context,
+      ).textTheme.bodySmall!.copyWith(color: cPrimary100),
     );
 
     return Semantics(
@@ -33,9 +33,7 @@ class _MOutlinedButtonState extends State<MOutlinedButton> {
         style: OutlinedButton.styleFrom(
           foregroundColor: cPrimary100,
           side: const BorderSide(color: cDark400),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
         onPressed: widget.onPressed,
         child: widget.isFullWidth

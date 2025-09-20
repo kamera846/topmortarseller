@@ -14,10 +14,7 @@ import 'package:topmortarseller/widget/modal/info_modal.dart';
 import 'package:topmortarseller/widget/modal/loading_modal.dart';
 
 class QRScannerScreen extends StatefulWidget {
-  const QRScannerScreen({
-    super.key,
-    this.userData,
-  });
+  const QRScannerScreen({super.key, this.userData});
 
   final ContactModel? userData;
 
@@ -136,7 +133,7 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
     qrController!.pauseCamera();
     CustomerBankModel? selectedBank;
     await showModalBottomSheet(
-      barrierColor: cDark100.withOpacity(0.7),
+      barrierColor: cDark100.withValues(alpha: 0.7),
       context: context,
       builder: (ctx) => ScannerResultScreen(
         userData: _userData,
@@ -158,7 +155,7 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
 
   @override
   void dispose() {
-    qrController?.dispose();
+    // qrController?.dispose();
     super.dispose();
   }
 
@@ -189,32 +186,39 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  icon: const Icon(
-                    Icons.arrow_back_ios_rounded,
-                    color: cWhite,
-                  ),
+                  icon: const Icon(Icons.arrow_back_ios_rounded, color: cWhite),
                 ),
                 Text(
                   'Top Mortar Scanner',
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleMedium!
-                      .copyWith(color: cWhite),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleMedium!.copyWith(color: cWhite),
                 ),
+                // Semantics(
+                //   label: '${TagHero.faviconAuth}',
+                //   child: Hero(
+                //     tag: TagHero.faviconAuth,
+                //     child: Image.asset(
+                //       'assets/favicon/favicon_white.png',
+                //       width: 32,
+                //     ),
+                //   ),
+                // ),
                 Hero(
                   tag: TagHero.faviconAuth,
-                  child: Semantics(
-                    label: '${TagHero.faviconAuth}',
-                    child: Image.asset(
-                      'assets/favicon/favicon_circle.png',
-                      width: 32,
+                  child: ClipRRect(
+                    borderRadius: BorderRadiusGeometry.circular(100),
+                    child: SizedBox(
+                      width: 35,
+                      height: 35,
+                      child: Image.asset('assets/favicon/favicon_white.png'),
                     ),
                   ),
-                )
+                ),
               ],
             ),
           ),
-          if (isLoading) const LoadingModal()
+          if (isLoading) const LoadingModal(),
         ],
       ),
     );

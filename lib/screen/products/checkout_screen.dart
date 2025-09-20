@@ -1,50 +1,135 @@
 import 'package:flutter/material.dart';
-import 'package:topmortarseller/model/order_model.dart';
-import 'package:topmortarseller/model/product_model.dart';
-import 'package:topmortarseller/screen/products/invoice_screen.dart';
+import 'package:topmortarseller/model/cart_model.dart';
+import 'package:topmortarseller/model/contact_model.dart';
+import 'package:topmortarseller/model/product_discount_modal.dart';
+import 'package:topmortarseller/services/cart_api.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/util/currency_format.dart';
 import 'package:topmortarseller/util/enum.dart';
 import 'package:topmortarseller/widget/form/button/elevated_button.dart';
 import 'package:topmortarseller/widget/modal/loading_modal.dart';
-
-class ProductDiskonModel {
-  const ProductDiskonModel({
-    required this.title,
-    required this.diskon,
-  });
-
-  final String title;
-  final double diskon;
-}
+import 'package:topmortarseller/widget/modal/modal_action.dart';
+import 'package:topmortarseller/widget/snackbar/show_snackbar.dart';
 
 class CheckoutScreen extends StatefulWidget {
-  const CheckoutScreen({
-    super.key,
-    required this.items,
-    this.orderItem,
-  });
+  const CheckoutScreen({super.key, required this.idCart});
 
-  final List<ProductModel> items;
-  final OrderModel? orderItem;
+  final String idCart;
 
   @override
   State<CheckoutScreen> createState() => _CheckoutScreenState();
 }
 
 class _CheckoutScreenState extends State<CheckoutScreen> {
-  List<ProductModel> items = [];
-  List<ProductModel> checkoutedItems = [];
-  List<ProductDiskonModel> diskons = [];
-  bool _isLoading = true;
+  late ContactModel userData;
+  late CartModel cart;
+  List<ProductDiscountModel> discounts = [];
+  double subTotalPrice = 0.0;
   double totalPrice = 0.0;
-  double totalDiskon = 0.0;
-  double totalAfterDiskon = 0.0;
+  double totalDiscountApp = 0.0;
+  bool isLoading = true;
 
   @override
   void initState() {
-    _getList();
+    _getUserData();
     super.initState();
+  }
+
+  void _getUserData() async {
+    final data = await getContactModel();
+    setState(() {
+      userData = data ?? ContactModel();
+    });
+
+    _onRefresh();
+  }
+
+  Future<void> _onRefresh() async {
+    setState(() {
+      isLoading = true;
+    });
+    _getList();
+  }
+
+  void _getList() async {
+    await CartApiService().get(
+      idContact: userData.idContact ?? '-1',
+      onError: (e) => showSnackBar(context, e),
+      onCompleted: (data) {
+        setState(() {
+          discounts.clear();
+          cart = data ?? CartModel();
+          subTotalPrice = double.tryParse(cart.subtotalPrice) == null
+              ? 0.0
+              : double.parse(cart.subtotalPrice);
+          totalDiscountApp = double.tryParse(cart.totalDiscountApp) == null
+              ? 0.0
+              : double.parse(cart.totalDiscountApp);
+          if (totalDiscountApp > 0.0) {
+            discounts.add(
+              ProductDiscountModel(
+                title: 'Diskon Aplikasi',
+                discount: totalDiscountApp,
+              ),
+            );
+          }
+          totalPrice = subTotalPrice - totalDiscountApp;
+          isLoading = false;
+        });
+      },
+    );
+  }
+
+  void _checkoutConfirmation() {
+    showAdaptiveDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog.adaptive(
+          title: Text('Konfirmasi'),
+          content: Text('Apakah anda yakin ingin checkout sekarang?'),
+          actions: <Widget>[
+            ModalAction.adaptiveAction(
+              context: context,
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Batal'),
+            ),
+            ModalAction.adaptiveAction(
+              context: context,
+              onPressed: () {
+                Navigator.pop(context);
+                _submitCheckout();
+              },
+              child: const Text('Ya'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _submitCheckout() async {
+    setState(() {
+      isLoading = true;
+    });
+    await CartApiService().checkout(
+      idContact: userData.idContact ?? '-1',
+      idCart: cart.idCart,
+      onError: (e) {
+        showSnackBar(context, e);
+      },
+      onSuccess: (e) {
+        showSnackBar(context, e);
+      },
+      onCompleted: (status) {
+        if (status) {
+          Navigator.pop(context, PopValue.isCheckouted);
+        } else {
+          setState(() {
+            isLoading = false;
+          });
+        }
+      },
+    );
   }
 
   @override
@@ -56,379 +141,281 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: Text(widget.orderItem != null ? 'Pesanan Saya' : 'Checkout'),
+        title: Text('Checkout Pesanan'),
         centerTitle: false,
         backgroundColor: cWhite,
         foregroundColor: cDark100,
       ),
-      body: _isLoading
+      bottomNavigationBar: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(24),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          border: Border.symmetric(
+            horizontal: BorderSide(color: cDark600, width: 1),
+          ),
+        ),
+        child: SafeArea(
+          child: MElevatedButton(
+            onPressed: () => _checkoutConfirmation(),
+            title: 'Checkout Sekarang',
+            isFullWidth: true,
+          ),
+        ),
+      ),
+      body: isLoading
           ? const LoadingModal()
-          : Column(
-              children: [
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        Container(
-                          margin: const EdgeInsets.only(bottom: 24),
-                          padding: const EdgeInsets.all(24),
-                          color: getReminderBackgroundColor(),
-                          width: double.infinity,
-                          child: Row(
+          : RefreshIndicator.adaptive(
+              onRefresh: () => _onRefresh(),
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 24),
+                      padding: const EdgeInsets.all(24),
+                      color: getReminderBackgroundColor(),
+                      width: double.infinity,
+                      child: Row(
+                        children: [
+                          getReminderIcon(),
+                          const SizedBox(width: 12),
+                          getReminderTitleAndDescriptionText(),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 24),
+                      padding: const EdgeInsets.all(24),
+                      color: cWhite,
+                      width: double.infinity,
+                      child: Column(
+                        children: [
+                          Row(
                             children: [
-                              getReminderIcon(),
+                              const Text(
+                                'Keranjang',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
                               const SizedBox(width: 12),
-                              getReminderTitleAndDescriptionText()
+                              Text(
+                                '${cart.details.length} produk',
+                                style: const TextStyle(color: cDark200),
+                              ),
                             ],
                           ),
-                        ),
-                        Container(
-                          margin: const EdgeInsets.only(bottom: 24),
-                          padding: const EdgeInsets.all(24),
-                          color: cWhite,
-                          width: double.infinity,
-                          child: Column(
-                            children: [
-                              Row(
-                                children: [
-                                  const Text(
-                                    'Keranjang',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.bold),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Text(
-                                    '${items.length} produk',
-                                    style: const TextStyle(color: cDark200),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 24),
-                              ListView.builder(
-                                itemCount: items.length,
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                padding: const EdgeInsets.all(0),
-                                itemBuilder: (conxtext, i) {
-                                  final item = items[i];
-                                  return Container(
-                                    margin: i < items.length - 1
-                                        ? const EdgeInsets.only(bottom: 24)
-                                        : null,
-                                    height: 90,
-                                    child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(12),
-                                          child: Container(
-                                            color: cDark600,
-                                            width: 90,
-                                            height: 90,
-                                            child: Hero(
-                                              tag: widget.orderItem != null
-                                                  ? 'product-${item.idProduk}-${widget.orderItem!.idOrder}'
-                                                  : 'product-${item.idProduk}',
-                                              child: Image.network(
-                                                item.imageProduk ?? '',
-                                                fit: BoxFit.cover,
-                                              ),
+                          const SizedBox(height: 24),
+                          ListView.separated(
+                            itemCount: cart.details.length,
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            padding: const EdgeInsets.all(0),
+                            separatorBuilder: (context, index) =>
+                                const SizedBox(height: 24),
+                            itemBuilder: (conxtext, i) {
+                              final product = cart.details[i];
+                              return SizedBox(
+                                height: 90,
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(12),
+                                      child: Container(
+                                        color: cDark600,
+                                        width: 90,
+                                        height: 90,
+                                        child: Image.network(
+                                          product.imageProduk ??
+                                              'https://google.com',
+                                          key: Key(
+                                            product.idProduk ?? i.toString(),
+                                          ),
+                                          fit: BoxFit.cover,
+                                          errorBuilder:
+                                              (context, error, stackTrace) {
+                                                return const Icon(
+                                                  Icons.error,
+                                                  size: 40,
+                                                  color: Colors.grey,
+                                                );
+                                              },
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            product.namaProduk ?? '',
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
                                             ),
                                           ),
-                                        ),
-                                        const SizedBox(width: 12),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                          const Spacer(),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
                                             children: [
                                               Text(
-                                                item.namaProduk ?? '',
-                                                maxLines: 2,
-                                                overflow: TextOverflow.ellipsis,
+                                                '${CurrencyFormat().format(amount: double.parse(product.hargaProduk ?? '0'))} / ${product.nameSatuan}',
+                                              ),
+                                              Text(
+                                                CurrencyFormat().format(
+                                                  amount:
+                                                      (int.parse(
+                                                                product.hargaProduk ??
+                                                                    '0',
+                                                              ) *
+                                                              int.parse(
+                                                                product.qtyCartDetail ??
+                                                                    '0',
+                                                              ))
+                                                          .toDouble(),
+                                                ),
                                                 style: const TextStyle(
-                                                  fontWeight: FontWeight.bold,
+                                                  color: cPrimary100,
                                                 ),
                                               ),
-                                              Expanded(
-                                                child: Text(
-                                                    '${CurrencyFormat().format(amount: double.parse(item.hargaProduk ?? '0'))} / satuan'),
-                                              ),
-                                              Text('x ${item.checkoutCount}'),
                                             ],
                                           ),
-                                        ),
-                                        Center(
-                                          child: Text(
-                                            CurrencyFormat().format(
-                                                amount: (int.parse(
-                                                            item.hargaProduk ??
-                                                                '0') *
-                                                        int.parse(
-                                                            item.checkoutCount ??
-                                                                '0'))
-                                                    .toDouble()),
-                                            style: const TextStyle(
-                                              color: cPrimary100,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          margin: const EdgeInsets.only(bottom: 24),
-                          padding: const EdgeInsets.all(24),
-                          color: cWhite,
-                          width: double.infinity,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  const Expanded(
-                                    child: Text(
-                                      'Total Harga',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  ),
-                                  Text(
-                                    getTotalPrices(),
-                                    style: const TextStyle(color: cPrimary100),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 24),
-                              ListView.builder(
-                                  itemCount: diskons.length,
-                                  shrinkWrap: true,
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  padding: const EdgeInsets.all(0),
-                                  itemBuilder: (ctx, idx) {
-                                    var diskonItem = diskons[idx];
-                                    return Container(
-                                      margin: const EdgeInsets.only(bottom: 12),
-                                      child: Row(
-                                        children: [
-                                          Expanded(
-                                            child: Text(
-                                              diskonItem.title,
-                                            ),
-                                          ),
                                           Text(
-                                            CurrencyFormat().format(
-                                                amount: diskonItem.diskon,
-                                                fractionDigits: 2),
+                                            'x ${product.qtyCartDetail}',
+                                            style: TextStyle(color: cDark200),
                                           ),
                                         ],
                                       ),
-                                    );
-                                  })
-                            ],
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
                           ),
-                        ),
-                        Container(
-                          margin: const EdgeInsets.only(bottom: 24),
-                          padding: const EdgeInsets.all(24),
-                          color: cWhite,
-                          width: double.infinity,
-                          child: Row(
+                        ],
+                      ),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 24),
+                      padding: const EdgeInsets.all(24),
+                      color: cWhite,
+                      width: double.infinity,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
                             children: [
                               const Expanded(
                                 child: Text(
-                                  'Total Bayar',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                  'Total Harga',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
-                              Column(
-                                children: [
-                                  Text(
-                                    getTotalAfterDiskon(),
-                                    style: const TextStyle(
-                                        color: cPrimary200,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  Text(
-                                    getTotalPrices(),
-                                    style: const TextStyle(
-                                        color: cPrimary200,
-                                        decoration: TextDecoration.lineThrough),
-                                  ),
-                                ],
-                              )
+                              Text(
+                                CurrencyFormat().format(
+                                  amount: subTotalPrice,
+                                  fractionDigits: 2,
+                                ),
+                                style: const TextStyle(color: cPrimary100),
+                              ),
                             ],
                           ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                if (widget.orderItem == null ||
-                    (widget.orderItem != null &&
-                        widget.orderItem!.orderStatus ==
-                            StatusOrder.invoice.name))
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(24),
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      border: Border.symmetric(
-                        horizontal: BorderSide(
-                          color: cDark600,
-                          width: 1,
-                        ),
+                          if (discounts.isNotEmpty)
+                            ListView.separated(
+                              itemCount: discounts.length,
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              padding: const EdgeInsets.only(top: 24),
+                              separatorBuilder: (context, index) =>
+                                  const SizedBox(height: 12),
+                              itemBuilder: (ctx, idx) {
+                                var discountItem = discounts[idx];
+                                return Row(
+                                  children: [
+                                    Expanded(child: Text(discountItem.title)),
+                                    Text(
+                                      '- ${CurrencyFormat().format(amount: discountItem.discount, fractionDigits: 2)}',
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
+                        ],
                       ),
                     ),
-                    child: MElevatedButton(
-                      onPressed: () {
-                        if (widget.orderItem != null &&
-                            widget.orderItem!.orderStatus ==
-                                StatusOrder.invoice.name) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (ctx) => InvoiceScreen(
-                                orderItem: widget.orderItem!,
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 24),
+                      padding: const EdgeInsets.all(24),
+                      color: cWhite,
+                      width: double.infinity,
+                      child: Row(
+                        children: [
+                          const Expanded(
+                            child: Text(
+                              'Total Bayar',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
-                          );
-                        }
-                      },
-                      title: widget.orderItem != null &&
-                              widget.orderItem!.orderStatus ==
-                                  StatusOrder.invoice.name
-                          ? 'Bayar Sekarang'
-                          : 'Checkout Sekarang',
-                      isFullWidth: true,
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              if (subTotalPrice != totalPrice)
+                                Text(
+                                  CurrencyFormat().format(
+                                    amount: subTotalPrice,
+                                    fractionDigits: 2,
+                                  ),
+                                  style: const TextStyle(
+                                    color: cPrimary200,
+                                    decoration: TextDecoration.lineThrough,
+                                    decorationColor: cPrimary200,
+                                    decorationThickness: 2,
+                                  ),
+                                ),
+                              Text(
+                                CurrencyFormat().format(
+                                  amount: totalPrice,
+                                  fractionDigits: 2,
+                                ),
+                                style: const TextStyle(
+                                  color: cPrimary200,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-              ],
+                  ],
+                ),
+              ),
             ),
     );
   }
 
-  void _getList() async {
-    setState(() {
-      items = widget.items;
-      diskons.add(
-          const ProductDiskonModel(title: 'Diskon aplikasi', diskon: -10000));
-      diskons.add(const ProductDiskonModel(
-          title: 'Diskon toko priority', diskon: -15000));
-      diskons.add(
-          const ProductDiskonModel(title: 'Voucher 10.000', diskon: -10000));
-      diskons.add(const ProductDiskonModel(title: 'Biaya admin', diskon: 1000));
-      _isLoading = false;
-    });
-  }
-
-  String getTotalPrices() {
-    var totalPrice = 0.0;
-    for (var item in items) {
-      double totalPriceProduct = double.parse(item.hargaProduk ?? '0') *
-          double.parse(item.checkoutCount ?? '0');
-      setState(() {
-        totalPrice += totalPriceProduct;
-      });
-    }
-    return CurrencyFormat().format(amount: totalPrice, fractionDigits: 2);
-  }
-
-  String getTotalAfterDiskon() {
-    var totalPrice = 0.0;
-    var totalDiskon = 0.0;
-    for (var item in items) {
-      double totalPriceProduct = double.parse(item.hargaProduk ?? '0') *
-          double.parse(item.checkoutCount ?? '0');
-      setState(() {
-        totalPrice += totalPriceProduct;
-      });
-    }
-    for (var item in diskons) {
-      totalDiskon += item.diskon;
-    }
-    var totalAfterDiskon = totalPrice + totalDiskon;
-    return CurrencyFormat().format(amount: totalAfterDiskon, fractionDigits: 2);
-  }
-
   Color getReminderBackgroundColor() {
-    if (widget.orderItem != null) {
-      var orderStatus = widget.orderItem?.orderStatus;
-      if (orderStatus == 'diproses') {
-        return Colors.grey[400]!;
-      } else if (orderStatus == 'dikirim') {
-        return Colors.blue[100]!;
-      } else if (orderStatus == 'invoice') {
-        return Colors.orange[100]!;
-      } else if (orderStatus == 'selesai') {
-        return Colors.green[100]!;
-      } else {
-        return Colors.yellow[700]!.withAlpha(180);
-      }
-    } else {
-      return Colors.yellow[700]!.withAlpha(180);
-    }
+    return Colors.yellow[700]!.withAlpha(180);
   }
 
   Widget getReminderIcon() {
-    if (widget.orderItem != null) {
-      var orderStatus = widget.orderItem?.orderStatus;
-      if (orderStatus == 'diproses') {
-        return const Icon(Icons.inventory_2_outlined);
-      } else if (orderStatus == 'dikirim') {
-        return const Icon(Icons.fire_truck_rounded);
-      } else if (orderStatus == 'invoice') {
-        return const Icon(Icons.payment_rounded);
-      } else if (orderStatus == 'selesai') {
-        return const Icon(Icons.check_circle_sharp);
-      } else {
-        return const Icon(Icons.info_outline);
-      }
-    } else {
-      return const Icon(Icons.info_outline);
-    }
+    return const Icon(Icons.info_outline);
   }
 
   Column getReminderTitleAndDescriptionText() {
-    var title = 'Periksa produk sebelum checkout';
-    var description = 'Pastikan setiap detail sudah sesuai';
-    if (widget.orderItem != null) {
-      var orderStatus = widget.orderItem?.orderStatus;
-      if (orderStatus == 'diproses') {
-        title = 'Status pesanan sedang diproses';
-        description = 'Sabarr ngab :))';
-      } else if (orderStatus == 'dikirim') {
-        title = 'Status pesanan sedang dikirim';
-        description = 'Otewe niih :)';
-      } else if (orderStatus == 'invoice') {
-        title = 'Status pesanan sudah diterima';
-        description = 'Bayarr woyy';
-      } else if (orderStatus == 'selesai') {
-        title = 'Status pesanan sudah selesai';
-        description = 'Terimakasih bos, cair nih caiirr ..';
-      } else {
-        title = '-';
-        description = '-';
-      }
-    }
+    String title = 'Periksa produk sebelum checkout';
+    String description = 'Pastikan setiap detail sudah sesuai';
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          title,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
+        Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
         Text(description),
       ],
     );

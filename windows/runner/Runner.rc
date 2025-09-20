@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.topmortar" "\0"
-            VALUE "FileDescription", "topmortarseller" "\0"
+            VALUE "CompanyName", "com.example" "\0"
+            VALUE "FileDescription", "mytopseller" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "topmortarseller" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2024 com.topmortar. All rights reserved." "\0"
-            VALUE "OriginalFilename", "topmortarseller.exe" "\0"
-            VALUE "ProductName", "topmortarseller" "\0"
+            VALUE "InternalName", "mytopseller" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2025 com.example. All rights reserved." "\0"
+            VALUE "OriginalFilename", "mytopseller.exe" "\0"
+            VALUE "ProductName", "mytopseller" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

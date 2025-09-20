@@ -1,28 +1,20 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:topmortarseller/model/claimed_model.dart';
 import 'package:topmortarseller/model/contact_model.dart';
 import 'package:topmortarseller/model/customer_bank_model.dart';
-import 'package:topmortarseller/screen/auth_screen.dart';
-import 'package:topmortarseller/services/auth_api.dart';
 import 'package:topmortarseller/services/claim_api.dart';
 import 'package:topmortarseller/services/customer_bank_api.dart';
-import 'package:topmortarseller/util/auth_settings.dart';
 import 'package:topmortarseller/util/enum.dart';
 import 'package:topmortarseller/screen/profile/new_rekening_screen.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/util/loading_item.dart';
+import 'package:topmortarseller/util/phone_format.dart';
 import 'package:topmortarseller/widget/card/card_rekening.dart';
 import 'package:topmortarseller/widget/form/button/elevated_button.dart';
-import 'package:topmortarseller/widget/modal/info_modal.dart';
-import 'package:topmortarseller/widget/modal/loading_modal.dart';
 import 'package:topmortarseller/widget/snackbar/show_snackbar.dart';
 
 class DetailProfileScreen extends StatefulWidget {
-  const DetailProfileScreen({
-    super.key,
-    this.userData,
-  });
+  const DetailProfileScreen({super.key, this.userData});
 
   final ContactModel? userData;
 
@@ -35,34 +27,35 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
   List<CustomerBankModel>? myBanks = [];
   List<ClaimedModel>? myRedeems = [];
   String? title;
+  String? phone;
   String? description;
   int totalQuota = 0;
   bool isLoading = true;
+  bool isLoadingRedeem = true;
 
   @override
   void initState() {
-    _getUserData();
     super.initState();
+    _getUserData();
   }
 
   void _getUserData() async {
     setState(() => isLoading = true);
 
-    // // final data = widget.userData ?? await getContactModel();
-    final data = await getContactModel();
+    final data = widget.userData ?? await getContactModel();
+    // final data = await getContactModel();
     setState(() {
       _userData = data;
 
       if (data != null) {
-        if (data.nama != null && data.nama != null && data.nama!.isNotEmpty) {
+        if (data.nama != null && data.nama!.isNotEmpty) {
           title = data.nama!;
+        }
+        if (data.nomorhp != null && data.nomorhp!.isNotEmpty) {
+          phone = data.nomorhp!;
         }
         if (data.address != null && data.address!.isNotEmpty) {
           description = data.address!;
-        } else if (data.nomorhp != null &&
-            data.nomorhp != null &&
-            data.nomorhp!.isNotEmpty) {
-          description = data.nomorhp!;
         }
       }
     });
@@ -82,7 +75,10 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
     });
   }
 
-  void _getUserRedeemList() async {
+  Future<void> _getUserRedeemList() async {
+    setState(() {
+      isLoadingRedeem = true;
+    });
     final data = await ClaimCashbackServices().claimed(
       idContact: _userData!.idContact!,
       onSuccess: (msg) => null,
@@ -103,36 +99,8 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
     );
     setState(() {
       myRedeems = data;
+      isLoadingRedeem = false;
     });
-  }
-
-  deleteAccount() async {
-    await AuthApiService().requestDeleteAccount(
-      idContact: _userData?.idContact,
-      onError: (e) {
-        if (context.mounted) {
-          Navigator.pop(context);
-          showSnackBar(context, e);
-        }
-      },
-      onSuccess: (e) async {
-        await removeLoginState();
-        await removeContactModel();
-        _clearAllScreenToAuth();
-      },
-    );
-  }
-
-  void _clearAllScreenToAuth() {
-    if (context.mounted) {
-      Navigator.pop(context);
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(
-          builder: (ctx) => const AuthScreen(),
-        ),
-        (Route<dynamic> route) => false,
-      );
-    }
   }
 
   String _monthName(int month) {
@@ -149,20 +117,24 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
       "September",
       "Oktober",
       "November",
-      "Desember"
+      "Desember",
     ];
     return months[month - 1];
   }
 
-  String _formattedDate(dateString) {
-    DateTime dateTime = DateTime.parse(dateString);
-    String day = dateTime.day.toString().padLeft(2, '0');
-    String month = _monthName(dateTime.month);
-    String year = dateTime.year.toString();
-    String hour = dateTime.hour.toString().padLeft(2, '0');
-    String minute = dateTime.minute.toString().padLeft(2, '0');
+  String _formattedDate(String dateString) {
+    try {
+      DateTime dateTime = DateTime.parse(dateString);
+      String day = dateTime.day.toString().padLeft(2, '0');
+      String month = _monthName(dateTime.month);
+      String year = dateTime.year.toString();
+      String hour = dateTime.hour.toString().padLeft(2, '0');
+      String minute = dateTime.minute.toString().padLeft(2, '0');
 
-    return "$day $month $year, $hour:$minute";
+      return "$day $month $year, $hour:$minute";
+    } catch (e) {
+      return dateString;
+    }
   }
 
   @override
@@ -207,47 +179,49 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
 
       if (myRedeems != null && myRedeems!.isNotEmpty) {
         redeemList = Expanded(
-          child: ListView.builder(
-            padding: const EdgeInsets.all(0),
-            itemCount: myRedeems!.length,
-            itemBuilder: (context, i) {
-              final redeemItem = myRedeems![i];
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(24),
-                    width: double.infinity,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          redeemItem.nama ?? 'null',
-                          softWrap: true,
-                          overflow: TextOverflow.visible,
-                          style: Theme.of(context).textTheme.bodyLarge,
-                        ),
-                        Text(
-                          _formattedDate(redeemItem.claimDate!),
-                          softWrap: true,
-                          overflow: TextOverflow.visible,
-                          style:
-                              Theme.of(context).textTheme.bodyMedium!.copyWith(
-                                    fontStyle: FontStyle.italic,
-                                    color: cDark200,
-                                  ),
-                        ),
-                      ],
-                    ),
+          child: isLoadingRedeem
+              ? Center(child: CircularProgressIndicator.adaptive())
+              : RefreshIndicator.adaptive(
+                  onRefresh: () => _getUserRedeemList(),
+                  child: ListView.builder(
+                    padding: const EdgeInsets.all(0),
+                    itemCount: myRedeems!.length,
+                    itemBuilder: (context, i) {
+                      final redeemItem = myRedeems![i];
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(24),
+                            width: double.infinity,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  redeemItem.nama ?? 'null',
+                                  softWrap: true,
+                                  overflow: TextOverflow.visible,
+                                  style: Theme.of(context).textTheme.bodyLarge,
+                                ),
+                                Text(
+                                  _formattedDate(redeemItem.claimDate ?? '-'),
+                                  softWrap: true,
+                                  overflow: TextOverflow.visible,
+                                  style: Theme.of(context).textTheme.bodyMedium!
+                                      .copyWith(
+                                        fontStyle: FontStyle.italic,
+                                        color: cDark200,
+                                      ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Divider(height: 1, color: cDark500),
+                        ],
+                      );
+                    },
                   ),
-                  const Divider(
-                    height: 1,
-                    color: cDark500,
-                  ),
-                ],
-              );
-            },
-          ),
+                ),
         );
       }
 
@@ -256,11 +230,10 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
         width: double.infinity,
         padding: const EdgeInsets.all(12),
         child: Text(
-          'Informasi Penukaran ($availableQuota kuota tersisa)',
-          style: Theme.of(context)
-              .textTheme
-              .titleSmall!
-              .copyWith(fontWeight: FontWeight.bold),
+          'Penukaran Voucher ($availableQuota kuota tersisa)',
+          style: Theme.of(
+            context,
+          ).textTheme.titleSmall!.copyWith(fontWeight: FontWeight.bold),
         ),
       );
     }
@@ -308,99 +281,60 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
     }
 
     return Scaffold(
+      backgroundColor: Colors.transparent,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          DetailProfileHeader(
-            title: title,
-            description: description,
-            onRequestDeleteAccount: deleteAccount,
-          ),
-          Expanded(
-            child: Stack(
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(
-                          top: 24, right: 24, left: 24, bottom: 12),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Daftar Rekening',
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleSmall!
-                                .copyWith(fontWeight: FontWeight.bold),
-                          ),
-                          Text(
-                            'Digunakan untuk tujuan transfer promo cashback dari kami.',
-                            softWrap: true,
-                            overflow: TextOverflow.visible,
-                            style: Theme.of(context).textTheme.bodySmall,
-                          ),
-                          const SizedBox(height: 12),
-                          cardBank,
-                          emptyCardBank
-                        ],
-                      ),
-                    ),
-                    aboutRedeem,
-                    redeemList,
-                    emptyRedeemList,
-                    // Expanded(
-                    //   child: ListView.builder(
-                    //     padding: const EdgeInsets.all(0),
-                    //     itemCount: myBanks!.length,
-                    //     itemBuilder: (context, i) {
-                    //       final bankItem = myBanks![i];
-                    //       return CardRekening(
-                    //         bankName: bankItem.namaBank!,
-                    //         rekening: bankItem.toAccount!,
-                    //         rekeningName: bankItem.toName!,
-                    //         rightIcon: Icons.mode_edit,
-                    //         action: () {
-                    //           Navigator.of(context).push(
-                    //             MaterialPageRoute(
-                    //               builder: (context) => NewRekeningScreen(
-                    //                 userData: _userData,
-                    //                 rekeningId: bankItem.idRekeningToko!,
-                    //                 onSuccess: (bool? state) {
-                    //                   if (state != null && state) {
-                    //                     setState(() => isLoading = true);
-                    //                     _getUserBanks();
-                    //                   }
-                    //                 },
-                    //               ),
-                    //             ),
-                    //           );
-                    //         },
-                    //       );
-                    //     },
-                    //   ),
-                    // ),
-                  ],
-                ),
-                if (isLoading) const LoadingModal()
-              ],
+          Padding(
+            padding: const EdgeInsets.all(24),
+            child: DetailProfileHeader(
+              title: title,
+              phone: phone,
+              description: description,
             ),
           ),
-          // Container(
-          //   padding: const EdgeInsets.all(12),
-          //   child: MElevatedButton(
-          //     title: 'Tambah Rekening Lain',
-          //     isFullWidth: true,
-          //     onPressed: () {
-          //       Navigator.of(context).push(
-          //         MaterialPageRoute(
-          //           builder: (context) => const NewRekeningScreen(),
-          //         ),
-          //       );
-          //     },
-          //   ),
-          // )
+          Expanded(
+            child: Material(
+              color: cWhite,
+              child: isLoading
+                  ? const Center(child: CircularProgressIndicator.adaptive())
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            left: 16,
+                            top: 16,
+                            right: 16,
+                            bottom: 16,
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Daftar Rekening',
+                                style: Theme.of(context).textTheme.titleMedium!
+                                    .copyWith(fontWeight: FontWeight.bold),
+                              ),
+                              Text(
+                                'Digunakan untuk tujuan transfer promo cashback dari kami.',
+                                softWrap: true,
+                                overflow: TextOverflow.visible,
+                                style: Theme.of(context).textTheme.bodySmall,
+                              ),
+                              const SizedBox(height: 16),
+                              cardBank,
+                              emptyCardBank,
+                            ],
+                          ),
+                        ),
+                        aboutRedeem,
+                        redeemList,
+                        emptyRedeemList,
+                      ],
+                    ),
+            ),
+          ),
         ],
       ),
     );
@@ -408,153 +342,63 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
 }
 
 class DetailProfileHeader extends StatelessWidget {
-  const DetailProfileHeader(
-      {super.key,
-      required this.title,
-      required this.description,
-      required this.onRequestDeleteAccount});
+  const DetailProfileHeader({
+    super.key,
+    required this.title,
+    required this.phone,
+    required this.description,
+  });
 
   final String? title;
+  final String? phone;
   final String? description;
-  final Function() onRequestDeleteAccount;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top + 12,
-        right: 0,
-        bottom: 24,
-        left: 0,
-      ),
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            cPrimary100,
-            cPrimary200,
-            cPrimary100,
-            cPrimary200,
-            cPrimary100,
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const SizedBox(width: 6),
-              IconButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                style: IconButton.styleFrom(
-                  padding: const EdgeInsets.all(0),
-                ),
-                icon: const Icon(
-                  Icons.arrow_back,
-                  color: cWhite,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  'Profil Saya',
-                  style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                        color: cWhite,
-                      ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              PopupMenuButton<String>(
-                icon: const Icon(
-                  Icons.settings,
-                  color: cWhite,
-                ),
-                itemBuilder: (ctx) {
-                  return [
-                    PopupMenuItem<String>(
-                      onTap: () {
-                        _onRequestDeleteAccount(context);
-                      },
-                      child: const Row(
-                        children: [SizedBox(width: 12), Text('Hapus Akun')],
-                      ),
-                    ),
-                  ];
-                },
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              const SizedBox(width: 24),
-              const Hero(
-                tag: TagHero.mainDrawerHeader,
-                child: Icon(
-                  Icons.storefront,
-                  size: 24,
-                  color: cWhite,
-                ),
-              ),
-              const SizedBox(width: 12),
-              title == null
-                  ? const Expanded(
-                      child: LoadingItem(
-                        isPrimaryTheme: true,
-                      ),
-                    )
-                  : Text(
-                      title!,
-                      style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                            color: cWhite,
-                          ),
-                    ),
-              const SizedBox(width: 24),
-            ],
-          ),
-          const SizedBox(height: 6),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: description == null
-                ? const LoadingItem(
-                    isPrimaryTheme: true,
-                  )
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            const Hero(
+              tag: TagHero.mainDrawerHeader,
+              child: Icon(Icons.storefront, size: 24, color: cWhite),
+            ),
+            const SizedBox(width: 12),
+            title == null
+                ? const Expanded(child: LoadingItem(isPrimaryTheme: true))
                 : Text(
-                    description!,
-                    softWrap: true,
-                    overflow: TextOverflow.visible,
-                    style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                          color: cPrimary600,
-                        ),
+                    title!,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.normal,
+                      fontSize: 20,
+                    ),
                   ),
-          )
-        ],
-      ),
-    );
-  }
-
-  void _onRequestDeleteAccount(BuildContext context) {
-    showCupertinoDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return MInfoModal(
-          contentName: 'Apakah anda yakin ingin menghapus akun?',
-          contentDescription:
-              'Dengan menghapus akun, data anda akan kami hapus permanen dalam 7 hari.',
-          contentIcon: Icons.warning_rounded,
-          contentIconColor: cPrimary100,
-          cancelText: 'Batal',
-          confirmText: 'Hapus',
-          onCancel: () {
-            Navigator.of(context).pop();
-          },
-          onConfirm: onRequestDeleteAccount,
-        );
-      },
+          ],
+        ),
+        const SizedBox(height: 6),
+        phone == null
+            ? const LoadingItem(isPrimaryTheme: true)
+            : Text(
+                MyPhoneFormat.format(phone!),
+                softWrap: true,
+                overflow: TextOverflow.visible,
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium!.copyWith(color: cWhite),
+              ),
+        description == null
+            ? const LoadingItem(isPrimaryTheme: true)
+            : Text(
+                description!,
+                softWrap: true,
+                overflow: TextOverflow.visible,
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium!.copyWith(color: cWhite),
+              ),
+      ],
     );
   }
 }

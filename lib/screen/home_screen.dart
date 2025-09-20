@@ -1,81 +1,129 @@
 import 'dart:async';
-import 'dart:convert';
+import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:topmortarseller/model/contact_model.dart';
+import 'package:topmortarseller/screen/auth_screen.dart';
+import 'package:topmortarseller/screen/products/catalog_screen.dart';
+import 'package:topmortarseller/screen/profile/detail_profile_screen.dart';
 import 'package:topmortarseller/screen/profile/new_rekening_screen.dart';
-import 'package:topmortarseller/services/api.dart';
+import 'package:topmortarseller/screen/scanner/qr_scanner_screen.dart';
+import 'package:topmortarseller/services/app_order_api.dart';
+import 'package:topmortarseller/services/auth_api.dart';
+import 'package:topmortarseller/services/cart_api.dart';
 import 'package:topmortarseller/services/customer_bank_api.dart';
+import 'package:topmortarseller/services/invoice_api.dart';
+import 'package:topmortarseller/services/notification_service.dart';
+import 'package:topmortarseller/services/point_api.dart';
+import 'package:topmortarseller/util/auth_settings.dart';
 import 'package:topmortarseller/util/enum.dart';
 import 'package:topmortarseller/util/colors/color.dart';
-import 'package:topmortarseller/widget/drawer/main_drawer.dart';
-import 'package:topmortarseller/widget/card/card_promo_scanner.dart';
-import 'package:topmortarseller/widget/modal/loading_modal.dart';
+import 'package:topmortarseller/util/loading_item.dart';
+import 'package:topmortarseller/widget/dashboard/content_section.dart';
+import 'package:topmortarseller/widget/dashboard/hero_section.dart';
+import 'package:topmortarseller/widget/dashboard/menu_section.dart';
+import 'package:topmortarseller/widget/dashboard/promo_slider_section.dart';
+import 'package:topmortarseller/widget/modal/info_modal.dart';
 import 'package:topmortarseller/widget/snackbar/show_snackbar.dart';
 import 'package:upgrader/upgrader.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 
-import 'package:http/http.dart' as http;
-
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({
-    super.key,
-    this.userData,
-  });
-
+class HomeScreen extends StatelessWidget {
   final ContactModel? userData;
+  final String? payload;
+
+  const HomeScreen({super.key, this.userData, this.payload});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  Widget build(BuildContext context) {
+    return UpgradeAlert(
+      upgrader: Upgrader(
+        languageCode: 'id',
+        durationUntilAlertAgain: const Duration(seconds: 1),
+      ),
+      dialogStyle: Platform.isIOS
+          ? UpgradeDialogStyle.cupertino
+          : UpgradeDialogStyle.material,
+      barrierDismissible: false,
+      showLater: false,
+      showReleaseNotes: false,
+      showIgnore: false,
+      child: HomeDashboard(payload: payload),
+    );
+  }
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-  ContactModel? _userData;
-  late Timer loadUiTimer;
+class HomeDashboard extends StatefulWidget {
+  final String? payload;
+
+  const HomeDashboard({super.key, this.payload});
+
+  @override
+  State<HomeDashboard> createState() => _HomeDashboardState();
+}
+
+class _HomeDashboardState extends State<HomeDashboard>
+    with WidgetsBindingObserver {
+  late ContactModel _userData;
+  final GlobalKey<ContentSectionState> contentKey = GlobalKey();
+  final GlobalKey<PromoSliderSectionState> contentPromoKey = GlobalKey();
+  final GlobalKey searchComponentKey = GlobalKey();
+  double searchComponentOffset = 0;
+  int navCurrentIndex = 0;
+  int totalPoint = 0;
+  bool isLoadPoint = true;
   bool isLoading = true;
-  bool isFeedLoading = true;
-  List<FeedModel>? listFeed;
-  String? mediaLink;
+
+  Map<String, int> badgeCounters = {};
 
   @override
   void initState() {
-    loadUiTimer = Timer(
-      const Duration(seconds: 1),
-      () {
-        _getUserData();
-      },
-    );
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _getUserData();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) {
+      await Future.delayed(Duration(milliseconds: 500));
+      if (mounted) {
+        _getTotalPoint();
+      }
+    }
   }
 
   @override
   void dispose() {
-    loadUiTimer.cancel();
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
   Future<void> _onRefresh() async {
     setState(() {
-      _userData = null;
       isLoading = true;
-      isFeedLoading = true;
-      listFeed = null;
-      mediaLink = null;
     });
     _getUserData();
+    contentKey.currentState?.onRefresh();
+    contentPromoKey.currentState?.onRefresh();
   }
 
-  void _getUserData() async {
-    // final data = widget.userData ?? await getContactModel();
-    final data = await getContactModel();
-    setState(() => _userData = data);
+  Future<void> _getUserData() async {
+    final user = await getContactModel();
+    setState(() {
+      _userData = user ?? ContactModel();
+      isLoading = false;
+    });
     final prefs = await SharedPreferences.getInstance();
-    final isSkipCreateBank =
-        prefs.getBool('${_userData!.idContact!}-${GlobalEnum.skipCreateBank}');
+    final isSkipCreateBank = prefs.getBool(
+      '${_userData.idContact!}-${GlobalEnum.skipCreateBank}',
+    );
     if (isSkipCreateBank == null || isSkipCreateBank == false) {
       final userBanks = await CustomerBankApiService().banks(
-        idContact: _userData!.idContact!,
+        idContact: _userData.idContact!,
         onSuccess: (msg) {},
         onError: (e) {},
         onCompleted: () {},
@@ -84,260 +132,598 @@ class _HomeScreenState extends State<HomeScreen> {
         _goToNewRekeningScreen();
       } else {
         prefs.setBool(
-            '${_userData!.idContact!}-${GlobalEnum.skipCreateBank}', true);
+          '${_userData.idContact!}-${GlobalEnum.skipCreateBank}',
+          true,
+        );
       }
     } else {
       prefs.setBool(
-          '${_userData!.idContact!}-${GlobalEnum.skipCreateBank}', true);
+        '${_userData.idContact!}-${GlobalEnum.skipCreateBank}',
+        true,
+      );
     }
-    setState(() => isLoading = false);
-    loadFeed();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      NotificationService().initialize();
+      final context = searchComponentKey.currentContext;
+      if (context != null) {
+        final box = context.findRenderObject() as RenderBox;
+        final height = box.size.height + 16;
+
+        setState(() {
+          searchComponentOffset = height / 2;
+        });
+      }
+    });
+    _getTotalPoint();
+  }
+
+  Future<void> _getTotalPoint() async {
+    setState(() => isLoadPoint = true);
+    final prefs = await SharedPreferences.getInstance();
+    bool isSucces = false;
+    String payload = widget.payload ?? '';
+    final currentPoint = await PointApi.total(
+      idContact: _userData.idContact!,
+      onError: (e) => showSnackBar(context, e),
+      onSuccess: (e) {
+        isSucces = true;
+      },
+      onCompleted: (point) {},
+    );
+    if (isSucces && mounted) {
+      final savedTotalPoint =
+          prefs.getInt(
+            '${_userData.idContact!}-${GlobalEnum.savedTotalPoint}',
+          ) ??
+          currentPoint;
+
+      // SHOW MODAL WHEN NAVIGATE FROM NOTIFICATION
+      if (savedTotalPoint < currentPoint &&
+          payload == GlobalEnum.showModalPoint.name) {
+        showPointRewardDialog(
+          context,
+          previousPoints: savedTotalPoint,
+          currentPoints: currentPoint,
+        );
+      }
+
+      prefs.setInt(
+        '${_userData.idContact!}-${GlobalEnum.savedTotalPoint}',
+        currentPoint,
+      );
+      setState(() {
+        totalPoint = currentPoint;
+        isLoadPoint = false;
+      });
+      _getCounterBadge();
+    }
+  }
+
+  void _getCounterBadge() async {
+    final idContact = _userData.idContact ?? "-1";
+    final cart = await CartApiService().get(
+      idContact: idContact,
+      onCompleted: (data) => {},
+    );
+    final order = await AppOrderApi().get(
+      idContact: idContact,
+      onCompleted: (data) => {},
+    );
+    final doneOrder = StatusOrder.selesai.name.toUpperCase();
+    final ongoingOrder = order
+        ?.where((element) => element.statusAppOrder != doneOrder)
+        .toList();
+    final waitingInvoice = StatusOrder.waiting.name.toUpperCase();
+    final invoice = await InvoiceApi().get(
+      idContact: idContact,
+      statusInvoice: waitingInvoice,
+      onCompleted: (data) => {},
+    );
+
+    setState(() {
+      badgeCounters['cart'] = cart?.details.length ?? 0;
+      badgeCounters['order'] = ongoingOrder?.length ?? 0;
+      badgeCounters['invoice'] = invoice?.length ?? 0;
+    });
+  }
+
+  void showPointRewardDialog(
+    BuildContext context, {
+    required int previousPoints,
+    required int currentPoints,
+  }) {
+    final newPoints = currentPoints - previousPoints;
+
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          backgroundColor: cWhite,
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.celebration_rounded,
+                  size: 64,
+                  color: Colors.amber.shade700,
+                ),
+
+                const SizedBox(height: 16),
+
+                Text(
+                  "Selamat",
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: cDark100,
+                  ),
+                ),
+
+                const SizedBox(height: 8),
+
+                RichText(
+                  textAlign: TextAlign.center,
+                  text: TextSpan(
+                    style: TextStyle(fontSize: 16, color: cDark100),
+                    children: [
+                      const TextSpan(text: 'Kamu berhasil mendapatkan '),
+                      TextSpan(
+                        text: '$newPoints poin',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.amber.shade800,
+                          fontSize: 18,
+                        ),
+                      ),
+                      const TextSpan(text: ' tambahan!'),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _buildPointBox(previousPoints),
+                    Icon(Icons.arrow_forward, color: cDark100),
+                    _buildPointBox(currentPoints),
+                  ],
+                ),
+
+                const SizedBox(height: 24),
+
+                ElevatedButton(
+                  onPressed: () => Navigator.pop(context),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.amber.shade700,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 32,
+                      vertical: 12,
+                    ),
+                  ),
+                  child: const Text(
+                    "Tutup",
+                    style: TextStyle(color: Colors.white, fontSize: 16),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildPointBox(int point) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.amber.shade100,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        "$point",
+        style: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+          color: Colors.amber.shade800,
+        ),
+      ),
+    );
   }
 
   void _goToNewRekeningScreen() {
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
-        builder: (ctx) => NewRekeningScreen(
-          userData: _userData,
-          onSuccess: (bool? state) {},
-        ),
+        builder: (ctx) =>
+            NewRekeningScreen(userData: _userData, onSuccess: (bool? state) {}),
       ),
     );
   }
 
-  void loadFeed() async {
-    List<FeedModel>? data;
-    try {
-      final url = Uri.https(baseUrl, 'api/konten');
-      final response = await http.get(
-        url,
-        headers: headerSetup,
+  void _onRequestDeleteAccount() {
+    showCupertinoDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return MInfoModal(
+          contentName: 'Apakah anda yakin ingin menghapus akun?',
+          contentDescription:
+              'Dengan menghapus akun, data anda akan kami hapus permanen dalam 7 hari.',
+          contentIcon: Icons.warning_rounded,
+          contentIconColor: cPrimary100,
+          cancelText: 'Batal',
+          confirmText: 'Hapus',
+          onCancel: () {
+            Navigator.of(context).pop();
+          },
+          onConfirm: () async {
+            await AuthApiService().requestDeleteAccount(
+              idContact: _userData.idContact,
+              onError: (e) {
+                if (context.mounted) {
+                  Navigator.pop(context);
+                  showSnackBar(context, e);
+                }
+              },
+              onSuccess: (e) async {
+                await removeLoginState();
+                await removeContactModel();
+                _clearAllScreenToAuth();
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _onRequestLogoutAccount() {
+    showCupertinoDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return MInfoModal(
+          contentName: 'Keluar dari akun?',
+          contentDescription:
+              'Anda diharuskan login kembali ketika mengakses aplikasi jika keluar dari akun.',
+          contentIcon: Icons.warning_rounded,
+          contentIconColor: cPrimary100,
+          cancelText: 'Batal',
+          onCancel: () {
+            Navigator.of(context).pop();
+          },
+          onConfirm: () async {
+            await removeLoginState();
+            await removeContactModel();
+            if (context.mounted) {
+              Navigator.of(context).pop();
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: (ctx) => const AuthScreen()),
+              );
+            }
+          },
+        );
+      },
+    );
+  }
+
+  void _clearAllScreenToAuth() {
+    if (context.mounted) {
+      Navigator.pop(context);
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (ctx) => const AuthScreen()),
+        (Route<dynamic> route) => false,
       );
-
-      if (response.statusCode == 200) {
-        final responseBody = jsonDecode(response.body);
-        final apiResponse = ApiResponse.fromJsonList(responseBody);
-
-        if (apiResponse.code == 200) {
-          if (apiResponse.listData != null) {
-            mediaLink = apiResponse.mediaLink;
-            data = apiResponse.listData
-                ?.map((item) => FeedModel.fromJson(item))
-                .toList();
-            return;
-          }
-        }
-
-        if (mounted) {
-          showSnackBar(context, apiResponse.msg);
-        }
-      } else {
-        if (mounted) {
-          showSnackBar(context,
-              '$failedRequestText. Status Code: ${response.statusCode}');
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        showSnackBar(context, '$failedRequestText. Exception: $e');
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          isFeedLoading = false;
-          listFeed = data;
-        });
-      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    Widget listFeedContent = Container();
-
-    if (!isFeedLoading) {
-      if (listFeed != null && listFeed!.isNotEmpty) {
-        listFeedContent = ListView.builder(
-            itemCount: listFeed!.length,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemBuilder: (conxtext, i) {
-              final item = listFeed![i];
-              return CardFeed(feed: item, mediaLink: mediaLink);
-            });
-      } else {
-        listFeedContent = Padding(
-          padding: const EdgeInsets.all(12),
-          child: Text(
-            'Belum ada konten',
-            style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                  color: cDark200,
-                ),
-          ),
-        );
-      }
-    } else {
-      listFeedContent = Padding(
-        padding: const EdgeInsets.all(12),
-        child: Text(
-          'Sedang memuat konten...',
-          style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                color: cDark200,
-              ),
-        ),
-      );
-    }
-
-    return UpgradeAlert(
-      upgrader: Upgrader(
-        debugLogging: true,
-        languageCode: 'id',
-        durationUntilAlertAgain: const Duration(seconds: 1),
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(
+        statusBarIconBrightness: Brightness.light, // For Android
+        statusBarBrightness: Brightness.dark, // For iOS
       ),
-      barrierDismissible: false,
-      showLater: false,
-      showReleaseNotes: false,
-      showIgnore: false,
-      child: Stack(
-        children: [
-          Scaffold(
-            appBar: AppBar(
-              title: const Text('Top Mortar Seller'),
-              backgroundColor: cWhite,
-              foregroundColor: cDark100,
-              actions: [
-                Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Hero(
-                    tag: TagHero.faviconAuth,
-                    child: Semantics(
-                      label: '${TagHero.faviconAuth}',
-                      child: Image.asset(
-                        'assets/favicon/favicon_circle.png',
-                        width: 32,
+    );
+
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      bottomNavigationBar: isLoading
+          ? null
+          : BottomNavigationBar(
+              backgroundColor: Colors.white,
+              onTap: (value) => value == 1
+                  ? Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (ctx) => QRScannerScreen(userData: _userData),
                       ),
-                    ),
-                  ),
+                    )
+                  : setState(() {
+                      navCurrentIndex = value;
+                    }),
+              currentIndex: navCurrentIndex,
+              selectedLabelStyle: TextStyle(fontWeight: FontWeight.bold),
+              items: const [
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.home_outlined),
+                  activeIcon: Icon(Icons.home_sharp),
+                  label: 'Beranda',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.qr_code_scanner_outlined),
+                  label: 'Scanner',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(CupertinoIcons.person_alt_circle),
+                  activeIcon: Icon(CupertinoIcons.person_alt_circle_fill),
+                  label: 'Akun',
                 ),
               ],
             ),
-            drawer: MainDrawer(userData: _userData),
-            body: RefreshIndicator(
-              onRefresh: () => _onRefresh(),
-              child: SingleChildScrollView(
-                child: Center(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      CardPromoScanner(userData: widget.userData),
-                      Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: Text(
-                          'Informasi menarik untuk anda',
-                          style:
-                              Theme.of(context).textTheme.titleSmall!.copyWith(
-                                    color: cDark100,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                        ),
-                      ),
-                      listFeedContent
-                    ],
-                  ),
-                ),
+      body: Stack(
+        children: [
+          /// -- Background Stack --
+          Positioned(
+            left: 0,
+            top: 0,
+            right: 0,
+            child: Container(
+              color: Colors.amber,
+              width: double.infinity,
+              child: Image.asset(
+                'assets/bg_shape_primary_vertical.jpg',
+                fit: BoxFit.cover,
               ),
             ),
           ),
-          if (isLoading) const LoadingModal()
+
+          /// -- Content Stack --
+          Positioned.fill(
+            child: SafeArea(
+              child: Column(
+                children: [
+                  /// -- Header Section --
+                  SizedBox(height: 60, child: _generateHeaderWidget(context)),
+
+                  /// -- Body Section --
+                  Expanded(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(16),
+                        topRight: Radius.circular(16),
+                      ),
+                      child: isLoading
+                          ? const SizedBox.shrink()
+                          : _generateBodyWidget(context),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
-}
 
-class CardFeed extends StatelessWidget {
-  const CardFeed({super.key, this.feed, this.mediaLink});
+  Widget _generateBodyWidget(BuildContext context) {
+    return navCurrentIndex == 0
+        /// -- Home Body --
+        ? RefreshIndicator.adaptive(
+            onRefresh: () => _onRefresh(),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  /// -- Hero Section --
+                  Padding(
+                    padding: EdgeInsets.only(left: 24, right: 24, bottom: 0),
+                    child: HeroSection(userData: _userData),
+                  ),
 
-  final FeedModel? feed;
-  final String? mediaLink;
+                  /// -- Search Container Section --
+                  SizedBox(
+                    height: searchComponentOffset * 2,
+                    child: Stack(
+                      children: [
+                        Positioned(
+                          left: 0,
+                          bottom: 0,
+                          right: 0,
+                          child: Container(
+                            height: searchComponentOffset,
+                            color: cWhite,
+                          ),
+                        ),
+                        Positioned(
+                          left: 0,
+                          top: 8,
+                          right: 0,
+                          child: Padding(
+                            key: searchComponentKey,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 0,
+                            ),
+                            child: Hero(
+                              tag: "search-component",
+                              child: Material(
+                                color: Colors.white,
+                                elevation: 1,
+                                borderRadius: BorderRadius.circular(100),
+                                child: InkWell(
+                                  onTap: () {
+                                    Navigator.of(context)
+                                        .push(
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                const CatalogScreen(
+                                                  searchTrigger: true,
+                                                ),
+                                          ),
+                                        )
+                                        .then((value) async {
+                                          await Future.delayed(
+                                            Duration(milliseconds: 500),
+                                          );
+                                          if (mounted) {
+                                            _getTotalPoint();
+                                          }
+                                        });
+                                  },
+                                  borderRadius: BorderRadius.circular(100),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(16),
+                                    child: Row(
+                                      children: [
+                                        Icon(Icons.search),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: Text("Cari produk sekarang"),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
 
-  void _launchNavigation(context, String url) async {
-    try {
-      launchUrlString(url);
-    } catch (e) {
-      showSnackBar(context, 'Gagal membuka $url');
-    }
+                  /// -- Body Content Section --
+                  Material(
+                    color: cWhite,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        /// -- Menu --
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            left: 12,
+                            right: 12,
+                            bottom: 6,
+                          ),
+                          child: MenuSection(
+                            badgeCounters: badgeCounters,
+                            onResumed: () async {
+                              await Future.delayed(Duration(milliseconds: 500));
+                              if (mounted) {
+                                _getTotalPoint();
+                              }
+                            },
+                          ),
+                        ),
+
+                        /// -- Promo Slider --
+                        PromoSliderSection(key: contentPromoKey),
+
+                        /// -- Socmed Content --
+                        ContentSection(key: contentKey),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          )
+        /// -- Detail Profil Body --
+        : DetailProfileScreen(userData: _userData);
   }
 
-  @override
-  Widget build(BuildContext context) {
-    // Setting image card feed on 3:2 ratio
-    final screenWidth = MediaQuery.of(context).size.width - 24;
-    final cardFeedHeight = screenWidth * (2 / 3);
-
-    return InkWell(
-      onTap: () => _launchNavigation(
-        context,
-        feed!.linkKonten!,
-      ),
-      child: Card(
-        elevation: 2,
-        margin: const EdgeInsets.only(left: 12, top: 0, right: 12, bottom: 12),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Container(
-          width: double.maxFinite,
-          height: cardFeedHeight,
-          decoration: BoxDecoration(
-            color: cDark400,
-            borderRadius: BorderRadius.circular(16),
-            image: DecorationImage(
-                image: NetworkImage(
-                  '${mediaLink ?? ''}${feed!.imgKonten!}',
-                ),
-                fit: BoxFit.cover),
+  Row _generateHeaderWidget(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        const SizedBox(width: 24),
+        // Text(
+        //   'Top Mortar Seller',
+        //   style: Theme.of(context).textTheme.titleLarge!.copyWith(
+        //     color: cWhite,
+        //     fontWeight: FontWeight.bold,
+        //   ),
+        // ),
+        Hero(
+          tag: TagHero.faviconAuth,
+          child: ClipRRect(
+            borderRadius: BorderRadiusGeometry.circular(100),
+            child: SizedBox(
+              width: 35,
+              height: 35,
+              child: Image.asset('assets/favicon/favicon_white.png'),
+            ),
           ),
         ),
-      ),
-    );
-  }
-}
+        // const SizedBox(width: 12),
+        // Text(
+        //   'Top Mortar Seller',
+        //   style: Theme.of(context).textTheme.titleLarge!.copyWith(
+        //     color: cWhite,
+        //     fontWeight: FontWeight.bold,
+        //   ),
+        // ),
+        const Spacer(),
+        if (navCurrentIndex == 0) ...[
+          isLoadPoint
+              ? const SizedBox(
+                  width: 50,
+                  child: LoadingItem(isPrimaryTheme: true),
+                )
+              : Text(
+                  "$totalPoint Poin",
+                  style: TextStyle(
+                    color: Colors.amber,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                  ),
+                ),
+          const SizedBox(width: 24),
+        ] else ...[
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.settings, color: cWhite),
 
-class FeedModel {
-  const FeedModel({
-    this.idKonten,
-    this.titleKonten,
-    this.imgKonten,
-    this.createdAt,
-    this.udpatedAt,
-    this.linkKonten,
-  });
-
-  final String? idKonten;
-  final String? titleKonten;
-  final String? imgKonten;
-  final String? createdAt;
-  final String? udpatedAt;
-  final String? linkKonten;
-
-  Map<String, dynamic> toJson() => {
-        'id_konten': idKonten ?? '',
-        'title_konten': titleKonten ?? '',
-        'img_konten': imgKonten ?? '',
-        'created_at': createdAt ?? '',
-        'udpated_at': udpatedAt ?? '',
-        'link_konten': linkKonten ?? '',
-      };
-
-  factory FeedModel.fromJson(Map<String, dynamic> json) {
-    return FeedModel(
-      idKonten: json['id_konten'] ?? '',
-      titleKonten: json['title_konten'] ?? '',
-      imgKonten: json['img_konten'] ?? '',
-      createdAt: json['created_at'] ?? '',
-      udpatedAt: json['udpated_at'] ?? '',
-      linkKonten: json['link_konten'] ?? '',
+            itemBuilder: (ctx) {
+              return [
+                PopupMenuItem<String>(
+                  onTap: _onRequestLogoutAccount,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text('Keluar dari akun'),
+                      const SizedBox(width: 8),
+                    ],
+                  ),
+                ),
+                PopupMenuItem<String>(
+                  onTap: _onRequestDeleteAccount,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        'Ajukan penghapusan akun',
+                        style: TextStyle(color: cPrimary100),
+                      ),
+                      const SizedBox(width: 8),
+                    ],
+                  ),
+                ),
+              ];
+            },
+          ),
+          const SizedBox(width: 12),
+        ],
+      ],
     );
   }
 }

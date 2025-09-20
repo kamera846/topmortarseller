@@ -16,7 +16,11 @@ import 'package:topmortarseller/widget/modal/loading_modal.dart';
 import 'package:topmortarseller/widget/snackbar/show_snackbar.dart';
 
 BankModel defaultBank = const BankModel(
-    idBank: '-1', namaBank: '== Pilih Bank ==', isBca: '-1', swiftBank: '-1');
+  idBank: '-1',
+  namaBank: '== Pilih Bank ==',
+  isBca: '-1',
+  swiftBank: '-1',
+);
 
 class NewTukangScreen extends StatefulWidget {
   const NewTukangScreen({
@@ -67,21 +71,23 @@ class _NewTukangScreenState extends State<NewTukangScreen> {
     final initPrefs = await SharedPreferences.getInstance();
     setState(() {
       prefs = initPrefs;
-      isSkipCreateBank = prefs!
-          .getBool('${_userData!.idContact!}-${GlobalEnum.skipCreateBank}');
+      isSkipCreateBank = prefs!.getBool(
+        '${_userData!.idContact!}-${GlobalEnum.skipCreateBank}',
+      );
     });
     _getBanks();
   }
 
-  _getBanks() async {
+  void _getBanks() async {
     List<BankModel>? items = [];
     items = await BankApiService().banks(
-        onError: (e) => showSnackBar(context, e),
-        onCompleted: () {
-          if (widget.rekeningId == '-1') {
-            setState(() => isSelectBankLoading = false);
-          }
-        });
+      onError: (e) => showSnackBar(context, e),
+      onCompleted: () {
+        if (widget.rekeningId == '-1') {
+          setState(() => isSelectBankLoading = false);
+        }
+      },
+    );
 
     setState(() {
       items?.insert(0, defaultBank);
@@ -103,8 +109,9 @@ class _NewTukangScreenState extends State<NewTukangScreen> {
 
     if (myBanks != null) {
       final bankItem = myBanks[0];
-      final selectedOptionIndex =
-          options.indexWhere((element) => element.idBank == bankItem.idBank);
+      final selectedOptionIndex = options.indexWhere(
+        (element) => element.idBank == bankItem.idBank,
+      );
       if (selectedOptionIndex != -1) {
         setState(() {
           _selectedBank = options[selectedOptionIndex];
@@ -253,14 +260,12 @@ class _NewTukangScreenState extends State<NewTukangScreen> {
   }
 
   void _skipCreateBank() async {
-    prefs!
-        .setBool('${_userData!.idContact!}-${GlobalEnum.skipCreateBank}', true);
+    prefs!.setBool(
+      '${_userData!.idContact!}-${GlobalEnum.skipCreateBank}',
+      true,
+    );
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (ctx) => HomeScreen(
-          userData: _userData,
-        ),
-      ),
+      MaterialPageRoute(builder: (ctx) => HomeScreen(userData: _userData)),
     );
   }
 
@@ -271,9 +276,7 @@ class _NewTukangScreenState extends State<NewTukangScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Input Tukang'),
-      ),
+      appBar: AppBar(title: const Text('Input Tukang')),
       body: Stack(
         children: [
           Padding(
@@ -356,9 +359,7 @@ class _NewTukangScreenState extends State<NewTukangScreen> {
                 //     _ownerNameErrorText!,
                 //     style: const TextStyle(color: cPrimary100),
                 //   ),
-                Expanded(
-                  child: Container(),
-                ),
+                Expanded(child: Container()),
                 if (!isSelectBankLoading)
                   MElevatedButton(
                     title: 'Simpan Rekening',
@@ -368,14 +369,11 @@ class _NewTukangScreenState extends State<NewTukangScreen> {
                   ),
                 if (prefs != null &&
                     (isSkipCreateBank == null || isSkipCreateBank == false))
-                  MTextButton(
-                    title: 'Atur Nanti',
-                    onPressed: _skipCreateBank,
-                  ),
+                  MTextButton(title: 'Atur Nanti', onPressed: _skipCreateBank),
               ],
             ),
           ),
-          if (isLoading) const LoadingModal()
+          if (isLoading) const LoadingModal(),
         ],
       ),
     );
@@ -412,13 +410,8 @@ class _SelectBankFieldState extends State<SelectBankField> {
           padding: const EdgeInsets.only(left: 12, right: 12, top: 12),
           decoration: BoxDecoration(
             color: Theme.of(context).scaffoldBackgroundColor,
-            borderRadius: const BorderRadius.all(
-              Radius.circular(8),
-            ),
-            border: Border.all(
-              color: cDark400,
-              width: 1,
-            ),
+            borderRadius: const BorderRadius.all(Radius.circular(8)),
+            border: Border.all(color: cDark400, width: 1),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -426,14 +419,13 @@ class _SelectBankFieldState extends State<SelectBankField> {
               const Text(
                 'Nama Bank atau E-Wallet',
                 style: TextStyle(
-                    color: cDark300,
-                    fontSize: 12.5,
-                    fontWeight: FontWeight.w500),
+                  color: cDark300,
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
               widget.isLoading
-                  ? const LoadingItem(
-                      margin: EdgeInsets.only(bottom: 12),
-                    )
+                  ? const LoadingItem(margin: EdgeInsets.only(bottom: 12))
                   : Semantics(
                       label: 'Dropdown Bank & E-Wallet',
                       child: DropdownButtonFormField<BankModel>(
@@ -441,7 +433,7 @@ class _SelectBankFieldState extends State<SelectBankField> {
                           border: InputBorder.none,
                         ),
                         dropdownColor: cWhite,
-                        value: widget.selectedBank,
+                        initialValue: widget.selectedBank,
                         onChanged: (BankModel? value) {
                           widget.onChange(value!);
                         },
@@ -450,9 +442,7 @@ class _SelectBankFieldState extends State<SelectBankField> {
                             value: bank,
                             child: Text(
                               bank.namaBank!,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleSmall!
+                              style: Theme.of(context).textTheme.titleSmall!
                                   .copyWith(
                                     color: cDark200,
                                     fontWeight: FontWeight.w500,
@@ -462,17 +452,16 @@ class _SelectBankFieldState extends State<SelectBankField> {
                           );
                         }).toList(),
                       ),
-                    )
+                    ),
             ],
           ),
         ),
         if (widget.errorText != null)
           Text(
             widget.errorText ?? '',
-            style: Theme.of(context)
-                .textTheme
-                .bodySmall!
-                .copyWith(color: cPrimary100),
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall!.copyWith(color: cPrimary100),
           ),
         const SizedBox(height: 12),
       ],

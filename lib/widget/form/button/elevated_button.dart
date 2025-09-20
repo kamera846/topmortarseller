@@ -26,8 +26,8 @@ class _MElevatedButtonState extends State<MElevatedButton> {
       widget.title,
       textAlign: TextAlign.center,
       style: Theme.of(context).textTheme.titleMedium!.copyWith(
-            color: cWhite,
-          ),
+        color: widget.enabled ? cWhite : cDark300,
+      ),
     );
 
     return Semantics(
@@ -36,7 +36,7 @@ class _MElevatedButtonState extends State<MElevatedButton> {
         onPressed: widget.enabled ? widget.onPressed : null,
         style: ElevatedButton.styleFrom(
           backgroundColor: widget.enabled ? cPrimary100 : cDark400,
-          foregroundColor: cWhite,
+          foregroundColor: widget.enabled ? cWhite : cDark300,
           padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
         ),
         child: widget.isFullWidth
