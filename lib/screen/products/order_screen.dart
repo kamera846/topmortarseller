@@ -336,7 +336,7 @@ class CardOrder extends StatelessWidget {
                     Text(
                       MyDateFormat.formatDate(
                         item.createdAt,
-                        outputFormat: 'dd MMMM yyyy, HH:mm',
+                        outputFormat: 'dd MMM yyyy, HH:mm',
                       ),
                       style: const TextStyle(color: cDark200),
                     ),
@@ -349,6 +349,11 @@ class CardOrder extends StatelessWidget {
               margin: const EdgeInsets.symmetric(vertical: 12),
               child: const Divider(height: 1, color: cDark500),
             ),
+            Text(
+              "No. Pesanan: ${item.noOrder}",
+              style: const TextStyle(color: cDark200),
+            ),
+            const SizedBox(height: 12),
             ListView.separated(
               shrinkWrap: true,
               itemCount: totalItems,
