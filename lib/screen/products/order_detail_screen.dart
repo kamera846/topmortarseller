@@ -5,6 +5,7 @@ import 'package:topmortarseller/model/product_discount_modal.dart';
 import 'package:topmortarseller/services/app_order_api.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/util/currency_format.dart';
+import 'package:topmortarseller/util/date_format.dart';
 import 'package:topmortarseller/widget/snackbar/show_snackbar.dart';
 
 class OrderDetailScreen extends StatefulWidget {
@@ -106,6 +107,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                     children: [
                       /// --- Reminder Section ---
                       generateReminderSection(context),
+
+                      /// --- List Order Information ---
+                      generateOrderInformation(context),
 
                       /// --- List Products Section ---
                       generateProductItems(context, products, 'Pesanan'),
@@ -284,6 +288,52 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           ),
           const SizedBox(height: 8),
           Text(description, maxLines: 2, overflow: TextOverflow.ellipsis),
+        ],
+      ),
+    );
+  }
+
+  Widget generateOrderInformation(BuildContext context) {
+    List<Map<String, String>> items = [];
+    items.add({
+      "label": "Pesanan Dibuat",
+      "value": MyDateFormat.formatDate(
+        order.createdAt,
+        outputFormat: 'dd MMM yyyy, HH:mm',
+      ),
+    });
+    items.add({"label": "No. Pesanan", "value": order.noOrder});
+    if (order.noSuratJalan != '-') {
+      items.add({"label": "No. Pengiriman", "value": order.noSuratJalan});
+    }
+    return Container(
+      margin: const EdgeInsets.only(bottom: 24),
+      padding: const EdgeInsets.all(24),
+      color: cWhite,
+      width: double.infinity,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Informasi Pesanan',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 24),
+          ListView.separated(
+            itemCount: items.length,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            separatorBuilder: (context, index) => const SizedBox(height: 12),
+            itemBuilder: (ctx, idx) {
+              var item = items[idx];
+              return Row(
+                children: [
+                  Expanded(child: Text(item['label'] as String)),
+                  Text(item['value'] as String),
+                ],
+              );
+            },
+          ),
         ],
       ),
     );

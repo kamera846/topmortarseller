@@ -12,6 +12,8 @@ class OrderModel {
   final String createdAt;
   final String updatedAt;
   final String deletedAt;
+  final String noOrder;
+  final String noSuratJalan;
   final List<OrderItemModel> items;
 
   OrderModel({
@@ -26,6 +28,8 @@ class OrderModel {
     this.createdAt = '',
     this.updatedAt = '',
     this.deletedAt = '',
+    this.noOrder = '',
+    this.noSuratJalan = '',
     this.items = const [],
   });
 
@@ -41,6 +45,8 @@ class OrderModel {
     String? createdAt,
     String? updatedAt,
     String? deletedAt,
+    String? noOrder,
+    String? noSuratJalan,
     List<OrderItemModel>? items,
   }) {
     return OrderModel(
@@ -55,6 +61,8 @@ class OrderModel {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       deletedAt: deletedAt ?? this.deletedAt,
+      noOrder: noOrder ?? this.noOrder,
+      noSuratJalan: noSuratJalan ?? this.noSuratJalan,
       items: items ?? this.items,
     );
   }
@@ -71,6 +79,8 @@ class OrderModel {
     'created_at': createdAt,
     'updated_at': updatedAt,
     'deleted_at': deletedAt,
+    'no_order': noOrder,
+    'no_surat_jalan': noSuratJalan,
     'items': items,
   };
 
@@ -87,6 +97,8 @@ class OrderModel {
       createdAt: json['created_at'] ?? '',
       updatedAt: json['updated_at'] ?? '',
       deletedAt: json['deleted_at'] ?? '',
+      noOrder: json['no_order'] ?? '',
+      noSuratJalan: json['no_surat_jalan'] ?? '',
       items: json['items'] != null && json['items'] is List
           ? (json['items'] as List).map((item) {
               return OrderItemModel.fromJson(item);
