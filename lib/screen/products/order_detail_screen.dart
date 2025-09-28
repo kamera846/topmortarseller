@@ -244,13 +244,14 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     if (statusAppOrder == 'diproses') {
       color = Colors.grey[400]!;
       icon = const Icon(Icons.inventory_2_outlined);
-      title = 'Pesanan dalam Proses';
+      title = 'Pesanan Dalam Proses';
       description = 'Kami sedang menyiapkan pesanan Anda. Tunggu sebentar ya!';
     } else if (statusAppOrder == 'dikirim') {
       color = Colors.blue[100]!;
       icon = const Icon(Icons.fire_truck_rounded);
-      title = 'Pesanan Sedang Dikirim';
-      description = 'Pesanan sudah dalam perjalanan. Ditunggu, ya!';
+      title = 'Disiapkan Pengiriman';
+      description =
+          'Pesanan sedang disiapkan untuk segera dikirim. Terima kasih atas kesabarannya!';
     } else if (statusAppOrder == 'selesai') {
       color = Colors.green[100]!;
       icon = const Icon(Icons.check_circle_sharp);

@@ -28,7 +28,7 @@ class _OrderScreenState extends State<OrderScreen>
   final List<String> _tabsTitle = [
     'Pesanan Saya',
     'Pesanan Diproses',
-    'Pesanan Dikirim',
+    'Disiapkan Pengiriman',
     'Pesanan Selesai',
   ];
   List<OrderTabsModel> _tabsData = [];
@@ -506,9 +506,10 @@ class CardOrder extends StatelessWidget {
   }
 
   Container _generateStatusBadge() {
-    final status = item.statusAppOrder.toLowerCase();
+    String status = item.statusAppOrder.toLowerCase();
     List<Color> badgeColor = List.of({Colors.grey[400]!, Colors.grey[800]!});
     if (status == StatusOrder.dikirim.name) {
+      status = 'DISIAPKAN PENGIRIMAN';
       badgeColor = List.of({Colors.blue[100]!, Colors.blue[800]!});
     } else if (status == StatusOrder.selesai.name) {
       badgeColor = List.of({Colors.green[100]!, Colors.green[800]!});
@@ -520,7 +521,7 @@ class CardOrder extends StatelessWidget {
         borderRadius: BorderRadius.circular(6),
       ),
       child: Text(
-        item.statusAppOrder,
+        status.toUpperCase(),
         style: TextStyle(
           color: badgeColor[1],
           fontWeight: FontWeight.bold,
