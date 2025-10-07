@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:topmortarseller/model/promo_banner_model.dart';
 import 'package:topmortarseller/services/promo_banner_api.dart';
 import 'package:topmortarseller/util/colors/color.dart';
+import 'package:topmortarseller/widget/dashboard/detail_promo_screen.dart';
 
 class PromoSliderSection extends StatefulWidget {
   const PromoSliderSection({super.key});
@@ -67,23 +68,35 @@ class PromoSliderSectionState extends State<PromoSliderSection> {
                       vertical: 12,
                       horizontal: 6,
                     ),
-                    child: Material(
-                      color: Colors.white,
-                      elevation: 1,
+                    child: InkWell(
+                      onTap: () {
+                        showModalBottomSheet(
+                          context: context,
+                          showDragHandle: true,
+                          useSafeArea: true,
+                          backgroundColor: Colors.white,
+                          builder: (context) => DetailPromoScreen(promo: item),
+                        );
+                      },
                       borderRadius: BorderRadius.circular(16),
-                      child: ClipRRect(
-                        borderRadius: BorderRadiusGeometry.circular(16),
-                        child: Image.network(
-                          item.imgPromoTopseller ?? 'https://google.com',
-                          errorBuilder: (context, error, stackTrace) =>
-                              SizedBox(
-                                width: double.infinity,
-                                height: double.infinity,
-                                child: Icon(Icons.error, color: Colors.grey),
-                              ),
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                          height: double.infinity,
+                      child: Material(
+                        color: Colors.white,
+                        elevation: 1,
+                        borderRadius: BorderRadius.circular(16),
+                        child: ClipRRect(
+                          borderRadius: BorderRadiusGeometry.circular(16),
+                          child: Image.network(
+                            item.imgPromoTopseller ?? 'https://google.com',
+                            errorBuilder: (context, error, stackTrace) =>
+                                SizedBox(
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                  child: Icon(Icons.error, color: Colors.grey),
+                                ),
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                            height: double.infinity,
+                          ),
                         ),
                       ),
                     ),
