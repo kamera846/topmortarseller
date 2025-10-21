@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:topmortarseller/model/merchandise_model.dart';
+import 'package:topmortarseller/screen/merchandise/merchandise_detail_screen.dart';
 import 'package:topmortarseller/services/merchandise_api.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/widget/snackbar/show_snackbar.dart';
@@ -64,15 +65,15 @@ class _MerchandiseScreenState extends State<MerchandiseScreen> {
               children: [
                 const Text(
                   'Daftar Merchandise',
-                  style: TextStyle(fontSize: 20),
+                  style: TextStyle(fontSize: 18),
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  '${widget.userPoint} Poin',
+                  '${widget.userPoint} Poin Saya',
                   style: TextStyle(
                     color: Colors.amber.shade800,
                     fontWeight: FontWeight.bold,
-                    fontSize: 20,
+                    fontSize: 16,
                   ),
                 ),
               ],
@@ -109,7 +110,17 @@ class _MerchandiseScreenState extends State<MerchandiseScreen> {
                           elevation: 0.5,
                           clipBehavior: Clip.antiAliasWithSaveLayer,
                           child: InkWell(
-                            onTap: () {},
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => MerchandiseDetailScreen(
+                                    id: item.idMerchandise,
+                                    userPoint: widget.userPoint,
+                                  ),
+                                ),
+                              );
+                            },
                             child: SizedBox(
                               width: double.infinity,
                               height: double.infinity,
@@ -152,7 +163,7 @@ class _MerchandiseScreenState extends State<MerchandiseScreen> {
                                             item.nameMerchandise,
                                             maxLines: 2,
                                             overflow: TextOverflow.ellipsis,
-                                            style: TextStyle(fontSize: 14),
+                                            style: TextStyle(fontSize: 16),
                                           ),
                                           Text(
                                             "${item.priceMerchandise} Poin",
