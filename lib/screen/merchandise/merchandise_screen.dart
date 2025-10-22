@@ -127,7 +127,7 @@ class _MerchandiseScreenState extends State<MerchandiseScreen> {
                               child: Column(
                                 children: [
                                   Expanded(
-                                    flex: 2,
+                                    flex: 3,
                                     child: Container(
                                       color: cDark600,
                                       width: double.infinity,
@@ -148,7 +148,7 @@ class _MerchandiseScreenState extends State<MerchandiseScreen> {
                                     ),
                                   ),
                                   Expanded(
-                                    flex: 1,
+                                    flex: 2,
                                     child: Container(
                                       color: Colors.white,
                                       padding: const EdgeInsets.all(12),

@@ -617,6 +617,7 @@ class _HomeDashboardState extends State<HomeDashboard>
                             bottom: 6,
                           ),
                           child: MenuSection(
+                            idContact: _userData.idContact ?? "-1",
                             badgeCounters: badgeCounters,
                             onResumed: () async {
                               await Future.delayed(Duration(milliseconds: 500));
@@ -677,9 +678,12 @@ class _HomeDashboardState extends State<HomeDashboard>
         const Spacer(),
         if (navCurrentIndex == 0) ...[
           isLoadPoint
-              ? const SizedBox(
-                  width: 50,
-                  child: LoadingItem(isPrimaryTheme: true),
+              ? Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: const SizedBox(
+                    width: 50,
+                    child: LoadingItem(isPrimaryTheme: true),
+                  ),
                 )
               : TextButton(
                   onPressed: () {
@@ -692,7 +696,7 @@ class _HomeDashboardState extends State<HomeDashboard>
                     );
                   },
                   child: Text(
-                    "$totalPoint Poin Tukarkan →",
+                    "$totalPoint Poin, Tukarkan →",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Colors.amber,
