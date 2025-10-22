@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:topmortarseller/screen/voucher/voucher_item_future.dart';
+import 'package:topmortarseller/screen/voucher/voucher_tab_items_future.dart';
 import 'package:topmortarseller/services/voucher_api.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 

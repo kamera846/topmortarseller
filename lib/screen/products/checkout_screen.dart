@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:topmortarseller/model/cart_model.dart';
 import 'package:topmortarseller/model/contact_model.dart';
 import 'package:topmortarseller/model/product_discount_modal.dart';
+import 'package:topmortarseller/model/voucher_model.dart';
+import 'package:topmortarseller/screen/voucher/voucher_checkout.dart';
 import 'package:topmortarseller/services/cart_api.dart';
+import 'package:topmortarseller/services/voucher_api.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/util/currency_format.dart';
 import 'package:topmortarseller/util/enum.dart';
@@ -23,10 +26,15 @@ class CheckoutScreen extends StatefulWidget {
 class _CheckoutScreenState extends State<CheckoutScreen> {
   late ContactModel userData;
   late CartModel cart;
+
   List<ProductDiscountModel> discounts = [];
+  List<VoucherModel> vouchers = [];
+  List<String> selectedVoucherId = [];
+
   double subTotalPrice = 0.0;
   double totalPrice = 0.0;
   double totalDiscountApp = 0.0;
+
   bool isLoading = true;
 
   @override
@@ -47,6 +55,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   Future<void> _onRefresh() async {
     setState(() {
       isLoading = true;
+      selectedVoucherId = [];
     });
     _getList();
   }
@@ -56,15 +65,29 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       idContact: userData.idContact ?? '-1',
       onError: (e) => showSnackBar(context, e),
       onCompleted: (data) {
+        _getVouchers(data);
+      },
+    );
+  }
+
+  void _getVouchers(CartModel? cartData) async {
+    await VoucherApi().list(
+      idContact: userData.idContact ?? "-1",
+      isClaimed: "1",
+      onCompleted: (data) {
         setState(() {
           discounts.clear();
-          cart = data ?? CartModel();
+
+          cart = cartData ?? CartModel();
+          vouchers = data ?? [];
+
           subTotalPrice = double.tryParse(cart.subtotalPrice) == null
               ? 0.0
               : double.parse(cart.subtotalPrice);
           totalDiscountApp = double.tryParse(cart.totalDiscountApp) == null
               ? 0.0
               : double.parse(cart.totalDiscountApp);
+
           if (totalDiscountApp > 0.0) {
             discounts.add(
               ProductDiscountModel(
@@ -73,7 +96,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               ),
             );
           }
+
           totalPrice = subTotalPrice - totalDiscountApp;
+
           isLoading = false;
         });
       },
@@ -294,6 +319,44 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                 ),
                               );
                             },
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 24),
+                      padding: const EdgeInsets.all(12),
+                      color: cWhite,
+                      width: double.infinity,
+                      child: Row(
+                        children: [
+                          const SizedBox(width: 12),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Voucher',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              Text(
+                                selectedVoucherId.isNotEmpty
+                                    ? '${selectedVoucherId.length} voucher digunakan'
+                                    : '${vouchers.length} voucher tersedia',
+                              ),
+                            ],
+                          ),
+                          const Spacer(),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      VoucherCheckout(vouchers: vouchers),
+                                ),
+                              );
+                            },
+                            child: Text('Gunakan Voucher →'),
                           ),
                         ],
                       ),

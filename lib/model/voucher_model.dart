@@ -8,8 +8,9 @@ class VoucherModel {
   final String isClaimed;
   final String expDate;
   final String typeVoucher;
+  bool isSelected;
 
-  const VoucherModel({
+  VoucherModel({
     this.idVoucher = "",
     this.idContact = "",
     this.noVoucher = "",
@@ -19,6 +20,7 @@ class VoucherModel {
     this.isClaimed = "",
     this.expDate = "",
     this.typeVoucher = "",
+    this.isSelected = false,
   });
 
   factory VoucherModel.fromJson(Map<String, dynamic> json) {
@@ -32,6 +34,7 @@ class VoucherModel {
       isClaimed: json["is_claimed"] ?? "",
       expDate: json["exp_date"] ?? "",
       typeVoucher: json["type_voucher"] ?? "",
+      isSelected: false,
     );
   }
 }
