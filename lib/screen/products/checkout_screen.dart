@@ -157,6 +157,21 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
   }
 
+  void handleSelectedVouchers(VoucherModel item) {
+    final selectedId = item.idVoucher;
+    final selectedIndex = vouchers.indexOf(item);
+    final availableId = selectedVoucherId.contains(selectedId);
+
+    setState(() {
+      if (availableId) {
+        selectedVoucherId.remove(selectedId);
+      } else {
+        selectedVoucherId.add(selectedId);
+      }
+      vouchers[selectedIndex].isSelected = !vouchers[selectedIndex].isSelected;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -338,11 +353,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                 'Voucher',
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
-                              Text(
-                                selectedVoucherId.isNotEmpty
-                                    ? '${selectedVoucherId.length} voucher digunakan'
-                                    : '${vouchers.length} voucher tersedia',
-                              ),
+                              if (selectedVoucherId.isNotEmpty)
+                                Text(
+                                  '${selectedVoucherId.length} voucher dipilih',
+                                ),
                             ],
                           ),
                           const Spacer(),
@@ -351,8 +365,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) =>
-                                      VoucherCheckout(vouchers: vouchers),
+                                  builder: (context) => VoucherCheckout(
+                                    vouchers: vouchers,
+                                    toggleSelectedItem: handleSelectedVouchers,
+                                  ),
                                 ),
                               );
                             },
