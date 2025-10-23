@@ -4,6 +4,7 @@ class VoucherModel {
   final String noVoucher;
   final String noFisik;
   final String pointVoucher;
+  final String valueVoucher;
   final String dateVoucher;
   final String isClaimed;
   final String expDate;
@@ -16,6 +17,7 @@ class VoucherModel {
     this.noVoucher = "",
     this.noFisik = "",
     this.pointVoucher = "",
+    this.valueVoucher = "",
     this.dateVoucher = "",
     this.isClaimed = "",
     this.expDate = "",
@@ -30,6 +32,7 @@ class VoucherModel {
       noVoucher: json["no_voucher"] ?? "",
       noFisik: json["no_fisik"] ?? "",
       pointVoucher: json["point_voucher"] ?? "",
+      valueVoucher: json["value_voucher"] ?? "",
       dateVoucher: json["date_voucher"] ?? "",
       isClaimed: json["is_claimed"] ?? "",
       expDate: json["exp_date"] ?? "",

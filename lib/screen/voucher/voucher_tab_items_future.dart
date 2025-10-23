@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:topmortarseller/model/voucher_model.dart';
 import 'package:topmortarseller/services/voucher_api.dart';
+import 'package:topmortarseller/util/currency_format.dart';
 import 'package:topmortarseller/util/date_format.dart';
 import 'package:topmortarseller/widget/modal/modal_action.dart';
 import 'package:topmortarseller/widget/snackbar/show_snackbar.dart';
@@ -117,9 +118,15 @@ class _VoucherTabItemsFutureState extends State<VoucherTabItemsFuture> {
                   item.expDate,
                   outputFormat: "d-M-y",
                 );
+                final valueVoucher = double.tryParse(item.valueVoucher) != null
+                    ? double.parse(item.valueVoucher)
+                    : 0.0;
+                final foramttedValueVoucher = CurrencyFormat().format(
+                  amount: valueVoucher,
+                );
                 return ListTile(
                   leading: Icon(Icons.local_offer),
-                  title: Text("Voucher ${item.noVoucher}"),
+                  title: Text("Voucher $foramttedValueVoucher"),
                   subtitle: Text("Berlaku sampai $formattedDate"),
                   trailing: FilledButton(
                     onPressed: item.isClaimed == "1"
