@@ -116,7 +116,7 @@ class ContentSectionState extends State<ContentSection> {
         );
       } else {
         return SizedBox(
-          height: 300,
+          height: 500,
           child: Padding(
             padding: const EdgeInsets.all(12),
             child: Text(
@@ -130,7 +130,7 @@ class ContentSectionState extends State<ContentSection> {
       }
     } else {
       return SizedBox(
-        height: 300,
+        height: 500,
         child: Padding(
           padding: const EdgeInsets.all(12),
           child: Text(
