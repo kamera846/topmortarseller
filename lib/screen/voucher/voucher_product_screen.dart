@@ -33,7 +33,7 @@ class _VoucherProductScreenState extends State<VoucherProductScreen> {
   String formattedTotalValueVouchers = "";
   String formattedTotalValueProducts = "";
 
-  late List<ProductModel> products;
+  List<ProductModel> products = [];
   List<ProductModel> selectedProducts = [];
 
   @override
@@ -68,13 +68,13 @@ class _VoucherProductScreenState extends State<VoucherProductScreen> {
 
   void handleMinusItem(ProductModel product) {
     setState(() {
-      product.voucherQty--;
+      product.qtyApplyProduct--;
     });
   }
 
   void handlePlusItem(ProductModel product) {
     setState(() {
-      product.voucherQty++;
+      product.qtyApplyProduct++;
     });
   }
 
@@ -83,16 +83,16 @@ class _VoucherProductScreenState extends State<VoucherProductScreen> {
     for (var product in products) {
       final availableItem = selectedProducts.contains(product);
 
-      if (availableItem && product.voucherQty < 1) {
+      if (availableItem && product.qtyApplyProduct < 1) {
         selectedProducts.remove(product);
-      } else if (!availableItem && product.voucherQty > 0) {
+      } else if (!availableItem && product.qtyApplyProduct > 0) {
         selectedProducts.add(product);
       }
 
       final productPrice = double.tryParse(product.hargaProduk ?? "0.0") != null
           ? double.parse(product.hargaProduk ?? "0.0")
           : 0.0;
-      totalValueProducts += productPrice * product.voucherQty;
+      totalValueProducts += productPrice * product.qtyApplyProduct;
     }
     return CurrencyFormat().format(amount: totalValueProducts);
   }
@@ -107,11 +107,11 @@ class _VoucherProductScreenState extends State<VoucherProductScreen> {
       final product = selectedProducts[i];
       final payloadObject = {
         "id": int.parse(product.idProduk ?? "-1"),
-        "pcs": product.voucherQty,
+        "qty": product.qtyApplyProduct,
       };
       productsPayload.add(payloadObject);
       selectedProductsText +=
-          "${i + 1}. ${product.namaProduk} (${product.voucherQty} pcs)\n";
+          "${i + 1}. ${product.namaProduk} (${product.qtyApplyProduct} pcs)\n";
     }
 
     showAdaptiveDialog(
@@ -179,6 +179,26 @@ class _VoucherProductScreenState extends State<VoucherProductScreen> {
         centerTitle: false,
         backgroundColor: cWhite,
         foregroundColor: cDark100,
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(75),
+          child: Container(
+            width: double.infinity,
+            color: Colors.grey.shade400,
+            padding: EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Total nilai voucher anda $formattedTotalValueVouchers",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  "Total nilai produk yang dipilih tidak bisa melebihi total nilai voucher.",
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator.adaptive())
@@ -186,94 +206,73 @@ class _VoucherProductScreenState extends State<VoucherProductScreen> {
           ? const Center(
               child: Text("Produk kosong", textAlign: TextAlign.center),
             )
-          : Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 12),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: Text(
-                    "Total nilai voucher anda $formattedTotalValueVouchers",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: Text(
-                    "Total nilai produk yang dipilih ${valueProductsCounter()}",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                ListView.separated(
-                  shrinkWrap: true,
-                  itemCount: products.length,
-                  padding: const EdgeInsets.all(12),
-                  separatorBuilder: (context, index) =>
-                      const SizedBox(height: 12),
-                  itemBuilder: (context, index) {
-                    final item = products[index];
-                    final price = item.hargaProduk ?? "0.0";
-                    final productPrice = double.tryParse(price) != null
-                        ? double.parse(price)
-                        : 0.0;
-                    final foramttedProductPrice = CurrencyFormat().format(
-                      amount: productPrice,
-                    );
-                    return Material(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                      child: ListTile(
-                        contentPadding: EdgeInsets.symmetric(horizontal: 12),
-                        title: Text(
-                          "${item.namaProduk}",
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        subtitle: Text(foramttedProductPrice),
-                        leading: ClipRRect(
-                          borderRadius: BorderRadiusGeometry.circular(6),
-                          child: Image.network(
-                            item.imageProduk ?? 'https://google.com',
-                            key: Key(item.idProduk ?? '-1'),
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return const Icon(
-                                Icons.error,
-                                size: 20,
-                                color: Colors.grey,
-                              );
-                            },
-                          ),
-                        ),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              onPressed: item.voucherQty <= 0
-                                  ? null
-                                  : () => handleMinusItem(item),
-                              icon: Icon(Icons.remove_circle),
-                            ),
-                            Text(
-                              "${item.voucherQty}",
-                              style: TextStyle(fontSize: 16),
-                            ),
-                            IconButton(
-                              onPressed: () => handlePlusItem(item),
-                              icon: Icon(Icons.add_circle),
-                            ),
-                          ],
-                        ),
+          : ListView.separated(
+              shrinkWrap: true,
+              itemCount: products.length,
+              padding: const EdgeInsets.all(12),
+              separatorBuilder: (context, index) => const SizedBox(height: 12),
+              itemBuilder: (context, index) {
+                final item = products[index];
+                final price = item.hargaProduk ?? "0.0";
+                final productPrice = double.tryParse(price) != null
+                    ? double.parse(price)
+                    : 0.0;
+                final foramttedProductPrice = CurrencyFormat().format(
+                  amount: productPrice,
+                );
+                return Material(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                  child: ListTile(
+                    selected: item.qtyApplyProduct > 0,
+                    contentPadding: EdgeInsets.symmetric(horizontal: 12),
+                    title: Text(
+                      "${item.namaProduk}",
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    subtitle: Text(foramttedProductPrice),
+                    leading: ClipRRect(
+                      borderRadius: BorderRadiusGeometry.circular(6),
+                      child: Image.network(
+                        item.imageProduk ?? 'https://google.com',
+                        key: Key(item.idProduk ?? '-1'),
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Icon(
+                            Icons.error,
+                            size: 20,
+                            color: Colors.grey,
+                          );
+                        },
                       ),
-                    );
-                  },
-                ),
-              ],
+                    ),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          onPressed: item.qtyApplyProduct <= 0
+                              ? null
+                              : () => handleMinusItem(item),
+                          icon: Icon(Icons.remove_circle),
+                        ),
+                        Text(
+                          "${item.qtyApplyProduct}",
+                          style: TextStyle(fontSize: 16),
+                        ),
+                        IconButton(
+                          onPressed: () => handlePlusItem(item),
+                          icon: Icon(Icons.add_circle),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
             ),
       bottomNavigationBar: Container(
         width: double.infinity,
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(16),
         decoration: const BoxDecoration(
           color: Colors.white,
           border: Border.symmetric(
@@ -281,14 +280,44 @@ class _VoucherProductScreenState extends State<VoucherProductScreen> {
           ),
         ),
         child: SafeArea(
-          child: MElevatedButton(
-            enabled:
-                !isLoading &&
-                selectedProducts.isNotEmpty &&
-                totalValueProducts <= totalValueVouchers,
-            onPressed: submitProcess,
-            title: 'OK',
-            isFullWidth: true,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  children: [
+                    const Expanded(
+                      child: Text(
+                        'Total nilai produk',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    Text(
+                      valueProductsCounter(),
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: cPrimary200,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              MElevatedButton(
+                enabled:
+                    !isLoading &&
+                    selectedProducts.isNotEmpty &&
+                    totalValueProducts <= totalValueVouchers,
+                onPressed: submitProcess,
+                title: 'OK',
+                isFullWidth: true,
+              ),
+            ],
           ),
         ),
       ),

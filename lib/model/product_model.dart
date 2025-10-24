@@ -13,7 +13,7 @@ class ProductModel {
     this.imageProduk,
     this.createdAt,
     this.updatedAt,
-    this.voucherQty = 0,
+    this.qtyApplyProduct = 0,
   });
 
   final String? idCartDetail;
@@ -29,7 +29,7 @@ class ProductModel {
   final String? imageProduk;
   final String? createdAt;
   final String? updatedAt;
-  int voucherQty;
+  int qtyApplyProduct;
 
   ProductModel copyWith({
     String? idCartDetail,
