@@ -214,7 +214,9 @@ class _VoucherProductScreenState extends State<VoucherProductScreen> {
                   amount: productPrice,
                 );
                 return Material(
-                  color: Colors.white,
+                  color: item.qtyApplyProduct > 0
+                      ? cPrimary100.withAlpha(25)
+                      : Colors.white,
                   borderRadius: BorderRadius.circular(8),
                   child: ListTile(
                     selected: item.qtyApplyProduct > 0,

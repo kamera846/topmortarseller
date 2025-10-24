@@ -195,7 +195,10 @@ class _VoucherTabItemsFutureState extends State<VoucherTabItemsFuture> {
                           )
                         : FilledButton(
                             style: FilledButton.styleFrom(
-                              backgroundColor: Colors.green.shade600,
+                              backgroundColor: Colors.yellow.shade800.withAlpha(
+                                50,
+                              ),
+                              foregroundColor: Colors.yellow.shade800,
                             ),
                             onPressed: () {
                               Navigator.pop(context);

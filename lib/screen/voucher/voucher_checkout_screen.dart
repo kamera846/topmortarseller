@@ -95,12 +95,13 @@ class _VoucherCheckoutScreenState extends State<VoucherCheckoutScreen> {
                 );
                 return Material(
                   color: item.isSelected
-                      ? cPrimary400.withAlpha(50)
+                      ? Colors.yellow.shade800.withAlpha(50)
                       : Colors.white,
                   borderRadius: BorderRadius.circular(8),
                   child: ListTile(
                     horizontalTitleGap: 8,
                     selected: item.isSelected,
+                    selectedColor: Colors.yellow.shade800,
                     onTap: () {
                       final availableItem = selectedVouchers.contains(item);
                       setState(() {
@@ -119,10 +120,7 @@ class _VoucherCheckoutScreenState extends State<VoucherCheckoutScreen> {
                         RichText(
                           textAlign: TextAlign.center,
                           text: TextSpan(
-                            style: TextStyle(
-                              color: item.isSelected ? cPrimary100 : cDark100,
-                              fontSize: 12,
-                            ),
+                            style: TextStyle(color: cDark100, fontSize: 12),
                             children: [
                               TextSpan(text: "EXP\n"),
                               TextSpan(
@@ -144,16 +142,13 @@ class _VoucherCheckoutScreenState extends State<VoucherCheckoutScreen> {
                       "Voucher $foramttedValueVoucher",
                       style: TextStyle(
                         fontSize: 14,
-                        fontWeight: FontWeight.w100,
-                        color: item.isSelected ? cPrimary100 : cDark100,
+                        fontWeight: FontWeight.bold,
+                        color: cDark100,
                       ),
                     ),
                     subtitle: Text(
                       "Nomor ${item.noVoucher}",
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: item.isSelected ? cPrimary100 : cDark100,
-                      ),
+                      style: TextStyle(fontSize: 12, color: cDark100),
                     ),
                     trailing: Icon(
                       item.isSelected

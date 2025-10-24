@@ -102,6 +102,7 @@ class _MerchandiseDetailScreenState extends State<MerchandiseDetailScreen> {
                       ),
                     )
                   : SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -145,7 +146,7 @@ class _MerchandiseDetailScreenState extends State<MerchandiseDetailScreen> {
                   width: double.infinity,
                   padding: const EdgeInsets.all(24),
                   decoration: const BoxDecoration(
-                    color: cWhite,
+                    color: Colors.white,
                     border: Border.symmetric(
                       horizontal: BorderSide(color: cDark500, width: 1),
                     ),

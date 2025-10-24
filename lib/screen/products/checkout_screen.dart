@@ -325,7 +325,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             ],
                           ),
                           const Spacer(),
-                          TextButton(
+                          FilledButton.tonal(
+                            style: FilledButton.styleFrom(
+                              backgroundColor: Colors.yellow.shade800.withAlpha(
+                                50,
+                              ),
+                              foregroundColor: Colors.yellow.shade800,
+                            ),
                             onPressed: () {
                               Navigator.push(
                                 context,
@@ -343,7 +349,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                 }
                               });
                             },
-                            child: Text('Gunakan Voucher →'),
+                            child: Text(
+                              'Gunakan Voucher →',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
                           ),
                         ],
                       ),
