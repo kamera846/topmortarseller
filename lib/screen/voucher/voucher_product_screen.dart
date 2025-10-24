@@ -180,22 +180,15 @@ class _VoucherProductScreenState extends State<VoucherProductScreen> {
         backgroundColor: cWhite,
         foregroundColor: cDark100,
         bottom: PreferredSize(
-          preferredSize: Size.fromHeight(75),
+          preferredSize: Size.fromHeight(70),
           child: Container(
             width: double.infinity,
             color: Colors.grey.shade400,
             padding: EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Total nilai voucher anda $formattedTotalValueVouchers",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  "Total nilai produk yang dipilih tidak bisa melebihi total nilai voucher.",
-                ),
-              ],
+            child: Text(
+              "Total nilai produk yang dipilih tidak bisa melebihi total nilai voucher $formattedTotalValueVouchers",
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ),
@@ -289,7 +282,7 @@ class _VoucherProductScreenState extends State<VoucherProductScreen> {
                   children: [
                     const Expanded(
                       child: Text(
-                        'Total nilai produk',
+                        'Total Nilai Produk',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,

@@ -75,9 +75,17 @@ class _VoucherCheckoutScreenState extends State<VoucherCheckoutScreen> {
               separatorBuilder: (context, index) => const SizedBox(height: 12),
               itemBuilder: (context, index) {
                 final item = vouchers[index];
-                final formattedDate = MyDateFormat.formatDate(
+                final day = MyDateFormat.formatDate(
                   item.expDate,
-                  outputFormat: "d MMM y",
+                  outputFormat: "d",
+                );
+                final month = MyDateFormat.formatDate(
+                  item.expDate,
+                  outputFormat: "MMM",
+                );
+                final year = MyDateFormat.formatDate(
+                  item.expDate,
+                  outputFormat: "y",
                 );
                 final valueVoucher = double.tryParse(item.valueVoucher) != null
                     ? double.parse(item.valueVoucher)
@@ -91,6 +99,7 @@ class _VoucherCheckoutScreenState extends State<VoucherCheckoutScreen> {
                       : Colors.white,
                   borderRadius: BorderRadius.circular(8),
                   child: ListTile(
+                    horizontalTitleGap: 8,
                     selected: item.isSelected,
                     onTap: () {
                       final availableItem = selectedVouchers.contains(item);
@@ -104,9 +113,48 @@ class _VoucherCheckoutScreenState extends State<VoucherCheckoutScreen> {
                             !vouchers[index].isSelected;
                       });
                     },
-                    leading: Icon(Icons.local_offer),
-                    title: Text("Voucher $foramttedValueVoucher"),
-                    subtitle: Text("Berlaku sampai $formattedDate"),
+                    leading: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        RichText(
+                          textAlign: TextAlign.center,
+                          text: TextSpan(
+                            style: TextStyle(
+                              color: item.isSelected ? cPrimary100 : cDark100,
+                              fontSize: 12,
+                            ),
+                            children: [
+                              TextSpan(text: "EXP\n"),
+                              TextSpan(
+                                text: '$day\n',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              TextSpan(text: '$month $year'),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        VerticalDivider(),
+                      ],
+                    ),
+                    title: Text(
+                      "Voucher $foramttedValueVoucher",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w100,
+                        color: item.isSelected ? cPrimary100 : cDark100,
+                      ),
+                    ),
+                    subtitle: Text(
+                      "Nomor ${item.noVoucher}",
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: item.isSelected ? cPrimary100 : cDark100,
+                      ),
+                    ),
                     trailing: Icon(
                       item.isSelected
                           ? Icons.check_circle

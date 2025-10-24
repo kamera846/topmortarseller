@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:topmortarseller/model/voucher_model.dart';
+import 'package:topmortarseller/screen/products/catalog_screen.dart';
 import 'package:topmortarseller/services/voucher_api.dart';
+import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/util/currency_format.dart';
 import 'package:topmortarseller/util/date_format.dart';
 import 'package:topmortarseller/widget/modal/modal_action.dart';
@@ -31,13 +33,21 @@ class _VoucherTabItemsFutureState extends State<VoucherTabItemsFuture> {
   }
 
   void showClaimValidation(VoucherModel item) {
+    final valueVoucher = double.tryParse(item.valueVoucher) != null
+        ? double.parse(item.valueVoucher)
+        : 0.0;
+    final foramttedValueVoucher = CurrencyFormat().format(amount: valueVoucher);
+    final formattedDate = MyDateFormat.formatDate(
+      item.expDate,
+      outputFormat: "d MMM y",
+    );
     showAdaptiveDialog(
       context: context,
       builder: (context) {
         return AlertDialog.adaptive(
           title: Text("Klaim Voucher"),
           content: Text(
-            "Apakah anda yakin akan klaim voucher nomor ${item.noVoucher} sekarang?",
+            "Voucher $foramttedValueVoucher nomor ${item.noVoucher}. Berlaku sampai $formattedDate ",
           ),
           actions: [
             ModalAction.adaptiveAction(
@@ -111,12 +121,21 @@ class _VoucherTabItemsFutureState extends State<VoucherTabItemsFuture> {
             return ListView.separated(
               physics: const AlwaysScrollableScrollPhysics(),
               itemCount: items.length,
-              separatorBuilder: (context, index) => Divider(),
+              padding: const EdgeInsets.all(12),
+              separatorBuilder: (context, index) => const SizedBox(height: 12),
               itemBuilder: (context, index) {
                 final item = items[index];
-                final formattedDate = MyDateFormat.formatDate(
+                final day = MyDateFormat.formatDate(
                   item.expDate,
-                  outputFormat: "d-M-y",
+                  outputFormat: "d",
+                );
+                final month = MyDateFormat.formatDate(
+                  item.expDate,
+                  outputFormat: "MMM",
+                );
+                final year = MyDateFormat.formatDate(
+                  item.expDate,
+                  outputFormat: "y",
                 );
                 final valueVoucher = double.tryParse(item.valueVoucher) != null
                     ? double.parse(item.valueVoucher)
@@ -124,15 +143,64 @@ class _VoucherTabItemsFutureState extends State<VoucherTabItemsFuture> {
                 final foramttedValueVoucher = CurrencyFormat().format(
                   amount: valueVoucher,
                 );
-                return ListTile(
-                  leading: Icon(Icons.local_offer),
-                  title: Text("Voucher $foramttedValueVoucher"),
-                  subtitle: Text("Berlaku sampai $formattedDate"),
-                  trailing: FilledButton(
-                    onPressed: item.isClaimed == "1"
-                        ? null
-                        : () => showClaimValidation(item),
-                    child: Text("Klaim"),
+                return Material(
+                  color: item.isSelected
+                      ? cPrimary400.withAlpha(50)
+                      : Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                  child: ListTile(
+                    horizontalTitleGap: 8,
+                    leading: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        RichText(
+                          textAlign: TextAlign.center,
+                          text: TextSpan(
+                            style: TextStyle(color: cDark100, fontSize: 12),
+                            children: [
+                              TextSpan(text: "EXP\n"),
+                              TextSpan(
+                                text: '$day\n',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              TextSpan(text: '$month $year'),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        VerticalDivider(),
+                      ],
+                    ),
+                    title: Text(
+                      "Voucher $foramttedValueVoucher",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w100,
+                      ),
+                    ),
+                    subtitle: Text(
+                      "Nomor ${item.noVoucher}",
+                      style: TextStyle(fontSize: 12),
+                    ),
+                    trailing: FilledButton(
+                      onPressed: item.isClaimed == "1"
+                          ? () {
+                              Navigator.pop(context);
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const CatalogScreen(),
+                                ),
+                              );
+                            }
+                          : () => showClaimValidation(item),
+                      child: item.isClaimed == "1"
+                          ? Text("Gunakan")
+                          : Text("Klaim"),
+                    ),
                   ),
                 );
               },

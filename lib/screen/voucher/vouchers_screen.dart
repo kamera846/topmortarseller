@@ -19,6 +19,7 @@ class _VouchersScreenState extends State<VouchersScreen> {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
+        backgroundColor: cDark600,
         appBar: AppBar(
           title: Text("Voucher"),
           centerTitle: false,
