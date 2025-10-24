@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:topmortarseller/model/cart_model.dart';
 import 'package:topmortarseller/model/contact_model.dart';
 import 'package:topmortarseller/model/product_discount_modal.dart';
-import 'package:topmortarseller/model/voucher_model.dart';
-import 'package:topmortarseller/screen/voucher/voucher_checkout.dart';
+import 'package:topmortarseller/screen/voucher/voucher_checkout_screen.dart';
 import 'package:topmortarseller/services/cart_api.dart';
-import 'package:topmortarseller/services/voucher_api.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/util/currency_format.dart';
 import 'package:topmortarseller/util/enum.dart';
@@ -28,8 +26,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   late CartModel cart;
 
   List<ProductDiscountModel> discounts = [];
-  List<VoucherModel> vouchers = [];
-  List<String> selectedVoucherId = [];
 
   double subTotalPrice = 0.0;
   double totalPrice = 0.0;
@@ -55,7 +51,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   Future<void> _onRefresh() async {
     setState(() {
       isLoading = true;
-      selectedVoucherId = [];
     });
     _getList();
   }
@@ -65,21 +60,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       idContact: userData.idContact ?? '-1',
       onError: (e) => showSnackBar(context, e),
       onCompleted: (data) {
-        _getVouchers(data);
-      },
-    );
-  }
-
-  void _getVouchers(CartModel? cartData) async {
-    await VoucherApi().list(
-      idContact: userData.idContact ?? "-1",
-      isClaimed: "1",
-      onCompleted: (data) {
         setState(() {
           discounts.clear();
 
-          cart = cartData ?? CartModel();
-          vouchers = data ?? [];
+          cart = data ?? CartModel();
 
           subTotalPrice = double.tryParse(cart.subtotalPrice) == null
               ? 0.0
@@ -155,21 +139,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         }
       },
     );
-  }
-
-  void handleSelectedVouchers(VoucherModel item) {
-    final selectedId = item.idVoucher;
-    final selectedIndex = vouchers.indexOf(item);
-    final availableId = selectedVoucherId.contains(selectedId);
-
-    setState(() {
-      if (availableId) {
-        selectedVoucherId.remove(selectedId);
-      } else {
-        selectedVoucherId.add(selectedId);
-      }
-      vouchers[selectedIndex].isSelected = !vouchers[selectedIndex].isSelected;
-    });
   }
 
   @override
@@ -353,10 +322,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                 'Voucher',
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
-                              if (selectedVoucherId.isNotEmpty)
-                                Text(
-                                  '${selectedVoucherId.length} voucher dipilih',
-                                ),
                             ],
                           ),
                           const Spacer(),
@@ -365,12 +330,18 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => VoucherCheckout(
-                                    vouchers: vouchers,
-                                    toggleSelectedItem: handleSelectedVouchers,
+                                  builder: (context) => VoucherCheckoutScreen(
+                                    idContact: userData.idContact ?? "-1",
+                                    idCart: cart.idCart,
                                   ),
                                 ),
-                              );
+                              ).then((value) {
+                                if (value is PopValue &&
+                                    value == PopValue.needRefresh &&
+                                    context.mounted) {
+                                  _onRefresh();
+                                }
+                              });
                             },
                             child: Text('Gunakan Voucher →'),
                           ),
