@@ -178,16 +178,26 @@ class _VoucherTabItemsFutureState extends State<VoucherTabItemsFuture> {
                       "Voucher $foramttedValueVoucher",
                       style: TextStyle(
                         fontSize: 14,
-                        fontWeight: FontWeight.w100,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                     subtitle: Text(
                       "Nomor ${item.noVoucher}",
                       style: TextStyle(fontSize: 12),
                     ),
-                    trailing: FilledButton(
-                      onPressed: item.isClaimed == "1"
-                          ? () {
+                    trailing: item.isClaimed == "0"
+                        ? FilledButton(
+                            onPressed: () => showClaimValidation(item),
+                            child: Text(
+                              "Klaim",
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          )
+                        : FilledButton(
+                            style: FilledButton.styleFrom(
+                              backgroundColor: Colors.green.shade600,
+                            ),
+                            onPressed: () {
                               Navigator.pop(context);
                               Navigator.push(
                                 context,
@@ -195,12 +205,12 @@ class _VoucherTabItemsFutureState extends State<VoucherTabItemsFuture> {
                                   builder: (context) => const CatalogScreen(),
                                 ),
                               );
-                            }
-                          : () => showClaimValidation(item),
-                      child: item.isClaimed == "1"
-                          ? Text("Gunakan")
-                          : Text("Klaim"),
-                    ),
+                            },
+                            child: Text(
+                              "Gunakan",
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
                   ),
                 );
               },
