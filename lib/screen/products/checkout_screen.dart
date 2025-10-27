@@ -116,6 +116,36 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
   }
 
+  void applyVouchers() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => VoucherCheckoutScreen(
+          idContact: userData.idContact ?? "-1",
+          idCart: cart.idCart,
+        ),
+      ),
+    ).then((value) {
+      if (value is PopValue &&
+          value == PopValue.needRefresh &&
+          context.mounted) {
+        _onRefresh();
+      }
+    });
+  }
+
+  void resetVouchers() {
+    CartApiService().resetVoucher(
+      idCart: cart.idCart,
+      onError: (e) => showSnackBar(context, e),
+      onCompleted: (status) {
+        if (status) {
+          _onRefresh();
+        }
+      },
+    );
+  }
+
   Future<void> _submitCheckout() async {
     setState(() {
       isLoading = true;
@@ -318,23 +348,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                         backgroundColor: Colors.yellow.shade800.withAlpha(30),
                         foregroundColor: Colors.yellow.shade800,
                       ),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => VoucherCheckoutScreen(
-                              idContact: userData.idContact ?? "-1",
-                              idCart: cart.idCart,
-                            ),
-                          ),
-                        ).then((value) {
-                          if (value is PopValue &&
-                              value == PopValue.needRefresh &&
-                              context.mounted) {
-                            _onRefresh();
-                          }
-                        });
-                      },
+                      onPressed: applyVouchers,
                       child: const Row(
                         children: [
                           Text(
@@ -351,7 +365,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                         backgroundColor: Colors.grey.shade800.withAlpha(30),
                         foregroundColor: Colors.grey.shade800,
                       ),
-                      onPressed: () {},
+                      onPressed: resetVouchers,
                       child: const Row(
                         children: [
                           Text(
