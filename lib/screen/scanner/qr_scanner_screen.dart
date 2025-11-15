@@ -137,7 +137,18 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
 
     var result = scanResult ?? "";
     if (MyUtils.isValidUrl(result)) {
-      showDialogUrl(result);
+      // showDialogUrl(result);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => WebviewScreen(contentUrl: result),
+        ),
+      ).then((value) {
+        setState(() {
+          isScanResultFounded = false;
+        });
+        qrController!.resumeCamera();
+      });
     } else {
       showDialogClaim();
     }
