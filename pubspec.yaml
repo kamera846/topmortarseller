@@ -1,7 +1,7 @@
 name: topmortarseller
 description: Aplikasi untuk toko atau penjual produk Top Mortar.
 publish_to: "none" # Remove this line if you wish to publish to pub.dev
-version: 1.4.26032828+28
+version: 1.4.26032829+29
 
 environment:
   sdk: ^3.9.2

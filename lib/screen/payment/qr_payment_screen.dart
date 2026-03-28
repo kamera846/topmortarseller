@@ -2,12 +2,12 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
-import 'package:device_info_plus/device_info_plus.dart';
+// import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
+// import 'package:permission_handler/permission_handler.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:topmortarseller/model/qris_model.dart';
 import 'package:topmortarseller/services/qris_api.dart';
@@ -194,14 +194,14 @@ class _QrPaymentScreenState extends State<QrPaymentScreen>
 
   void _downloadQrCode() async {
     try {
-      final granted = await requestStoragePermissions();
-      if (!granted) {
-        if (!mounted) return;
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text("Izin penyimpanan ditolak")));
-        return;
-      }
+      // final granted = await requestStoragePermissions();
+      // if (!granted) {
+        // if (!mounted) return;
+        // ScaffoldMessenger.of(
+        //   context,
+        // ).showSnackBar(SnackBar(content: Text("Izin penyimpanan ditolak")));
+        // return;
+      // }
 
       final renderObject = _qrisWrapper.currentContext?.findRenderObject();
 
@@ -292,24 +292,24 @@ class _QrPaymentScreenState extends State<QrPaymentScreen>
     }
   }
 
-  Future<bool> requestStoragePermissions() async {
-    if (Platform.isAndroid) {
-      final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-      final AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+  // Future<bool> requestStoragePermissions() async {
+  //   if (Platform.isAndroid) {
+  //     final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+  //     final AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
 
-      if (androidInfo.version.sdkInt >= 33) {
-        final photosPermission = await Permission.photos.request();
-        return photosPermission.isGranted;
-      } else if (androidInfo.version.sdkInt >= 30) {
-        return true;
-      } else {
-        final storagePermission = await Permission.storage.request();
-        return storagePermission.isGranted;
-      }
-    } else {
-      return true;
-    }
-  }
+  //     if (androidInfo.version.sdkInt >= 33) {
+  //       final photosPermission = await Permission.photos.request();
+  //       return photosPermission.isGranted;
+  //     } else if (androidInfo.version.sdkInt >= 30) {
+  //       return true;
+  //     } else {
+  //       final storagePermission = await Permission.storage.request();
+  //       return storagePermission.isGranted;
+  //     }
+  //   } else {
+  //     return true;
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
