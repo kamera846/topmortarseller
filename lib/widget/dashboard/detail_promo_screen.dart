@@ -32,7 +32,20 @@ class DetailPromoScreen extends StatelessWidget {
               ),
               Padding(
                 padding: const EdgeInsets.all(16),
-                child: Text(promo.detailPromoTopseller ?? ''),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      promo.namePromoTopseller ?? '',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(promo.detailPromoTopseller ?? ''),
+                  ],
+                ),
               ),
             ],
           ),

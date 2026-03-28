@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:topmortarseller/model/cart_model.dart';
 import 'package:topmortarseller/model/contact_model.dart';
 import 'package:topmortarseller/model/product_discount_modal.dart';
+import 'package:topmortarseller/screen/voucher/voucher_checkout_screen.dart';
 import 'package:topmortarseller/services/cart_api.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/util/currency_format.dart';
@@ -23,10 +24,13 @@ class CheckoutScreen extends StatefulWidget {
 class _CheckoutScreenState extends State<CheckoutScreen> {
   late ContactModel userData;
   late CartModel cart;
+
   List<ProductDiscountModel> discounts = [];
+
   double subTotalPrice = 0.0;
   double totalPrice = 0.0;
   double totalDiscountApp = 0.0;
+
   bool isLoading = true;
 
   @override
@@ -58,13 +62,16 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       onCompleted: (data) {
         setState(() {
           discounts.clear();
+
           cart = data ?? CartModel();
+
           subTotalPrice = double.tryParse(cart.subtotalPrice) == null
               ? 0.0
               : double.parse(cart.subtotalPrice);
           totalDiscountApp = double.tryParse(cart.totalDiscountApp) == null
               ? 0.0
               : double.parse(cart.totalDiscountApp);
+
           if (totalDiscountApp > 0.0) {
             discounts.add(
               ProductDiscountModel(
@@ -73,7 +80,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               ),
             );
           }
+
           totalPrice = subTotalPrice - totalDiscountApp;
+
           isLoading = false;
         });
       },
@@ -103,6 +112,36 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             ),
           ],
         );
+      },
+    );
+  }
+
+  void applyVouchers() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => VoucherCheckoutScreen(
+          idContact: userData.idContact ?? "-1",
+          idCart: cart.idCart,
+        ),
+      ),
+    ).then((value) {
+      if (value is PopValue &&
+          value == PopValue.needRefresh &&
+          context.mounted) {
+        _onRefresh();
+      }
+    });
+  }
+
+  void resetVouchers() {
+    CartApiService().resetVoucher(
+      idCart: cart.idCart,
+      onError: (e) => showSnackBar(context, e),
+      onCompleted: (status) {
+        if (status) {
+          _onRefresh();
+        }
       },
     );
   }
@@ -183,121 +222,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                         ],
                       ),
                     ),
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 24),
-                      padding: const EdgeInsets.all(24),
-                      color: cWhite,
-                      width: double.infinity,
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              const Text(
-                                'Keranjang',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              const SizedBox(width: 12),
-                              Text(
-                                '${cart.details.length} produk',
-                                style: const TextStyle(color: cDark200),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 24),
-                          ListView.separated(
-                            itemCount: cart.details.length,
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            padding: const EdgeInsets.all(0),
-                            separatorBuilder: (context, index) =>
-                                const SizedBox(height: 24),
-                            itemBuilder: (conxtext, i) {
-                              final product = cart.details[i];
-                              return SizedBox(
-                                height: 90,
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(12),
-                                      child: Container(
-                                        color: cDark600,
-                                        width: 90,
-                                        height: 90,
-                                        child: Image.network(
-                                          product.imageProduk ??
-                                              'https://google.com',
-                                          key: Key(
-                                            product.idProduk ?? i.toString(),
-                                          ),
-                                          fit: BoxFit.cover,
-                                          errorBuilder:
-                                              (context, error, stackTrace) {
-                                                return const Icon(
-                                                  Icons.error,
-                                                  size: 40,
-                                                  color: Colors.grey,
-                                                );
-                                              },
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            product.namaProduk ?? '',
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          const Spacer(),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text(
-                                                '${CurrencyFormat().format(amount: double.parse(product.hargaProduk ?? '0'))} / ${product.nameSatuan}',
-                                              ),
-                                              Text(
-                                                CurrencyFormat().format(
-                                                  amount:
-                                                      (int.parse(
-                                                                product.hargaProduk ??
-                                                                    '0',
-                                                              ) *
-                                                              int.parse(
-                                                                product.qtyCartDetail ??
-                                                                    '0',
-                                                              ))
-                                                          .toDouble(),
-                                                ),
-                                                style: const TextStyle(
-                                                  color: cPrimary100,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          Text(
-                                            'x ${product.qtyCartDetail}',
-                                            style: TextStyle(color: cDark200),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
+                    _buildCartItem(),
+                    _buildVoucherItem(context),
                     Container(
                       margin: const EdgeInsets.only(bottom: 24),
                       padding: const EdgeInsets.all(24),
@@ -398,6 +324,233 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 ),
               ),
             ),
+    );
+  }
+
+  Container _buildVoucherItem(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 24),
+      padding: const EdgeInsets.all(24),
+      color: cWhite,
+      width: double.infinity,
+      child: Column(
+        children: [
+          Row(
+            children: [
+              const Text(
+                '🎉 Voucher',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const Spacer(),
+              cart.productVouchers.isEmpty
+                  ? FilledButton.tonal(
+                      style: FilledButton.styleFrom(
+                        backgroundColor: Colors.yellow.shade800.withAlpha(30),
+                        foregroundColor: Colors.yellow.shade800,
+                      ),
+                      onPressed: applyVouchers,
+                      child: const Row(
+                        children: [
+                          Text(
+                            'Gunakan Voucher',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(width: 8),
+                          Icon(Icons.arrow_right_alt, size: 14),
+                        ],
+                      ),
+                    )
+                  : FilledButton.tonal(
+                      style: FilledButton.styleFrom(
+                        backgroundColor: Colors.grey.shade800.withAlpha(30),
+                        foregroundColor: Colors.grey.shade800,
+                      ),
+                      onPressed: resetVouchers,
+                      child: const Row(
+                        children: [
+                          Text(
+                            'Atur Ulang',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(width: 8),
+                          Icon(Icons.sync, size: 14),
+                        ],
+                      ),
+                    ),
+            ],
+          ),
+          if (cart.productVouchers.isNotEmpty)
+            ListView.separated(
+              itemCount: cart.productVouchers.length,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              padding: const EdgeInsets.only(top: 12),
+              separatorBuilder: (context, index) => const SizedBox(height: 24),
+              itemBuilder: (conxtext, i) {
+                final product = cart.productVouchers[i];
+                return SizedBox(
+                  height: 60,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Container(
+                          color: cDark600,
+                          width: 60,
+                          height: 60,
+                          child: Image.network(
+                            product.imageProduk ?? '#',
+                            key: Key(product.idProduk ?? i.toString()),
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return const Icon(
+                                Icons.error,
+                                size: 25,
+                                color: Colors.grey,
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                product.namaProduk ?? '',
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                'x ${product.qtyCartDetail}',
+                                style: TextStyle(color: cDark200),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+        ],
+      ),
+    );
+  }
+
+  Container _buildCartItem() {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 24),
+      padding: const EdgeInsets.all(24),
+      color: cWhite,
+      width: double.infinity,
+      child: Column(
+        children: [
+          Row(
+            children: [
+              const Text(
+                'Keranjang',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                '${cart.details.length} produk',
+                style: const TextStyle(color: cDark200),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          ListView.separated(
+            itemCount: cart.details.length,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            padding: const EdgeInsets.all(0),
+            separatorBuilder: (context, index) => const SizedBox(height: 24),
+            itemBuilder: (conxtext, i) {
+              final product = cart.details[i];
+              return SizedBox(
+                height: 90,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        color: cDark600,
+                        width: 90,
+                        height: 90,
+                        child: Image.network(
+                          product.imageProduk ?? 'https://google.com',
+                          key: Key(product.idProduk ?? i.toString()),
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return const Icon(
+                              Icons.error,
+                              size: 40,
+                              color: Colors.grey,
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              product.namaProduk ?? '',
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const Spacer(),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  '${CurrencyFormat().format(amount: double.parse(product.hargaProduk ?? '0'))} / ${product.nameSatuan}',
+                                ),
+                                Text(
+                                  CurrencyFormat().format(
+                                    amount:
+                                        (int.parse(product.hargaProduk ?? '0') *
+                                                int.parse(
+                                                  product.qtyCartDetail ?? '0',
+                                                ))
+                                            .toDouble(),
+                                  ),
+                                  style: const TextStyle(color: cPrimary100),
+                                ),
+                              ],
+                            ),
+                            Text(
+                              'x ${product.qtyCartDetail}',
+                              style: TextStyle(color: cDark200),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ],
+      ),
     );
   }
 

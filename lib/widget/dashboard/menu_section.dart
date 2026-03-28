@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:topmortarseller/screen/products/catalog_screen.dart';
 import 'package:topmortarseller/screen/products/invoice_screen.dart';
 import 'package:topmortarseller/screen/products/order_screen.dart';
+import 'package:topmortarseller/screen/voucher/vouchers_screen.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/util/enum.dart';
 import 'package:topmortarseller/widget/snackbar/show_snackbar.dart';
@@ -10,10 +11,13 @@ import 'package:topmortarseller/widget/snackbar/show_snackbar.dart';
 class MenuSection extends StatelessWidget {
   final Map<String, int> badgeCounters;
   final void Function() onResumed;
+  final String idContact;
+
   const MenuSection({
     super.key,
     this.badgeCounters = const {},
     required this.onResumed,
+    required this.idContact,
   });
 
   @override
@@ -38,7 +42,11 @@ class MenuSection extends StatelessWidget {
         'badge': badgeCounters['invoice'] ?? 0,
         'route': (context) => const InvoiceScreen(),
       },
-      {'icon': Icons.local_offer, 'title': 'Voucher', 'route': null},
+      {
+        'icon': Icons.local_offer,
+        'title': 'Voucher',
+        'route': (context) => VouchersScreen(idContact: idContact),
+      },
     ];
 
     return Column(

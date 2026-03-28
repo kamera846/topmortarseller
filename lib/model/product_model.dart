@@ -1,5 +1,5 @@
 class ProductModel {
-  const ProductModel({
+  ProductModel({
     this.idCartDetail,
     this.idCart,
     this.qtyCartDetail,
@@ -13,6 +13,7 @@ class ProductModel {
     this.imageProduk,
     this.createdAt,
     this.updatedAt,
+    this.qtyApplyProduct = 0,
   });
 
   final String? idCartDetail;
@@ -28,6 +29,7 @@ class ProductModel {
   final String? imageProduk;
   final String? createdAt;
   final String? updatedAt;
+  int qtyApplyProduct;
 
   ProductModel copyWith({
     String? idCartDetail,

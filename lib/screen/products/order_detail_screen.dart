@@ -116,7 +116,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
 
                       /// --- List Free Products Section ---
                       if (freeProducts.isNotEmpty)
-                        generateProductItems(context, freeProducts, '🎉Bonus'),
+                        generateProductItems(context, freeProducts, '🎁 Bonus'),
 
                       Container(
                         margin: const EdgeInsets.only(bottom: 24),

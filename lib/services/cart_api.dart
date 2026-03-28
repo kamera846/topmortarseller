@@ -197,4 +197,99 @@ class CartApiService {
       onCompleted(status);
     }
   }
+
+  Future<void> applyVoucher({
+    required String idCart,
+    required List<int> idVouchers,
+    required List<Map<String, int>> idProducts,
+    Function(String e)? onError,
+    Function(String e)? onSuccess,
+    required Function(bool status) onCompleted,
+  }) async {
+    bool status = false;
+    try {
+      final url = Uri.https(baseUrl, 'api/cart/apply-voucher');
+      final response = await http.post(
+        url,
+        headers: headerSetup,
+        body: json.encode({
+          'id_cart': idCart,
+          'id_vouchers': idVouchers,
+          'id_products': idProducts,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final responseBody = json.decode(response.body);
+        final apiResponse = ApiResponse.fromJson(responseBody);
+
+        if (apiResponse.code == 200) {
+          if (onSuccess != null) {
+            onSuccess(apiResponse.msg);
+          }
+          status = true;
+          return;
+        }
+
+        if (onError != null) {
+          onError(apiResponse.msg);
+        }
+        status = false;
+        return;
+      } else {
+        if (onError != null) {
+          onError('$failedRequestText. Status Code: ${response.statusCode}');
+        }
+        status = false;
+        return;
+      }
+    } catch (e) {
+      if (onError != null) {
+        onError('$failedRequestText. Exception: $e');
+      }
+      status = false;
+      return;
+    } finally {
+      onCompleted(status);
+    }
+  }
+
+  Future<void> resetVoucher({
+    required String idCart,
+    Function(String e)? onError,
+    Function(String e)? onSuccess,
+    required Function(bool status) onCompleted,
+  }) async {
+    bool status = false;
+    try {
+      final url = Uri.https(baseUrl, 'api/cart/remove-voucher');
+      final response = await http.post(
+        url,
+        headers: headerSetup,
+        body: json.encode({'id_cart': idCart}),
+      );
+
+      if (response.statusCode == 200) {
+        if (onSuccess != null) {
+          onSuccess(response.body);
+        }
+        status = true;
+        return;
+      } else {
+        if (onError != null) {
+          onError('$failedRequestText. Status Code: ${response.statusCode}');
+        }
+        status = false;
+        return;
+      }
+    } catch (e) {
+      if (onError != null) {
+        onError('$failedRequestText. Exception: $e');
+      }
+      status = false;
+      return;
+    } finally {
+      onCompleted(status);
+    }
+  }
 }

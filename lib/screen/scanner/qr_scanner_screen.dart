@@ -7,11 +7,14 @@ import 'package:qr_code_scanner_plus/qr_code_scanner_plus.dart';
 import 'package:topmortarseller/model/contact_model.dart';
 import 'package:topmortarseller/model/customer_bank_model.dart';
 import 'package:topmortarseller/screen/scanner/scanner_result_screen.dart';
+import 'package:topmortarseller/screen/webview_screen.dart';
 import 'package:topmortarseller/services/claim_api.dart';
 import 'package:topmortarseller/util/enum.dart';
 import 'package:topmortarseller/util/colors/color.dart';
+import 'package:topmortarseller/util/my_utils.dart';
 import 'package:topmortarseller/widget/modal/info_modal.dart';
 import 'package:topmortarseller/widget/modal/loading_modal.dart';
+import 'package:topmortarseller/widget/modal/modal_action.dart';
 
 class QRScannerScreen extends StatefulWidget {
   const QRScannerScreen({super.key, this.userData});
@@ -131,6 +134,75 @@ class _QRScannerScreenState extends State<QRScannerScreen> {
 
   void showScannerResultScreen() async {
     qrController!.pauseCamera();
+
+    var result = scanResult ?? "";
+    if (MyUtils.isValidUrl(result)) {
+      // showDialogUrl(result);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => WebviewScreen(contentUrl: result),
+        ),
+      ).then((value) {
+        setState(() {
+          isScanResultFounded = false;
+        });
+        qrController!.resumeCamera();
+      });
+    } else {
+      showDialogClaim();
+    }
+  }
+
+  void showDialogUrl(String url) {
+    final String domain = Uri.parse(url).host;
+    bool isOpenAction = false;
+
+    showAdaptiveDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) {
+        return AlertDialog.adaptive(
+          title: Text("Peringatan"),
+          content: Text(
+            "Code QR yang anda scan berupa url yang mengarah ke \"$domain\", buka website tersebut?",
+          ),
+          actions: [
+            ModalAction.adaptiveAction(
+              context: context,
+              onPressed: () => Navigator.pop(context),
+              child: Text("Batal"),
+            ),
+            ModalAction.adaptiveAction(
+              context: context,
+              onPressed: () {
+                Navigator.pop(context);
+                isOpenAction = true;
+              },
+              child: Text("Buka"),
+            ),
+          ],
+        );
+      },
+    ).then((value) {
+      if (isOpenAction && mounted) {
+        Navigator.pop(context);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => WebviewScreen(contentUrl: url),
+          ),
+        );
+      } else {
+        setState(() {
+          isScanResultFounded = false;
+        });
+        qrController!.resumeCamera();
+      }
+    });
+  }
+
+  void showDialogClaim() async {
     CustomerBankModel? selectedBank;
     await showModalBottomSheet(
       barrierColor: cDark100.withValues(alpha: 0.7),

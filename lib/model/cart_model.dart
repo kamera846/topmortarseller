@@ -9,6 +9,7 @@ class CartModel {
     this.discountApp = '',
     this.totalDiscountApp = '',
     this.details = const [],
+    this.productVouchers = const [],
     this.createdAt = '',
     this.updatedAt = '',
     this.deletedAt = '',
@@ -21,6 +22,7 @@ class CartModel {
   final String discountApp;
   final String totalDiscountApp;
   final List<ProductModel> details;
+  final List<ProductModel> productVouchers;
   final String createdAt;
   final String updatedAt;
   final String deletedAt;
@@ -33,6 +35,7 @@ class CartModel {
     String? discountApp,
     String? totalDiscountApp,
     List<ProductModel>? details,
+    List<ProductModel>? productVouchers,
     String? createdAt,
     String? updatedAt,
     String? deletedAt,
@@ -45,6 +48,7 @@ class CartModel {
       discountApp: discountApp ?? this.discountApp,
       totalDiscountApp: totalDiscountApp ?? this.totalDiscountApp,
       details: details ?? this.details,
+      productVouchers: productVouchers ?? this.productVouchers,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       deletedAt: deletedAt ?? this.deletedAt,
@@ -59,6 +63,7 @@ class CartModel {
     'discount_app': discountApp,
     'total_discount_app': totalDiscountApp,
     'details': details,
+    'product_vouchers': productVouchers,
     'created_at': createdAt,
     'updated_at': updatedAt,
     'deleted_at': deletedAt,
@@ -74,6 +79,12 @@ class CartModel {
       totalDiscountApp: json['total_discount_app'] ?? '',
       details: json['details'] != null && json['details'] is List
           ? (json['details'] as List).map((item) {
+              return ProductModel.fromJson(item);
+            }).toList()
+          : [],
+      productVouchers:
+          json['product_vouchers'] != null && json['product_vouchers'] is List
+          ? (json['product_vouchers'] as List).map((item) {
               return ProductModel.fromJson(item);
             }).toList()
           : [],
