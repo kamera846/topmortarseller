@@ -159,6 +159,7 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
         rekeningName: myBanks![0].toName!,
         badge: 'default',
         rightIcon: Icons.mode_edit,
+        isMaskedRekening: true,
         action: () {
           Navigator.of(context).push(
             MaterialPageRoute(

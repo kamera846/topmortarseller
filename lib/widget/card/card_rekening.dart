@@ -13,6 +13,7 @@ class CardRekening extends StatefulWidget {
     this.rightIconColor = cDark200,
     this.action,
     this.withDeleteAction = false,
+    this.isMaskedRekening = false,
   });
 
   final String bankName;
@@ -24,12 +25,29 @@ class CardRekening extends StatefulWidget {
   final Color rightIconColor;
   final Function()? action;
   final bool withDeleteAction;
+  final bool isMaskedRekening;
 
   @override
   State<CardRekening> createState() => _CardRekeningState();
 }
 
 class _CardRekeningState extends State<CardRekening> {
+  String maskRekening(String rekening) {
+    if (!widget.isMaskedRekening) {
+      return rekening;
+    }
+    
+    if (rekening.length <= 6) {
+      return rekening; // terlalu pendek, tidak disensor
+    }
+
+    String start = rekening.substring(0, 3);
+    String end = rekening.substring(rekening.length - 3);
+    String masked = '*' * (rekening.length - 6);
+
+    return '$start$masked$end';
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget cardWidget = Card(
@@ -54,7 +72,7 @@ class _CardRekeningState extends State<CardRekening> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    '${widget.bankName} • ${widget.rekening}',
+                    '${widget.bankName} • ${maskRekening(widget.rekening)}',
                     overflow: TextOverflow.ellipsis,
                     softWrap: true,
                     style: Theme.of(context).textTheme.titleSmall!.copyWith(

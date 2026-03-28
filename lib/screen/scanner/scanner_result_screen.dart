@@ -83,6 +83,7 @@ class _ScannerResultScreenState extends State<ScannerResultScreen> {
               badge: index == selectedPosition ? 'default' : null,
               backgroundColor: index == selectedPosition ? cPrimary600 : cWhite,
               withDeleteAction: false,
+              isMaskedRekening: true,
               action: () {
                 setState(() {
                   selectedPosition = index;
