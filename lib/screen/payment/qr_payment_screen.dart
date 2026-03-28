@@ -194,14 +194,14 @@ class _QrPaymentScreenState extends State<QrPaymentScreen>
 
   void _downloadQrCode() async {
     try {
-      final granted = await requestStoragePermissions();
-      if (!granted) {
-        if (!mounted) return;
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text("Izin penyimpanan ditolak")));
-        return;
-      }
+      // final granted = await requestStoragePermissions();
+      // if (!granted) {
+        // if (!mounted) return;
+        // ScaffoldMessenger.of(
+        //   context,
+        // ).showSnackBar(SnackBar(content: Text("Izin penyimpanan ditolak")));
+        // return;
+      // }
 
       final renderObject = _qrisWrapper.currentContext?.findRenderObject();
 
@@ -292,24 +292,24 @@ class _QrPaymentScreenState extends State<QrPaymentScreen>
     }
   }
 
-  Future<bool> requestStoragePermissions() async {
-    if (Platform.isAndroid) {
-      final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-      final AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+  // Future<bool> requestStoragePermissions() async {
+  //   if (Platform.isAndroid) {
+  //     final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+  //     final AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
 
-      if (androidInfo.version.sdkInt >= 33) {
-        final photosPermission = await Permission.photos.request();
-        return photosPermission.isGranted;
-      } else if (androidInfo.version.sdkInt >= 30) {
-        return true;
-      } else {
-        final storagePermission = await Permission.storage.request();
-        return storagePermission.isGranted;
-      }
-    } else {
-      return true;
-    }
-  }
+  //     if (androidInfo.version.sdkInt >= 33) {
+  //       final photosPermission = await Permission.photos.request();
+  //       return photosPermission.isGranted;
+  //     } else if (androidInfo.version.sdkInt >= 30) {
+  //       return true;
+  //     } else {
+  //       final storagePermission = await Permission.storage.request();
+  //       return storagePermission.isGranted;
+  //     }
+  //   } else {
+  //     return true;
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
