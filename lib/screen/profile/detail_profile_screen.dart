@@ -379,7 +379,8 @@ class DetailProfileHeader extends StatelessWidget {
         ),
         const SizedBox(height: 6),
         phone == null
-            ? const LoadingItem(isPrimaryTheme: true)
+            // ? const LoadingItem(isPrimaryTheme: true)
+            ? SizedBox.shrink()
             : Text(
                 MyPhoneFormat.format(phone!),
                 softWrap: true,
@@ -389,7 +390,8 @@ class DetailProfileHeader extends StatelessWidget {
                 ).textTheme.bodyMedium!.copyWith(color: cWhite),
               ),
         description == null
-            ? const LoadingItem(isPrimaryTheme: true)
+            // ? const LoadingItem(isPrimaryTheme: true)
+            ? SizedBox.shrink()
             : Text(
                 description!,
                 softWrap: true,

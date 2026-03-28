@@ -395,8 +395,6 @@ class _HomeDashboardState extends State<HomeDashboard>
           contentName: 'Keluar dari akun?',
           contentDescription:
               'Anda diharuskan login kembali ketika mengakses aplikasi jika keluar dari akun.',
-          contentIcon: Icons.warning_rounded,
-          contentIconColor: cPrimary100,
           cancelText: 'Batal',
           onCancel: () {
             Navigator.of(context).pop();
