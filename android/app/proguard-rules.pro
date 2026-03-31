@@ -1,62 +1,108 @@
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+# =========================================
+# Flutter 기본 (WAJIB)
+# =========================================
+-keep class io.flutter.** { *; }
+-keep class io.flutter.plugins.** { *; }
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+# Keep GeneratedPluginRegistrant
+-keep class io.flutter.plugins.GeneratedPluginRegistrant { *; }
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+# =========================================
+# Kotlin & Coroutines
+# =========================================
+-keep class kotlin.Metadata { *; }
+-dontwarn kotlin.**
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
--keep class com.topmortar.** { *; }
--keep interface com.topmortar.** { *; }
--dontwarn org.bouncycastle.asn1.ASN1Encodable
--dontwarn org.bouncycastle.asn1.ASN1InputStream
--dontwarn org.bouncycastle.asn1.ASN1Integer
--dontwarn org.bouncycastle.asn1.ASN1ObjectIdentifier
--dontwarn org.bouncycastle.asn1.ASN1OctetString
--dontwarn org.bouncycastle.asn1.ASN1Primitive
--dontwarn org.bouncycastle.asn1.ASN1Set
--dontwarn org.bouncycastle.asn1.DEROctetString
--dontwarn org.bouncycastle.asn1.DEROutputStream
--dontwarn org.bouncycastle.asn1.DERSet
--dontwarn org.bouncycastle.asn1.cms.ContentInfo
--dontwarn org.bouncycastle.asn1.cms.EncryptedContentInfo
--dontwarn org.bouncycastle.asn1.cms.EnvelopedData
--dontwarn org.bouncycastle.asn1.cms.IssuerAndSerialNumber
--dontwarn org.bouncycastle.asn1.cms.KeyTransRecipientInfo
--dontwarn org.bouncycastle.asn1.cms.OriginatorInfo
--dontwarn org.bouncycastle.asn1.cms.RecipientIdentifier
--dontwarn org.bouncycastle.asn1.cms.RecipientInfo
--dontwarn org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers
--dontwarn org.bouncycastle.asn1.x500.X500Name
--dontwarn org.bouncycastle.asn1.x509.AlgorithmIdentifier
--dontwarn org.bouncycastle.asn1.x509.SubjectPublicKeyInfo
--dontwarn org.bouncycastle.asn1.x509.TBSCertificateStructure
--dontwarn org.bouncycastle.crypto.BlockCipher
--dontwarn org.bouncycastle.crypto.CipherParameters
--dontwarn org.bouncycastle.crypto.engines.AESFastEngine
--dontwarn org.bouncycastle.crypto.modes.CBCBlockCipher
--dontwarn org.bouncycastle.crypto.paddings.PaddedBufferedBlockCipher
--dontwarn org.bouncycastle.crypto.params.KeyParameter
--dontwarn org.bouncycastle.crypto.params.ParametersWithIV
--dontwarn org.bouncycastle.jsse.BCSSLParameters
--dontwarn org.bouncycastle.jsse.BCSSLSocket
--dontwarn org.bouncycastle.jsse.provider.BouncyCastleJsseProvider
--dontwarn org.conscrypt.Conscrypt$Version
--dontwarn org.conscrypt.Conscrypt
--dontwarn org.conscrypt.ConscryptHostnameVerifier
--dontwarn org.openjsse.javax.net.ssl.SSLParameters
--dontwarn org.openjsse.javax.net.ssl.SSLSocket
--dontwarn org.openjsse.net.ssl.OpenJSSE
+# =========================================
+# HTTP (package http)
+# =========================================
+-dontwarn org.apache.http.**
+-dontwarn okhttp3.**
+
+# =========================================
+# Shared Preferences
+# =========================================
+-keep class android.content.SharedPreferences { *; }
+
+# =========================================
+# WebView (webview_flutter)
+# =========================================
+-keep class android.webkit.** { *; }
+-dontwarn android.webkit.**
+
+# =========================================
+# URL Launcher / Intent
+# =========================================
+-keep class androidx.browser.customtabs.** { *; }
+-keep class android.content.Intent { *; }
+
+# =========================================
+# Google Fonts
+# =========================================
+-keep class com.google.android.gms.** { *; }
+-dontwarn com.google.android.gms.**
+
+# =========================================
+# Flutter Local Notifications
+# =========================================
+-keep class com.dexterous.flutterlocalnotifications.** { *; }
+-keep class androidx.core.app.NotificationCompat { *; }
+
+# =========================================
+# Permission Handler
+# =========================================
+-keep class com.baseflow.permissionhandler.** { *; }
+
+# =========================================
+# Device Info Plus
+# =========================================
+-keep class dev.fluttercommunity.plus.device_info.** { *; }
+
+# =========================================
+# Share Plus
+# =========================================
+-keep class dev.fluttercommunity.plus.share.** { *; }
+
+# =========================================
+# Path Provider
+# =========================================
+-keep class io.flutter.plugins.pathprovider.** { *; }
+
+# =========================================
+# Image Gallery Saver
+# =========================================
+-keep class com.example.imagegallerysaver.** { *; }
+
+# =========================================
+# QR Code Scanner
+# =========================================
+-keep class com.journeyapps.barcodescanner.** { *; }
+-keep class com.google.zxing.** { *; }
+
+# =========================================
+# Upgrader (App update checker)
+# =========================================
+-keep class com.google.android.play.core.** { *; }
+-dontwarn com.google.android.play.core.**
+
+# =========================================
+# JSON / Serialization safety (general)
+# =========================================
+-keepattributes *Annotation*
+-keepattributes Signature
+
+# =========================================
+# Prevent stripping model classes (optional, jika pakai parsing JSON manual)
+# =========================================
+# -keep class com.topmortar.topmortarseller.model.** { *; }
+
+# =========================================
+# Suppress warnings umum
+# =========================================
+-dontwarn javax.annotation.**
+-dontwarn sun.misc.**
+
+# =========================================
+# Debugging (optional - hapus saat production final)
+# =========================================
+# -keepattributes SourceFile,LineNumberTable
