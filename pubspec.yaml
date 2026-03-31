@@ -1,7 +1,7 @@
 name: topmortarseller
 description: Aplikasi untuk toko atau penjual produk Top Mortar.
 publish_to: "none" # Remove this line if you wish to publish to pub.dev
-version: 1.4.26032829+29
+version: 1.4.26033130+30
 
 environment:
   sdk: ^3.9.2
@@ -15,7 +15,6 @@ dependencies:
   http: ^1.1.0
   shared_preferences: ^2.2.2
   google_fonts: ^6.2.0
-  upgrader: ^11.2.0
   url_launcher: ^6.3.1
   money_formatter: ^0.0.6
   intl: ^0.19.0
@@ -27,6 +26,7 @@ dependencies:
   image_gallery_saver_plus: ^4.0.1
   share_plus: ^12.0.0
   webview_flutter: ^4.13.0
+  upgrader: ^12.5.0
 
 dev_dependencies:
   flutter_test:
