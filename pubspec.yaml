@@ -5,6 +5,7 @@ version: 1.4.26033130+30
 
 environment:
   sdk: ^3.9.2
+  flutter: '>=3.41.0'
 
 dependencies:
   flutter:
@@ -26,7 +27,7 @@ dependencies:
   image_gallery_saver_plus: ^4.0.1
   share_plus: ^12.0.0
   webview_flutter: ^4.13.0
-  upgrader: ^12.5.0
+  upgrader: ^13.7.0
 
 dev_dependencies:
   flutter_test:

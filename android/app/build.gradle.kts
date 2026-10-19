@@ -42,6 +42,8 @@ android {
 }
 
 dependencies {
+    implementation("id.co.haloai:halochat-ui:0.2.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
     // for flutter local notifcations
     add("coreLibraryDesugaring", "com.android.tools:desugar_jdk_libs:2.1.4")
 }

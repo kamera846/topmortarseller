@@ -31,6 +31,8 @@ import 'package:topmortarseller/widget/modal/info_modal.dart';
 import 'package:topmortarseller/widget/snackbar/show_snackbar.dart';
 import 'package:upgrader/upgrader.dart';
 
+import '../services/halochat_service.dart';
+
 class HomeScreen extends StatelessWidget {
   final ContactModel? userData;
   final String? payload;
@@ -76,6 +78,7 @@ class _HomeDashboardState extends State<HomeDashboard>
   int totalPoint = 0;
   bool isLoadPoint = true;
   bool isLoading = true;
+  bool _isOpeningChat = false;
 
   Map<String, int> badgeCounters = {};
 
@@ -436,7 +439,44 @@ class _HomeDashboardState extends State<HomeDashboard>
     );
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: Colors.white,
+      floatingActionButton: FloatingActionButton(
+        tooltip: HaloChatService.isDemo ? 'Chat CS — Demo' : 'Chat CS',
+        onPressed: _isOpeningChat
+            ? null
+            : () async {
+                setState(() => _isOpeningChat = true);
+                try {
+                  await HaloChatService.openChat();
+                } catch (error) {
+                  if (!context.mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        error is PlatformException
+                            ? error.message ?? 'Chat belum dapat dibuka.'
+                            : 'Chat belum dapat dibuka. Silakan coba lagi.',
+                      ),
+                    ),
+                  );
+                } finally {
+                  if (mounted) setState(() => _isOpeningChat = false);
+                }
+              },
+        child: _isOpeningChat
+            ? const SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
+            : const Icon(
+                CupertinoIcons.chat_bubble_text_fill,
+                size: 26,
+                color: cPrimary100,
+              ),
+        // label: Text("Chat CS"),
+        // icon: const Icon(Icons.person, size: 26, color: cDark100),
+      ),
       bottomNavigationBar: isLoading
           ? null
           : BottomNavigationBar(

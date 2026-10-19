@@ -1,0 +1,72 @@
+openapi: 3.0.3
+info:
+  title: MyTop Seller HaloChat token bridge
+  version: 1.0.0
+  description: Proposed backend contract. The endpoint must authenticate the existing seller account. Never return a HaloChat server key to the app.
+servers:
+  - url: https://seller.topmortarindonesia.com
+paths:
+  /api/halochat/token:
+    post:
+      operationId: mintHaloChatClientToken
+      summary: Authenticate seller and mint a HaloChat client token
+      description: Identity must be derived from the authenticated account. Mint per request; forceRefresh must bypass any session-specific cache. Credentials are in the JSON body to match the current app login contract. Transport must be HTTPS.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [nomorhp, pass_contact, forceRefresh]
+              properties:
+                nomorhp:
+                  type: string
+                  minLength: 1
+                  example: '08000000000'
+                pass_contact:
+                  type: string
+                  format: password
+                  minLength: 1
+                  writeOnly: true
+                  example: dummy-password
+                forceRefresh:
+                  type: boolean
+                  example: false
+      responses:
+        '200':
+          description: Client token only; never a server key.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data]
+                properties:
+                  data:
+                    type: object
+                    required: [token]
+                    properties:
+                      token:
+                        type: string
+                        pattern: '^hct_\S+$'
+                        example: hct_example_not_valid
+                      expiresAt:
+                        type: string
+                        format: date-time
+                      roomId:
+                        type: string
+        '401':
+          description: Invalid seller credentials or expired app session.
+        '403':
+          description: Seller is not allowed to use chat.
+        '429':
+          description: Too many token requests; client displays a retry message.
+          headers:
+            Retry-After:
+              schema:
+                type: integer
+              description: Suggested delay in seconds for the user to retry.
+        '502':
+          description: HaloAI token service unavailable. Do not expose upstream credentials or response internals.
+        '503':
+          description: Token bridge not yet available or temporarily unavailable.

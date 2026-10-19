@@ -737,10 +737,10 @@ packages:
     dependency: "direct main"
     description:
       name: upgrader
-      sha256: "3fae4eb861c7e8567f91412d9ca4a287e024e58d6f79f98da79e3f6d78da74ba"
+      sha256: "5a117075c5d22844136a89a60cc0272602cb8a5d0ce371b15379ddf68a415588"
       url: "https://pub.dev"
     source: hosted
-    version: "12.5.0"
+    version: "13.7.0"
   url_launcher:
     dependency: "direct main"
     description:
@@ -919,4 +919,4 @@ packages:
     version: "3.1.3"
 sdks:
   dart: ">=3.10.3 <4.0.0"
-  flutter: ">=3.38.4"
+  flutter: ">=3.41.0"

@@ -24,3 +24,11 @@ plugins {
 }
 
 include(":app")
+
+// Build the vendored SDK, keeping Android and iOS on the reviewed local sources.
+includeBuild("../halochat-sdk/halochat-android") {
+    dependencySubstitution {
+        substitute(module("id.co.haloai:halochat")).using(project(":"))
+        substitute(module("id.co.haloai:halochat-ui")).using(project(":ui"))
+    }
+}

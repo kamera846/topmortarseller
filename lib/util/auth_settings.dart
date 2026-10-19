@@ -1,4 +1,5 @@
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:topmortarseller/services/halochat_service.dart';
 import 'package:topmortarseller/model/auth_settings_model.dart';
 import 'package:topmortarseller/util/enum.dart';
 
@@ -75,6 +76,7 @@ Future<String> getLoginPassword() async {
 }
 
 Future<void> removeLoginState() async {
+  await HaloChatService.clearUser();
   final prefs = await SharedPreferences.getInstance();
   // await prefs.remove(GlobalEnum.isLoggedIn.toString());
   // await prefs.remove(GlobalEnum.loggedInPhone.toString());
