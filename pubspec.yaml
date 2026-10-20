@@ -23,10 +23,10 @@ dependencies:
   path_provider: ^2.1.5
   permission_handler: ^12.0.1
   device_info_plus: ^9.0.3
-  image_gallery_saver_plus: ^4.0.1
+  image_gallery_saver_plus: ^5.1.1
   share_plus: ^12.0.0
   webview_flutter: ^4.13.0
-  upgrader: ^12.5.0
+  upgrader: ^13.7.0
 
 dev_dependencies:
   flutter_test:

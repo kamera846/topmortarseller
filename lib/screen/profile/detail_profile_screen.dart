@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:topmortarseller/model/claimed_model.dart';
 import 'package:topmortarseller/model/contact_model.dart';
 import 'package:topmortarseller/model/customer_bank_model.dart';
+import 'package:topmortarseller/screen/profile/new_rekening_screen.dart';
+import 'package:topmortarseller/screen/profile/point_history_screen.dart';
 import 'package:topmortarseller/services/claim_api.dart';
 import 'package:topmortarseller/services/customer_bank_api.dart';
-import 'package:topmortarseller/util/enum.dart';
-import 'package:topmortarseller/screen/profile/new_rekening_screen.dart';
 import 'package:topmortarseller/util/colors/color.dart';
+import 'package:topmortarseller/util/date_format.dart';
+import 'package:topmortarseller/util/enum.dart';
 import 'package:topmortarseller/util/loading_item.dart';
 import 'package:topmortarseller/util/phone_format.dart';
 import 'package:topmortarseller/widget/card/card_rekening.dart';
@@ -24,263 +26,240 @@ class DetailProfileScreen extends StatefulWidget {
 
 class _DetailProfileScreenState extends State<DetailProfileScreen> {
   ContactModel? _userData;
-  List<CustomerBankModel>? myBanks = [];
-  List<ClaimedModel>? myRedeems = [];
-  String? title;
-  String? phone;
-  String? description;
-  int totalQuota = 0;
-  bool isLoading = true;
-  bool isLoadingRedeem = true;
+  List<CustomerBankModel> _banks = [];
+  List<ClaimedModel> _redeems = [];
+  int _totalQuota = 0;
+  bool _isLoading = true;
+
+  String? get _idContact => _userData?.idContact;
+  bool get _hasContact => _idContact != null && _idContact!.isNotEmpty;
 
   @override
   void initState() {
     super.initState();
-    _getUserData();
+    _loadProfile();
   }
 
-  void _getUserData() async {
-    setState(() => isLoading = true);
-
+  Future<void> _loadProfile() async {
+    setState(() => _isLoading = true);
     final data = widget.userData ?? await getContactModel();
-    // final data = await getContactModel();
-    setState(() {
-      _userData = data;
-
-      if (data != null) {
-        if (data.nama != null && data.nama!.isNotEmpty) {
-          title = data.nama!;
-        }
-        if (data.nomorhp != null && data.nomorhp!.isNotEmpty) {
-          phone = data.nomorhp!;
-        }
-        if (data.address != null && data.address!.isNotEmpty) {
-          description = data.address!;
-        }
-      }
-    });
-
-    _getUserBanks();
+    if (!mounted) return;
+    setState(() => _userData = data);
+    await _loadDetails();
   }
 
-  void _getUserBanks() async {
-    final data = await CustomerBankApiService().banks(
-      idContact: _userData!.idContact!,
-      onSuccess: (msg) => null,
-      onError: (e) => showSnackBar(context, e),
-      onCompleted: () => _getUserRedeemList(),
-    );
-    setState(() {
-      myBanks = data;
-    });
-  }
-
-  Future<void> _getUserRedeemList() async {
-    setState(() {
-      isLoadingRedeem = true;
-    });
-    final data = await ClaimCashbackServices().claimed(
-      idContact: _userData!.idContact!,
-      onSuccess: (msg) => null,
-      onError: (e) {
-        if (e != 'Tidak ada data') {
-          showSnackBar(context, e);
-        }
-      },
-      onCompleted: (apiResponse) {
-        setState(() {
-          if (apiResponse!.quota != null &&
-              int.tryParse(apiResponse.quota!) != null) {
-            totalQuota = int.parse(apiResponse.quota ?? '0');
-          }
-          isLoading = false;
-        });
-      },
-    );
-    setState(() {
-      myRedeems = data;
-      isLoadingRedeem = false;
-    });
-  }
-
-  String _monthName(int month) {
-    // List nama bulan dalam bahasa Indonesia
-    List<String> months = [
-      "Januari",
-      "Februari",
-      "Maret",
-      "April",
-      "Mei",
-      "Juni",
-      "Juli",
-      "Agustus",
-      "September",
-      "Oktober",
-      "November",
-      "Desember",
-    ];
-    return months[month - 1];
-  }
-
-  String _formattedDate(String dateString) {
-    try {
-      DateTime dateTime = DateTime.parse(dateString);
-      String day = dateTime.day.toString().padLeft(2, '0');
-      String month = _monthName(dateTime.month);
-      String year = dateTime.year.toString();
-      String hour = dateTime.hour.toString().padLeft(2, '0');
-      String minute = dateTime.minute.toString().padLeft(2, '0');
-
-      return "$day $month $year, $hour:$minute";
-    } catch (e) {
-      return dateString;
+  void _showError(String message) {
+    if (mounted && message != 'Tidak ada data') {
+      showSnackBar(context, message);
     }
+  }
+
+  Future<void> _loadDetails() async {
+    if (!mounted) return;
+    if (!_hasContact) {
+      setState(() => _isLoading = false);
+      return;
+    }
+    setState(() => _isLoading = true);
+    await Future.wait([_loadBanks(), _loadVouchers()]);
+    if (!mounted) return;
+    setState(() => _isLoading = false);
+  }
+
+  Future<void> _loadBanks() async {
+    final banks = await CustomerBankApiService().banks(
+      idContact: _idContact!,
+      onSuccess: (_) {},
+      onError: _showError,
+      onCompleted: () {},
+    );
+    if (!mounted) return;
+    setState(() => _banks = banks ?? []);
+  }
+
+  Future<void> _loadVouchers() async {
+    var quota = 0;
+    final redeems = await ClaimCashbackServices().claimed(
+      idContact: _idContact!,
+      onSuccess: (_) {},
+      onError: _showError,
+      onCompleted: (response) {
+        quota = int.tryParse(response?.quota ?? '') ?? 0;
+      },
+    );
+    if (!mounted) return;
+    setState(() {
+      _redeems = redeems ?? [];
+      _totalQuota = quota;
+    });
+  }
+
+  void _openBank({CustomerBankModel? bank}) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => NewRekeningScreen(
+          userData: _userData,
+          rekeningId: bank?.idRekeningToko ?? '-1',
+          onSuccess: (success) {
+            if (success == true && mounted) _loadDetails();
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBanks() {
+    final bank = _banks.firstOrNull;
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Daftar Rekening',
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+          ),
+          Text(
+            'Digunakan untuk tujuan transfer promo cashback dari kami.',
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+          const SizedBox(height: 16),
+          if (bank != null)
+            CardRekening(
+              bankName: bank.namaBank ?? '-',
+              rekening: bank.toAccount ?? '-',
+              rekeningName: bank.toName ?? '-',
+              badge: 'default',
+              rightIcon: Icons.mode_edit,
+              isMaskedRekening: true,
+              action: () => _openBank(bank: bank),
+            )
+          else
+            Center(
+              child: Column(
+                children: [
+                  const Text('Anda belum menambahkan rekening!'),
+                  const SizedBox(height: 12),
+                  MElevatedButton(
+                    title: 'Tambah Rekening',
+                    onPressed: () => _openBank(),
+                  ),
+                ],
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDetails() {
+    if (!_hasContact) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Data profil tidak tersedia.'),
+            TextButton(onPressed: _loadProfile, child: const Text('Coba Lagi')),
+          ],
+        ),
+      );
+    }
+    final remainingQuota = _totalQuota - _redeems.length;
+    final availableQuota = remainingQuota < 0 ? 0 : remainingQuota;
+    return RefreshIndicator.adaptive(
+      onRefresh: _loadDetails,
+      child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: EdgeInsets.zero,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+            child: Material(
+              color: cPrimary100.withValues(alpha: 0.07),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+                side: BorderSide(color: cPrimary100.withValues(alpha: 0.18)),
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: ListTile(
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                leading: const CircleAvatar(
+                  backgroundColor: cPrimary100,
+                  child: Icon(Icons.stars_rounded, color: Colors.white),
+                ),
+                title: const Text(
+                  'Riwayat Poin',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: cPrimary100,
+                  ),
+                ),
+                subtitle: const Text(
+                  'Lihat poin masuk dan penukaran poin Anda',
+                ),
+                trailing: const Icon(Icons.chevron_right, color: cPrimary100),
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => PointHistoryScreen(idContact: _idContact!),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          if (_isLoading)
+            const Padding(
+              padding: EdgeInsets.all(24),
+              child: Center(child: CircularProgressIndicator.adaptive()),
+            )
+          else ...[
+            _buildBanks(),
+            Container(
+              color: cDark500,
+              padding: const EdgeInsets.all(12),
+              child: Text(
+                'Penukaran Voucher ($availableQuota kuota tersisa)',
+                style: Theme.of(
+                  context,
+                ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
+              ),
+            ),
+            if (_redeems.isEmpty)
+              const Padding(
+                padding: EdgeInsets.all(24),
+                child: Text(
+                  'Riwayat penukaran voucher Anda akan ditampilkan di sini.',
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            for (final redeem in _redeems) ...[
+              ListTile(
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 8,
+                ),
+                title: Text(redeem.nama ?? '-'),
+                subtitle: Text(
+                  MyDateFormat.formatDateTime(
+                    redeem.claimDate ?? '',
+                    outputFormat: 'dd MMMM yyyy, HH:mm',
+                  ),
+                ),
+              ),
+              const Divider(height: 1, color: cDark500),
+            ],
+          ],
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    Widget cardBank = Container();
-    Widget emptyCardBank = Container();
-    Widget aboutRedeem = Container();
-    Widget redeemList = Container();
-    Widget emptyRedeemList = Container();
-
-    // final quotaPriority = _userData!.quotaPriority;
-    var availableQuota = totalQuota;
-
-    if (myRedeems != null && myRedeems!.isNotEmpty) {
-      availableQuota = totalQuota - myRedeems!.length;
-    }
-
-    if (myBanks != null && myBanks!.isNotEmpty) {
-      cardBank = CardRekening(
-        bankName: myBanks![0].namaBank!,
-        rekening: myBanks![0].toAccount!,
-        rekeningName: myBanks![0].toName!,
-        badge: 'default',
-        rightIcon: Icons.mode_edit,
-        isMaskedRekening: true,
-        action: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => NewRekeningScreen(
-                userData: _userData,
-                rekeningId: myBanks![0].idRekeningToko!,
-                onSuccess: (bool? state) {
-                  if (state != null && state) {
-                    setState(() => isLoading = true);
-                    _getUserBanks();
-                  }
-                },
-              ),
-            ),
-          );
-        },
-      );
-
-      if (myRedeems != null && myRedeems!.isNotEmpty) {
-        redeemList = Expanded(
-          child: isLoadingRedeem
-              ? Center(child: CircularProgressIndicator.adaptive())
-              : RefreshIndicator.adaptive(
-                  onRefresh: () => _getUserRedeemList(),
-                  child: ListView.builder(
-                    padding: const EdgeInsets.all(0),
-                    itemCount: myRedeems!.length,
-                    itemBuilder: (context, i) {
-                      final redeemItem = myRedeems![i];
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(24),
-                            width: double.infinity,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  redeemItem.nama ?? 'null',
-                                  softWrap: true,
-                                  overflow: TextOverflow.visible,
-                                  style: Theme.of(context).textTheme.bodyLarge,
-                                ),
-                                Text(
-                                  _formattedDate(redeemItem.claimDate ?? '-'),
-                                  softWrap: true,
-                                  overflow: TextOverflow.visible,
-                                  style: Theme.of(context).textTheme.bodyMedium!
-                                      .copyWith(
-                                        fontStyle: FontStyle.italic,
-                                        color: cDark200,
-                                      ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const Divider(height: 1, color: cDark500),
-                        ],
-                      );
-                    },
-                  ),
-                ),
-        );
-      }
-
-      aboutRedeem = Container(
-        color: cDark500,
-        width: double.infinity,
-        padding: const EdgeInsets.all(12),
-        child: Text(
-          'Penukaran Voucher ($availableQuota kuota tersisa)',
-          style: Theme.of(
-            context,
-          ).textTheme.titleSmall!.copyWith(fontWeight: FontWeight.bold),
-        ),
-      );
-    }
-
-    if (myBanks == null || myBanks!.isEmpty) {
-      emptyCardBank = SizedBox(
-        width: double.infinity,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const SizedBox(height: 24),
-            const Text('Anda belum menambahkan rekening!'),
-            const SizedBox(height: 12),
-            MElevatedButton(
-              title: 'Tambah Rekening',
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => NewRekeningScreen(
-                      userData: _userData,
-                      onSuccess: (bool? state) {},
-                    ),
-                  ),
-                );
-              },
-            ),
-            const SizedBox(height: 24),
-          ],
-        ),
-      );
-    }
-
-    if (myRedeems == null || myRedeems!.isEmpty) {
-      emptyRedeemList = const SizedBox(
-        width: double.infinity,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SizedBox(height: 24),
-            Text('Riwayat penukaran anda akan ditampilkan disini.'),
-            SizedBox(height: 24),
-          ],
-        ),
-      );
-    }
-
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Column(
@@ -289,51 +268,17 @@ class _DetailProfileScreenState extends State<DetailProfileScreen> {
           Padding(
             padding: const EdgeInsets.all(24),
             child: DetailProfileHeader(
-              title: title,
-              phone: phone,
-              description: description,
+              title: _userData?.nama ?? (_isLoading ? null : 'Profil'),
+              phone: _userData?.nomorhp,
+              description: _userData?.address,
             ),
           ),
           Expanded(
             child: Material(
               color: cWhite,
-              child: isLoading
+              child: _isLoading && !_hasContact
                   ? const Center(child: CircularProgressIndicator.adaptive())
-                  : Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(
-                            left: 16,
-                            top: 16,
-                            right: 16,
-                            bottom: 16,
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Daftar Rekening',
-                                style: Theme.of(context).textTheme.titleMedium!
-                                    .copyWith(fontWeight: FontWeight.bold),
-                              ),
-                              Text(
-                                'Digunakan untuk tujuan transfer promo cashback dari kami.',
-                                softWrap: true,
-                                overflow: TextOverflow.visible,
-                                style: Theme.of(context).textTheme.bodySmall,
-                              ),
-                              const SizedBox(height: 16),
-                              cardBank,
-                              emptyCardBank,
-                            ],
-                          ),
-                        ),
-                        aboutRedeem,
-                        redeemList,
-                        emptyRedeemList,
-                      ],
-                    ),
+                  : _buildDetails(),
             ),
           ),
         ],
@@ -368,20 +313,21 @@ class DetailProfileHeader extends StatelessWidget {
             const SizedBox(width: 12),
             title == null
                 ? const Expanded(child: LoadingItem(isPrimaryTheme: true))
-                : Text(
-                    title!,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.normal,
-                      fontSize: 20,
+                : Expanded(
+                    child: Text(
+                      title!,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.normal,
+                        fontSize: 20,
+                      ),
                     ),
                   ),
           ],
         ),
         const SizedBox(height: 6),
         phone == null
-            // ? const LoadingItem(isPrimaryTheme: true)
-            ? SizedBox.shrink()
+            ? const SizedBox.shrink()
             : Text(
                 MyPhoneFormat.format(phone!),
                 softWrap: true,
@@ -391,8 +337,7 @@ class DetailProfileHeader extends StatelessWidget {
                 ).textTheme.bodyMedium!.copyWith(color: cWhite),
               ),
         description == null
-            // ? const LoadingItem(isPrimaryTheme: true)
-            ? SizedBox.shrink()
+            ? const SizedBox.shrink()
             : Text(
                 description!,
                 softWrap: true,
