@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:topmortarseller/model/contact_model.dart';
 import 'package:topmortarseller/screen/auth_screen.dart';
 import 'package:topmortarseller/screen/merchandise/merchandise_screen.dart';
+import 'package:topmortarseller/screen/merchandise/merchandise_widgets.dart';
 import 'package:topmortarseller/screen/products/catalog_screen.dart';
 import 'package:topmortarseller/screen/profile/detail_profile_screen.dart';
 import 'package:topmortarseller/screen/profile/new_rekening_screen.dart';
@@ -73,7 +74,9 @@ class _HomeDashboardState extends State<HomeDashboard>
   final GlobalKey searchComponentKey = GlobalKey();
   double searchComponentOffset = 0;
   int navCurrentIndex = 0;
-  int totalPoint = 0;
+  int? totalPoint;
+  bool _isBrowsingMerchandise = false;
+  int _pointRequest = 0;
   bool isLoadPoint = true;
   bool isLoading = true;
 
@@ -159,19 +162,24 @@ class _HomeDashboardState extends State<HomeDashboard>
   }
 
   Future<void> _getTotalPoint() async {
+    if (!mounted || isLoading || _isBrowsingMerchandise) return;
+    final request = ++_pointRequest;
     setState(() => isLoadPoint = true);
     final prefs = await SharedPreferences.getInstance();
     bool isSucces = false;
     String payload = widget.payload ?? '';
     final currentPoint = await PointApi.total(
       idContact: _userData.idContact!,
-      onError: (e) => showSnackBar(context, e),
+      onError: (e) {
+        if (mounted && request == _pointRequest) showSnackBar(context, e);
+      },
       onSuccess: (e) {
         isSucces = true;
       },
       onCompleted: (point) {},
     );
-    if (isSucces && mounted) {
+    if (!mounted || request != _pointRequest) return;
+    if (isSucces) {
       final savedTotalPoint =
           prefs.getInt(
             '${_userData.idContact!}-${GlobalEnum.savedTotalPoint}',
@@ -197,7 +205,35 @@ class _HomeDashboardState extends State<HomeDashboard>
         isLoadPoint = false;
       });
       _getCounterBadge();
+    } else {
+      setState(() {
+        totalPoint = null;
+        isLoadPoint = false;
+      });
     }
+  }
+
+  Future<void> _openMerchandise() async {
+    final idContact = _userData.idContact;
+    if (idContact == null || idContact.isEmpty) return;
+    _isBrowsingMerchandise = true;
+    ++_pointRequest;
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => MerchandiseScreen(
+          idContact: idContact,
+          onPointsChanged: (points) {
+            if (!mounted) return;
+            setState(() {
+              totalPoint = points;
+              isLoadPoint = false;
+            });
+          },
+        ),
+      ),
+    );
+    _isBrowsingMerchandise = false;
+    if (mounted) await _getTotalPoint();
   }
 
   void _getCounterBadge() async {
@@ -221,6 +257,7 @@ class _HomeDashboardState extends State<HomeDashboard>
       onCompleted: (data) => {},
     );
 
+    if (!mounted) return;
     setState(() {
       badgeCounters['cart'] = cart?.details.length ?? 0;
       badgeCounters['order'] = ongoingOrder?.length ?? 0;
@@ -675,37 +712,38 @@ class _HomeDashboardState extends State<HomeDashboard>
         //     fontWeight: FontWeight.bold,
         //   ),
         // ),
-        const Spacer(),
+        const SizedBox(width: 12),
         if (navCurrentIndex == 0) ...[
-          isLoadPoint
-              ? Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: const SizedBox(
-                    width: 50,
-                    child: LoadingItem(isPrimaryTheme: true),
-                  ),
-                )
-              : TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            MerchandiseScreen(userPoint: totalPoint),
+          Expanded(
+            child: isLoadPoint
+                ? Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: const SizedBox(
+                      width: 50,
+                      child: LoadingItem(isPrimaryTheme: true),
+                    ),
+                  )
+                : Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: totalPoint == null
+                          ? _getTotalPoint
+                          : _openMerchandise,
+                      child: Text(
+                        totalPoint == null
+                            ? 'Muat ulang poin'
+                            : '${formatPoints(totalPoint!)} Poin · Tukar →',
+                        style: TextStyle(
+                          color: Colors.amber,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
                       ),
-                    );
-                  },
-                  child: Text(
-                    "$totalPoint Poin, Tukarkan →",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.amber,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
                     ),
                   ),
-                ),
+          ),
         ] else ...[
+          const Spacer(),
           PopupMenuButton<String>(
             icon: const Icon(Icons.settings, color: cWhite),
 

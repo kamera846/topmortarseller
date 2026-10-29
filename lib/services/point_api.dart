@@ -16,7 +16,9 @@ class PointApi {
     try {
       final params = {'id_contact': idContact};
       final url = Uri.https(baseUrl, 'api/point/total', params);
-      final response = await http.get(url, headers: headerSetup);
+      final response = await http
+          .get(url, headers: headerSetup)
+          .timeout(const Duration(seconds: 20));
 
       if (response.statusCode == 200) {
         final responseBody = json.decode(response.body);
@@ -107,35 +109,36 @@ class PointApi {
     }
   }
 
-  Future<PointModel?> request({
+  static Future<ApiResponse?> redeem({
     required String idContact,
     required String idMerchandise,
     required String priceMerchandise,
     Function(String e)? onError,
     Function(String e)? onSuccess,
-    required Function(PointModel? data) onCompleted,
+    required Function(ApiResponse? reponse) onCompleted,
   }) async {
-    PointModel? data;
+    ApiResponse? data;
     try {
       final url = Uri.https(baseUrl, 'api/point/redeem');
-      final response = await http.post(
-        url,
-        headers: headerSetup,
-        body: json.encode({
-          'id_contact': idContact,
-          'id_merchandise': idMerchandise,
-          'price_merchandise': priceMerchandise,
-        }),
-      );
+      final response = await http
+          .post(
+            url,
+            headers: headerSetup,
+            body: json.encode({
+              'id_contact': idContact,
+              'id_merchandise': idMerchandise,
+              'price_merchandise': priceMerchandise,
+            }),
+          )
+          .timeout(const Duration(seconds: 30));
 
       if (response.statusCode == 200) {
         final responseBody = json.decode(response.body);
         final apiResponse = ApiResponse.fromJson(responseBody);
 
         if (apiResponse.code == 200) {
-          if (apiResponse.data != null) {
-            data = PointModel.fromJson(apiResponse.data!);
-          }
+          // Some successful redemptions only return code/msg, without data.
+          data = apiResponse;
           if (onSuccess != null) {
             onSuccess(apiResponse.msg);
           }
@@ -154,7 +157,10 @@ class PointApi {
       }
     } catch (e) {
       if (onError != null) {
-        onError('$failedRequestText. Exception: $e');
+        onError(
+          'Status penukaran belum dapat dipastikan. '
+          'Periksa riwayat poin sebelum mencoba kembali.',
+        );
       }
       return data;
     } finally {
