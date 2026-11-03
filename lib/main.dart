@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:topmortarseller/screen/splash_screen.dart';
+import 'package:topmortarseller/services/live_chat_service.dart';
 import 'package:topmortarseller/util/colors/color.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:upgrader/upgrader.dart';
@@ -19,6 +20,7 @@ final mDarkColorScheme = ColorScheme.fromSeed(
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  LiveChatService.instance.initialize();
   await Upgrader.clearSavedSettings();
   await initializeDateFormatting('id_ID', null);
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);

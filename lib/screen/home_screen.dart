@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:topmortarseller/model/contact_model.dart';
 import 'package:topmortarseller/screen/auth_screen.dart';
+import 'package:topmortarseller/screen/live_chat/live_chat_screen.dart';
 import 'package:topmortarseller/screen/merchandise/merchandise_screen.dart';
 import 'package:topmortarseller/screen/merchandise/merchandise_widgets.dart';
 import 'package:topmortarseller/screen/products/catalog_screen.dart';
@@ -18,6 +19,7 @@ import 'package:topmortarseller/services/auth_api.dart';
 import 'package:topmortarseller/services/cart_api.dart';
 import 'package:topmortarseller/services/customer_bank_api.dart';
 import 'package:topmortarseller/services/invoice_api.dart';
+import 'package:topmortarseller/services/live_chat_service.dart';
 import 'package:topmortarseller/services/notification_service.dart';
 import 'package:topmortarseller/services/point_api.dart';
 import 'package:topmortarseller/util/auth_settings.dart';
@@ -26,6 +28,7 @@ import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/util/loading_item.dart';
 import 'package:topmortarseller/widget/dashboard/content_section.dart';
 import 'package:topmortarseller/widget/dashboard/hero_section.dart';
+import 'package:topmortarseller/widget/dashboard/live_chat_card.dart';
 import 'package:topmortarseller/widget/dashboard/menu_section.dart';
 import 'package:topmortarseller/widget/dashboard/promo_slider_section.dart';
 import 'package:topmortarseller/widget/modal/info_modal.dart';
@@ -76,6 +79,7 @@ class _HomeDashboardState extends State<HomeDashboard>
   int navCurrentIndex = 0;
   int? totalPoint;
   bool _isBrowsingMerchandise = false;
+  bool _isOpeningLiveChat = false;
   int _pointRequest = 0;
   bool isLoadPoint = true;
   bool isLoading = true;
@@ -234,6 +238,18 @@ class _HomeDashboardState extends State<HomeDashboard>
     );
     _isBrowsingMerchandise = false;
     if (mounted) await _getTotalPoint();
+  }
+
+  Future<void> _openLiveChat() async {
+    if (_isOpeningLiveChat) return;
+    _isOpeningLiveChat = true;
+    try {
+      await Navigator.of(
+        context,
+      ).push(MaterialPageRoute(builder: (_) => const LiveChatScreen()));
+    } finally {
+      _isOpeningLiveChat = false;
+    }
   }
 
   void _getCounterBadge() async {
@@ -665,6 +681,12 @@ class _HomeDashboardState extends State<HomeDashboard>
                           ),
                         ),
 
+                        if (LiveChatService.instance.isSupported)
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
+                            child: LiveChatCard(onTap: _openLiveChat),
+                          ),
+
                         /// -- Promo Slider --
                         PromoSliderSection(key: contentPromoKey),
 
@@ -744,6 +766,12 @@ class _HomeDashboardState extends State<HomeDashboard>
           ),
         ] else ...[
           const Spacer(),
+          if (LiveChatService.instance.isSupported)
+            IconButton(
+              onPressed: _openLiveChat,
+              tooltip: 'Chat CS',
+              icon: const Icon(Icons.support_agent_rounded, color: cWhite),
+            ),
           PopupMenuButton<String>(
             icon: const Icon(Icons.settings, color: cWhite),
 

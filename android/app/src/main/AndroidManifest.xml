@@ -15,6 +15,10 @@
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
+            android:name="id.co.haloai.halochat.ui.HaloChatActivity"
+            android:theme="@style/TopMortarChatTheme"
+            tools:replace="android:theme" />
+        <activity
             android:name=".MainActivity"
             android:exported="true"
             android:launchMode="singleTop"
