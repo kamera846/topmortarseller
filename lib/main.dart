@@ -1,8 +1,10 @@
 import 'dart:io';
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:topmortarseller/firebase_options.dart';
 import 'package:topmortarseller/screen/splash_screen.dart';
 import 'package:topmortarseller/services/live_chat_service.dart';
 import 'package:topmortarseller/util/colors/color.dart';
@@ -23,6 +25,7 @@ void main() async {
   LiveChatService.instance.initialize();
   await Upgrader.clearSavedSettings();
   await initializeDateFormatting('id_ID', null);
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   HttpOverrides.global = MyHttpOverrides();
   runApp(const MyApp());

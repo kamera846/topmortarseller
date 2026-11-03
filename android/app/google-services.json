@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "492698925463",
+    "project_id": "top-mortar-seller",
+    "storage_bucket": "top-mortar-seller.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:492698925463:android:7d3fc1a1cd602feb9f2cd2",
+        "android_client_info": {
+          "package_name": "com.topmortar.topmortarseller"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB0LFDqdtk6bDYle2Ea_VZmkByN-sQXRzk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

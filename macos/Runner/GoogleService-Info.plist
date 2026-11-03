@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyBiQq2lrBOXpO6fLASaZLlj9bq_LhfWdz8</string>
+	<key>GCM_SENDER_ID</key>
+	<string>492698925463</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.topmortar.topmortarseller</string>
+	<key>PROJECT_ID</key>
+	<string>top-mortar-seller</string>
+	<key>STORAGE_BUCKET</key>
+	<string>top-mortar-seller.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:492698925463:ios:12b4c766aa68b0729f2cd2</string>
+</dict>
+</plist>
