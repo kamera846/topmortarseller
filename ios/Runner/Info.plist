@@ -47,7 +47,7 @@
 	<true/>
 	<!-- My Permissions -->
 	<key>NSCameraUsageDescription</key>
-	<string>Aplikasi memerlukan akses untuk melakukan scan QR-CODE pada program promo yang tersedia.</string>
+	<string>Kamera digunakan untuk memindai kode QR promo dan mengirim foto kepada tim layanan pelanggan.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Aplikasi memerlukan akses untuk menyimpan Gambar (QRIS) ke galeri Anda.</string>
 	<key>ITSAppUsesNonExemptEncryption</key>

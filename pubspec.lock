@@ -169,6 +169,30 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.0.1"
+  firebase_core:
+    dependency: "direct main"
+    description:
+      name: firebase_core
+      sha256: "21551c1205441d9d155660ea0a409530b65a8d66ce88002bab3f38d94a8638fc"
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.1.0"
+  firebase_core_platform_interface:
+    dependency: transitive
+    description:
+      name: firebase_core_platform_interface
+      sha256: "9bfbc85faca09346471ac56fbcee00757ebcfd85887c6f602764eff0001902d8"
+      url: "https://pub.dev"
+    source: hosted
+    version: "8.1.1"
+  firebase_core_web:
+    dependency: transitive
+    description:
+      name: firebase_core_web
+      sha256: "0ec9832bfec1662629d6d09abd65021357634b2c10964970d3e96ab18c9458db"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.1.0"
   fixnum:
     dependency: transitive
     description:
@@ -300,10 +324,10 @@ packages:
     dependency: "direct main"
     description:
       name: image_gallery_saver_plus
-      sha256: "199b9e24f8d85e98f11e3d35571ab68ae50626ad40e2bb85c84383f69a6950ad"
+      sha256: "598beaaade0ead242416a6ef85883bb8f7f1c18f523c531c06c586a4688bd34a"
       url: "https://pub.dev"
     source: hosted
-    version: "4.0.1"
+    version: "5.1.1"
   intl:
     dependency: "direct main"
     description:
@@ -737,10 +761,10 @@ packages:
     dependency: "direct main"
     description:
       name: upgrader
-      sha256: "3fae4eb861c7e8567f91412d9ca4a287e024e58d6f79f98da79e3f6d78da74ba"
+      sha256: "5a117075c5d22844136a89a60cc0272602cb8a5d0ce371b15379ddf68a415588"
       url: "https://pub.dev"
     source: hosted
-    version: "12.5.0"
+    version: "13.7.0"
   url_launcher:
     dependency: "direct main"
     description:

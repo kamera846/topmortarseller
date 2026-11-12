@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Keep selection handles, dialogs and progress indicators on brand. -->
+    <style name="TopMortarChatTheme" parent="halochat_Theme">
+        <item name="colorPrimary">#B22222</item>
+        <item name="colorPrimaryDark">#B22222</item>
+        <item name="colorAccent">#B22222</item>
+        <item name="android:windowBackground">#F3F2ED</item>
+    </style>
+</resources>

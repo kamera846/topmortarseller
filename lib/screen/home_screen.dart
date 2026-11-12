@@ -7,7 +7,9 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:topmortarseller/model/contact_model.dart';
 import 'package:topmortarseller/screen/auth_screen.dart';
+import 'package:topmortarseller/screen/live_chat/live_chat_screen.dart';
 import 'package:topmortarseller/screen/merchandise/merchandise_screen.dart';
+import 'package:topmortarseller/screen/merchandise/merchandise_widgets.dart';
 import 'package:topmortarseller/screen/products/catalog_screen.dart';
 import 'package:topmortarseller/screen/profile/detail_profile_screen.dart';
 import 'package:topmortarseller/screen/profile/new_rekening_screen.dart';
@@ -17,6 +19,7 @@ import 'package:topmortarseller/services/auth_api.dart';
 import 'package:topmortarseller/services/cart_api.dart';
 import 'package:topmortarseller/services/customer_bank_api.dart';
 import 'package:topmortarseller/services/invoice_api.dart';
+import 'package:topmortarseller/services/live_chat_service.dart';
 import 'package:topmortarseller/services/notification_service.dart';
 import 'package:topmortarseller/services/point_api.dart';
 import 'package:topmortarseller/util/auth_settings.dart';
@@ -25,6 +28,7 @@ import 'package:topmortarseller/util/colors/color.dart';
 import 'package:topmortarseller/util/loading_item.dart';
 import 'package:topmortarseller/widget/dashboard/content_section.dart';
 import 'package:topmortarseller/widget/dashboard/hero_section.dart';
+import 'package:topmortarseller/widget/dashboard/live_chat_card.dart';
 import 'package:topmortarseller/widget/dashboard/menu_section.dart';
 import 'package:topmortarseller/widget/dashboard/promo_slider_section.dart';
 import 'package:topmortarseller/widget/modal/info_modal.dart';
@@ -73,7 +77,10 @@ class _HomeDashboardState extends State<HomeDashboard>
   final GlobalKey searchComponentKey = GlobalKey();
   double searchComponentOffset = 0;
   int navCurrentIndex = 0;
-  int totalPoint = 0;
+  int? totalPoint;
+  bool _isBrowsingMerchandise = false;
+  bool _isOpeningLiveChat = false;
+  int _pointRequest = 0;
   bool isLoadPoint = true;
   bool isLoading = true;
 
@@ -159,19 +166,24 @@ class _HomeDashboardState extends State<HomeDashboard>
   }
 
   Future<void> _getTotalPoint() async {
+    if (!mounted || isLoading || _isBrowsingMerchandise) return;
+    final request = ++_pointRequest;
     setState(() => isLoadPoint = true);
     final prefs = await SharedPreferences.getInstance();
     bool isSucces = false;
     String payload = widget.payload ?? '';
     final currentPoint = await PointApi.total(
       idContact: _userData.idContact!,
-      onError: (e) => showSnackBar(context, e),
+      onError: (e) {
+        if (mounted && request == _pointRequest) showSnackBar(context, e);
+      },
       onSuccess: (e) {
         isSucces = true;
       },
       onCompleted: (point) {},
     );
-    if (isSucces && mounted) {
+    if (!mounted || request != _pointRequest) return;
+    if (isSucces) {
       final savedTotalPoint =
           prefs.getInt(
             '${_userData.idContact!}-${GlobalEnum.savedTotalPoint}',
@@ -197,6 +209,46 @@ class _HomeDashboardState extends State<HomeDashboard>
         isLoadPoint = false;
       });
       _getCounterBadge();
+    } else {
+      setState(() {
+        totalPoint = null;
+        isLoadPoint = false;
+      });
+    }
+  }
+
+  Future<void> _openMerchandise() async {
+    final idContact = _userData.idContact;
+    if (idContact == null || idContact.isEmpty) return;
+    _isBrowsingMerchandise = true;
+    ++_pointRequest;
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => MerchandiseScreen(
+          idContact: idContact,
+          onPointsChanged: (points) {
+            if (!mounted) return;
+            setState(() {
+              totalPoint = points;
+              isLoadPoint = false;
+            });
+          },
+        ),
+      ),
+    );
+    _isBrowsingMerchandise = false;
+    if (mounted) await _getTotalPoint();
+  }
+
+  Future<void> _openLiveChat() async {
+    if (_isOpeningLiveChat) return;
+    _isOpeningLiveChat = true;
+    try {
+      await Navigator.of(
+        context,
+      ).push(MaterialPageRoute(builder: (_) => const LiveChatScreen()));
+    } finally {
+      _isOpeningLiveChat = false;
     }
   }
 
@@ -221,6 +273,7 @@ class _HomeDashboardState extends State<HomeDashboard>
       onCompleted: (data) => {},
     );
 
+    if (!mounted) return;
     setState(() {
       badgeCounters['cart'] = cart?.details.length ?? 0;
       badgeCounters['order'] = ongoingOrder?.length ?? 0;
@@ -628,6 +681,12 @@ class _HomeDashboardState extends State<HomeDashboard>
                           ),
                         ),
 
+                        if (LiveChatService.instance.isSupported)
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
+                            child: LiveChatCard(onTap: _openLiveChat),
+                          ),
+
                         /// -- Promo Slider --
                         PromoSliderSection(key: contentPromoKey),
 
@@ -675,37 +734,44 @@ class _HomeDashboardState extends State<HomeDashboard>
         //     fontWeight: FontWeight.bold,
         //   ),
         // ),
-        const Spacer(),
+        const SizedBox(width: 12),
         if (navCurrentIndex == 0) ...[
-          isLoadPoint
-              ? Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: const SizedBox(
-                    width: 50,
-                    child: LoadingItem(isPrimaryTheme: true),
-                  ),
-                )
-              : TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            MerchandiseScreen(userPoint: totalPoint),
+          Expanded(
+            child: isLoadPoint
+                ? Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: const SizedBox(
+                      width: 50,
+                      child: LoadingItem(isPrimaryTheme: true),
+                    ),
+                  )
+                : Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: totalPoint == null
+                          ? _getTotalPoint
+                          : _openMerchandise,
+                      child: Text(
+                        totalPoint == null
+                            ? 'Muat ulang poin'
+                            : '${formatPoints(totalPoint!)} Poin · Tukar →',
+                        style: TextStyle(
+                          color: Colors.amber,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
                       ),
-                    );
-                  },
-                  child: Text(
-                    "$totalPoint Poin, Tukarkan →",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.amber,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
                     ),
                   ),
-                ),
+          ),
         ] else ...[
+          const Spacer(),
+          if (LiveChatService.instance.isSupported)
+            IconButton(
+              onPressed: _openLiveChat,
+              tooltip: 'Chat CS',
+              icon: const Icon(Icons.support_agent_rounded, color: cWhite),
+            ),
           PopupMenuButton<String>(
             icon: const Icon(Icons.settings, color: cWhite),
 

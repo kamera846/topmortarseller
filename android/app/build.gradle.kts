@@ -3,6 +3,9 @@ import java.io.FileInputStream
 import org.gradle.api.GradleException
 plugins {
     id("com.android.application")
+    // START: FlutterFire Configuration
+    id("com.google.gms.google-services")
+    // END: FlutterFire Configuration
     id("kotlin-android")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
@@ -78,6 +81,10 @@ android {
 }
 
 dependencies {
+    implementation("com.github.afgventura.halochat-android:halochat-ui:0.2.1")
+    // HaloChatActivity exposes AppCompatActivity in its public type hierarchy.
+    implementation("androidx.appcompat:appcompat:1.7.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
     // for flutter local notifcations
     add("coreLibraryDesugaring", "com.android.tools:desugar_jdk_libs:2.1.4")
 }
