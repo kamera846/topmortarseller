@@ -426,9 +426,35 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                               ),
                             ],
                           ),
-                          Text(
-                            'x${product.qtyAppOrderDetail}${product.isBonus == "1" ? ' (Free)' : ''}',
-                            style: TextStyle(color: cDark200),
+                          Row(
+                            children: [
+                              Text(
+                                'x${product.qtyAppOrderDetail}${product.isBonus == "1" ? ' (Free)' : ''}',
+                                style: const TextStyle(color: cDark200),
+                              ),
+                              if (product.isBonus == "1" &&
+                                  product.idVouchers != null) ...[
+                                const SizedBox(width: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 6,
+                                    vertical: 2,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: cPrimary200.withAlpha(30),
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: const Text(
+                                    'Bonus Voucher',
+                                    style: TextStyle(
+                                      color: cPrimary200,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ],
                           ),
                         ],
                       ),

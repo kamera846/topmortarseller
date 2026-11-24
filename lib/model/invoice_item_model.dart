@@ -1,6 +1,7 @@
 class InvoiceItemModel {
   final String idProduct;
   final String isBonus;
+  final String noVoucher;
   final String namaProduk;
   final String price;
   final String qtyProduk;
@@ -13,6 +14,7 @@ class InvoiceItemModel {
   InvoiceItemModel({
     required this.idProduct,
     required this.isBonus,
+    required this.noVoucher,
     required this.namaProduk,
     required this.price,
     required this.qtyProduk,
@@ -26,6 +28,7 @@ class InvoiceItemModel {
   InvoiceItemModel copyWith({
     String? idProduct,
     String? isBonus,
+    String? noVoucher,
     String? namaProduk,
     String? price,
     String? qtyProduk,
@@ -38,6 +41,7 @@ class InvoiceItemModel {
     return InvoiceItemModel(
       idProduct: idProduct ?? this.idProduct,
       isBonus: isBonus ?? this.isBonus,
+      noVoucher: noVoucher ?? this.noVoucher,
       namaProduk: namaProduk ?? this.namaProduk,
       price: price ?? this.price,
       qtyProduk: qtyProduk ?? this.qtyProduk,
@@ -52,6 +56,7 @@ class InvoiceItemModel {
   Map<String, dynamic> toJson() => {
     'is_produk': idProduct,
     'is_bonus': isBonus,
+    'no_voucher': noVoucher,
     'nama_produk': namaProduk,
     'price': price,
     'qty_produk': qtyProduk,
@@ -66,6 +71,7 @@ class InvoiceItemModel {
     return InvoiceItemModel(
       idProduct: json['id_produk'] ?? '',
       isBonus: json['is_bonus'] ?? '',
+      noVoucher: json['no_voucher'] ?? '',
       namaProduk: json['nama_produk'] ?? '',
       price: json['price'] ?? '',
       qtyProduk: json['qty_produk'] ?? '',
