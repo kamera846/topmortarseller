@@ -604,6 +604,41 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
                 item.isBonus == '1'
                     ? Text('(Free)', style: TextStyle(color: cDark200))
                     : const SizedBox.shrink(),
+                if (item.noVoucher.trim().isNotEmpty)
+                  Container(
+                    width: double.infinity,
+                    margin: const EdgeInsets.only(top: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: cPrimary200.withAlpha(20),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.confirmation_number_outlined,
+                          size: 16,
+                          color: cPrimary200,
+                        ),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            'No. Voucher: ${item.noVoucher.trim()}',
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: cPrimary200,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
               ],
             );
           },
