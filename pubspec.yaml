@@ -1,7 +1,7 @@
 name: topmortarseller
 description: Aplikasi untuk toko atau penjual produk Top Mortar.
 publish_to: "none" # Remove this line if you wish to publish to pub.dev
-version: 1.4.26112433+33
+version: 1.4.26112435+35
 
 environment:
   sdk: ^3.9.2
@@ -33,6 +33,12 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
+
+dependency_overrides:
+  # path_provider_foundation brings this in transitively. Versions before
+  # 9.4.1 omit DWARF symbols from the iOS framework, triggering App Store
+  # Connect's missing-dSYM warning.
+  objective_c: ^9.4.1
 
 flutter_launcher_icons:
   android: true

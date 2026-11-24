@@ -208,6 +208,7 @@
 				3B06AD1E1E4923F5004D2608 /* Thin Binary */,
 				D7A5820F4BE3A9A0F39CE839 /* [CP] Embed Pods Frameworks */,
 				F4D40D3D9D27E364C9DB8B5F /* [CP] Copy Pods Resources */,
+				C88AF1000000000000000005 /* Generate objective_c dSYM */,
 			);
 			buildRules = (
 			);
@@ -387,6 +388,22 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		C88AF1000000000000000005 /* Generate objective_c dSYM */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Generate objective_c dSYM";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [ \"$PLATFORM_NAME\" != \"iphoneos\" ]; then\n  exit 0\nfi\n\nFRAMEWORK_BINARY=\"$TARGET_BUILD_DIR/$FRAMEWORKS_FOLDER_PATH/objective_c.framework/objective_c\"\nif [ ! -f \"$FRAMEWORK_BINARY\" ]; then\n  echo \"warning: objective_c.framework not found at $FRAMEWORK_BINARY; skipping dSYM generation\"\n  exit 0\nfi\n\nOUTPUT_DSYM=\"$DWARF_DSYM_FOLDER_PATH/objective_c.framework.dSYM\"\nmkdir -p \"$DWARF_DSYM_FOLDER_PATH\"\nrm -rf \"$OUTPUT_DSYM\"\n/usr/bin/xcrun dsymutil \"$FRAMEWORK_BINARY\" -o \"$OUTPUT_DSYM\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
